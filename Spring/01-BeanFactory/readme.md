@@ -1,5 +1,7 @@
 # org.springframework.beans.factory.BeanFactory
 
+工厂模式
+
 
 
 # 问题：
@@ -11,11 +13,9 @@
 
 
 
-# spring源码地址
+# 源码地址
 
 https://github.com/liuxianfa520/spring-framework
-
-# 测试用例
 
 org.springframework.beans.factory.xml.XmlBeanFactoryTests#testHelloService
 
@@ -23,3 +23,10 @@ org.springframework.beans.factory.xml.XmlBeanFactoryTests#testHelloService
 
 
 
+# 资源
+
+BeanFactory#getBean方法源码讲解视频： https://www.bilibili.com/video/BV1oW41167AV?p=49
+
+《Spring源码深度解析（第2版）》
+
+![image-20210317194152027](images/image-20210317194152027.png)
