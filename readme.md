@@ -9,7 +9,8 @@
 - [bean定义 BeanDefinition](Spring/02-BeanDefinition/readme.md)
 - [循环依赖 circularReference](Spring/03-circularReference/readme.md)
 
-
+- 疑问&解答
+  - [不支持静态方法&字段自动注入](Spring\疑问&解答\不支持静态方法&字段自动注入.md)
 
 
 
