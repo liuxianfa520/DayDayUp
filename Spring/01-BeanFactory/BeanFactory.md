@@ -8,7 +8,7 @@
 
 - spring 是如何获取一个bean的？
 - spring 创建bean流程是？
-- spring ioc容器是什么？
+- [spring 实例化bean](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-class)
 - spring bean生命周期是？
 
 
@@ -24,6 +24,9 @@ org.springframework.beans.factory.xml.XmlBeanFactoryTests#testHelloService
 
 
 # 资源
+
+
+https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-introduction
 
 BeanFactory#getBean方法源码讲解视频： https://www.bilibili.com/video/BV1oW41167AV?p=49
 

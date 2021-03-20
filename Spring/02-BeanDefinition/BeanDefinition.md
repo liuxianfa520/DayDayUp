@@ -16,3 +16,11 @@
 # spring源码地址
 
 https://github.com/liuxianfa520/spring-framework
+
+
+
+
+
+
+
+[bean定义继承](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-child-bean-definitions)
