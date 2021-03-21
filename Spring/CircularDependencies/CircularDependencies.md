@@ -22,13 +22,6 @@ https://github.com/liuxianfa520/spring-framework
 
 com.atguigu.test.circularReference.useSetter.CircularDependencyTest
 
-com.atguigu.test.circularReference.prototype.CircularDependencyWithPrototypeBeanTest
-
-com.atguigu.test.circularReference.useConstructor.CircularDependencyUseConstructorTest
-
-
-
-
 
 
 
@@ -52,3 +45,11 @@ com.atguigu.test.circularReference.prototype.CircularDependencyWithPrototypeBean
 com.atguigu.test.circularReference.useConstructor.CircularDependencyUseConstructorTest
 
 ![image-20210320165141492](images/image-20210320165141492.png)
+
+## 最终bean被包装 has eventually been wrapped
+
+com.atguigu.test.circularReference.withEventuallyWrappedBean.withEventuallyWrappedBean.CircularDependencyWithEventuallyWrappedBeanTest
+
+com.atguigu.test.circularReference.withEventuallyWrappedBean.withAsyncAnnotation.CircularDependencyWithAsyncTest
+
+![image-20210321203549648](images/image-20210321203549648.png)
