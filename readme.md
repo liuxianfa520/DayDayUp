@@ -5,9 +5,9 @@
 
 
 # Spring源码
-- [bean工厂 BeanFactory](Spring/01-BeanFactory/readme.md)
-- [bean定义 BeanDefinition](Spring/02-BeanDefinition/readme.md)
-- [循环依赖 circularReference](Spring/03-circularReference/readme.md)
+- [bean工厂 BeanFactory](Spring/BeanFactory/BeanFactory.md)
+- [bean定义 BeanDefinition](Spring/BeanDefinition/BeanDefinition.md)
+- [循环依赖 circularReference](Spring/CircularDependencies/CircularDependencies.md)
 
 - 疑问&解答
   - [不支持静态方法&字段自动注入](Spring\疑问&解答\不支持静态方法&字段自动注入.md)
