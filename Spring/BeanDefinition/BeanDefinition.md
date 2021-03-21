@@ -13,9 +13,11 @@
 
 
 
-# spring源码地址
+# 源码阅读
 
 https://github.com/liuxianfa520/spring-framework
+
+org.springframework.beans.factory.xml.XmlBeanFactoryTests#testLoadBeanDefinitions
 
 
 
