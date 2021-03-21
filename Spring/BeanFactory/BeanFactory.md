@@ -12,14 +12,14 @@
 
 
 
-# 问题：
+# 问题
 
 - spring bean生命周期是？[参考博客](https://www.jianshu.com/p/1dec08d290c1)
-  - 实例化 Instantiation
-  - 属性赋值 Populate
-  - 初始化 Initialization
+  - 实例化 createBeanInstance()
+  - 属性赋值 populateBean()
+  - 初始化 initializeBean()
   - 销毁 Destruction
-- *[spring 实例化bean三种方式](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-class)
+- *spring 实例化bean三种方式 [参考官方文档](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-class)
   - 使用构造器
   - 使用静态工厂方法
   - 使用一个工厂方法
