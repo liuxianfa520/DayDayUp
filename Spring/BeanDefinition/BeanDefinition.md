@@ -25,7 +25,7 @@
     	public int scan(String... basePackages) {
     		int beanCountAtScanStart = this.registry.getBeanDefinitionCount();
     
-    		// 包扫描
+    		// 包扫描。
     		doScan(basePackages);
     
     		// Register annotation config processors, if necessary.
@@ -56,7 +56,9 @@
   - `com.alibaba.dubbo.config.spring.schema.DubboNamespaceHandler`
   - META-INF\spring.handlers 中配置：http\://code.alibabatech.com/schema/dubbo=com.alibaba.dubbo.config.spring.schema.DubboNamespaceHandler
 - *超纲问题：使用@Controller、@Service、@Component注解的类，spring是如何解析的呢？*
-  - org.springframework.context.annotation.ConfigurationClassPostProcessor#postProcessBeanDefinitionRegistry
+  - *org.springframework.context.annotation.ConfigurationClassPostProcessor#postProcessBeanDefinitionRegistry*
+  - *这是一个 **bean工厂注册中心后置处理器：BeanDefinitionRegistryPostProcessor***
+  - *注意：实际上调用的是 ClassPathBeanDefinitionScanner 的`doScan()`方法，而不是`scan()`方法。*
   - ![image-20210328001114068](images/image-20210328001114068.png)
 
 
