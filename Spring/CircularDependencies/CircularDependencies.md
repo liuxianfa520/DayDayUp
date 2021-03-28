@@ -1,4 +1,10 @@
 # spring循环依赖
+
+- spring**默认**支持**单例bean**之间**基于setter注入**的循环依赖。
+- 默认：AbstractAutowireCapableBeanFactory#allowCircularReferences 默认为true。只要修改为false则让spring不支持循环依赖。
+- 单例bean：protype原型模式的bean存在循环依赖时，会直接报错。
+- 基于setter：如果单例bean是基于构造器注入的循环依赖，会直接报错。
+
 [spring官方文档：依赖处理过程](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-dependency-resolution)
 
 
@@ -11,7 +17,12 @@
   - prototype bean的循环依赖问题，无法解决。
   - 会抛出异常： `BeanCurrentlyInCreationException`
 - 是通过哪种方式解决的？
+  - 是使用 暴露**早期bean**引用的方式 —— 把早期bean的引用放到 **singletonFactories** 三级缓存中。
+  - 早期bean：指尚未经过**bean填充**和**初始化**的对象。
+  - bean填充：populateBean(beanName, mbd, instanceWrapper);
+  - 初始化：initializeBean(beanName, exposedObject, mbd);
 - spring ioc容器中的三级缓存是什么？能否改成二级缓存？
+  - **singletonFactories** 存放**早期bean**用的。放的都是ObjectFactory对象工厂。
 
 
 
@@ -24,6 +35,7 @@ com.atguigu.test.circularReference.useSetter.CircularDependencyTest
 
 
 
+# 图示
 
 ![Spring解决循环依赖的步骤【简图】](Spring解决循环依赖的步骤【简图】.jpg)
 ![Spring解决循环依赖的步骤](Spring解决循环依赖的步骤.png)
@@ -53,3 +65,18 @@ com.atguigu.test.circularReference.withEventuallyWrappedBean.withEventuallyWrapp
 com.atguigu.test.circularReference.withEventuallyWrappedBean.withAsyncAnnotation.CircularDependencyWithAsyncTest
 
 ![image-20210321203549648](images/image-20210321203549648.png)
+
+
+
+
+
+
+
+# 一个超纲的问题
+
+在spring中，aop增强两个存在循环引用的bean，各自注入的bean，是否为代理对象呢？spring是如何实现的？
+
+![image-20210328233718083](images/image-20210328233718083.png)
+
+- 首先要知道spring是如何解决循环依赖的
+- 要知道aop在bean生命周期中，什么时候创建代理对象的。（有两个地方）
