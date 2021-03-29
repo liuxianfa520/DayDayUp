@@ -18,7 +18,8 @@
 - 在bean的哪个生命周期时创建的代理对象？
   - AbstractAutoProxyCreator#postProcessAfterInitialization 在bean初始化完毕后，对目标bean创建代理对象。
   - AbstractAutoProxyCreator#getEarlyBeanReference 在早期引用的时，对目标bean创建代理对象。（只有存在循环依赖时，才会使用此方式创建代理对象）
-
+- aop调用 AbstractAutoProxyCreator#postProcessBeforeInstantiation 方法,有什么作用?
+  - 
 
 
 
