@@ -15,11 +15,20 @@
   - Cglib动态代理
   - 设置proxyTargetClass=true就用Cglib动态代理
   - 如果proxyTargetClass=false并且目标class是接口，则用JDK动态代理
+  
 - 在bean的哪些生命周期时创建aop代理对象？
   - AbstractAutoProxyCreator#postProcessAfterInitialization
-  - AbstractAutoProxyCreator#getEarlyBeanReference
+- AbstractAutoProxyCreator#getEarlyBeanReference
   - AbstractAutoProxyCreator#postProcessBeforeInstantiation
-  - 详见 [在bean的哪个生命周期时创建的代理对象？](#在bean的哪个生命周期时创建的代理对象？)
+- 详见此篇文章最后，单独章节 
+  
+- 在什么时候解析带有 @Aspect 注解的切面？
+
+  - 把切面解析成增强器？
+  - 把切面解析成Pointcut？
+  - BeanFactoryAspectJAdvisorsBuilder#buildAspectJAdvisors
+  
+  
 
 
 
@@ -121,10 +130,6 @@ public final class LoginServiceImpl$Proxy extends Proxy implements LoginService 
 
 
 
-
-
-
-
 # Cglib原生动态代理
 
 - com.atguigu.test.cglib.CglibTest 一个简单的cglib动态代理测试用例
@@ -174,11 +179,117 @@ public final class LoginServiceImpl$Proxy extends Proxy implements LoginService 
 
 
 
+# Spring-aop API
+
+官方文档：https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#aop-api
+
+中文文档：https://www.php.cn/manual/view/21776.html
+
+## 1、切点 Pointcut
+
+org.springframework.aop.aspectj.AspectJExpressionPointcut
+
+![image-20210403223052123](images/image-20210403223052123.png)
+
+org.springframework.aop.aspectj.AspectJExpressionPointcut 的使用：
+
+![image-20210403230455284](images/image-20210403230455284.png)
+
+Pointcut 其他实现类：
+
+- 抽象的静态切点 StaticMethodMatcherPointcut
+
+  - ```java
+    public abstract class StaticMethodMatcherPointcut extends StaticMethodMatcher implements Pointcut{
+    	@Override
+    	public final MethodMatcher getMethodMatcher() {
+    		return this; // StaticMethodMatcher 静态方法匹配器器——  isRuntime()返回false
+    	}
+    }
+    ```
+
+- 基于正则的方法切点 JdkRegexpMethodPointcut          [官方文档](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#aop-api-pointcuts-regex)
+
+- 动态切点    [官方文档](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#aop-api-pointcuts-dynamic)
+  - 
 
 
 
 
-# AopProxyFactory
+
+## 2、通知 Advice
+
+- 官方文档：[Advice API in Spring](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#aop-api-advice)
+
+- **每个通知都是一个Spring bean。**
+
+- **一个通知实例既可以被所有被通知的对象共享，也可以被每个被通知对象独占。** 这根据设置*类共享（per-class）*或*基于实例（per-instance）*的参数来决定。
+- 【疑问：基于实例的Advice 如何开启？使用场景是？】
+  - 目前有一下线索，可供理解：
+  - org.springframework.aop.Advisor#isPerInstance
+
+#### Spring里的通知类型
+
+- 拦截环绕通知  MethodInterceptor 
+
+- 前置通知 MethodBeforeAdvice
+
+- 异常通知 ThrowsAdvice
+
+  - ThrowsAdvice 不包含任何方法： 它只是一个标记接口，用来标识所给对象实现了一个或者多个针对特定类型的异常通知方法。这些方法应当满足下面的格式:
+
+    afterThrowing([Method, args, target], subclassOfThrowable) 
+
+- 后置通知 AfterReturningAdvice 
+
+- 引入通知  IntroductionInterceptor ？？？ 
+
+  - https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#aop-api-advice-introduction
+  - https://www.php.cn/manual/view/21790.html#aop-api-advice-introduction
+
+
+
+
+
+## 3、通知器 Advisor 
+
+官方文档：[The Advisor API in Spring](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#aop-api-advisor)
+
+中文文档：[Spring里的Advisor API](https://www.php.cn/manual/view/21798.html)
+
+![image-20210404003252472](images/image-20210404003252472.png)
+
+
+
+## 4、ProxyFactoryBean
+
+org.springframework.aop.framework.ProxyFactoryBean
+
+![image-20210404003827589](images/image-20210404003827589.png)
+
+
+
+
+
+
+
+
+
+
+
+
+
+## 5、切面增强器创建工厂 AspectJAdvisorFactory
+
+![image-20210403221243797](images/image-20210403221243797.png)
+
+![image-20210403224749422](images/image-20210403224749422.png)
+
+
+
+
+
+## 6、AopProxyFactory
 
 org.springframework.aop.framework.AopProxyFactory
 
@@ -190,7 +301,45 @@ org.springframework.aop.framework.AopProxyFactory
 
 
 
-# AopProxy
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## 7、AopProxy
 
 org.springframework.aop.framework.AopProxy
 
@@ -236,7 +385,7 @@ org.springframework.aop.framework.CglibAopProxy
 
 
 
-# 在bean的哪个生命周期时创建的代理对象？
+# 在bean的哪些生命周期时创建aop代理对象？
 
 ![image-20210330001415390](images/image-20210330001415390.png)
 
