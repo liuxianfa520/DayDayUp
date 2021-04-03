@@ -15,14 +15,11 @@
   - Cglib动态代理
   - 设置proxyTargetClass=true就用Cglib动态代理
   - 如果proxyTargetClass=false并且目标class是接口，则用JDK动态代理
-- 在bean的哪个生命周期时创建的代理对象？
-  - AbstractAutoProxyCreator#postProcessAfterInitialization 在bean初始化完毕后，对目标bean创建代理对象。
-  - AbstractAutoProxyCreator#getEarlyBeanReference 在早期引用的时，对目标bean创建代理对象。（只有存在循环依赖时，才会使用此方式创建代理对象）
-  - AbstractAutoProxyCreator#postProcessBeforeInstantiation  ？？？？？？？
-- aop调用 AbstractAutoProxyCreator#postProcessBeforeInstantiation 方法,有什么作用?
-  - ![image-20210329172855706](images/image-20210329172855706.png)
-
-
+- 在bean的哪些生命周期时创建aop代理对象？
+  - AbstractAutoProxyCreator#postProcessAfterInitialization
+  - AbstractAutoProxyCreator#getEarlyBeanReference
+  - AbstractAutoProxyCreator#postProcessBeforeInstantiation
+  - 详见 [在bean的哪个生命周期时创建的代理对象？](#在bean的哪个生命周期时创建的代理对象？)
 
 
 
@@ -243,13 +240,26 @@ org.springframework.aop.framework.CglibAopProxy
 
 ![image-20210330001415390](images/image-20210330001415390.png)
 
-- AbstractAutoProxyCreator#postProcessAfterInitialization 在bean初始化完毕后，对目标bean创建代理对象。
+![image-20210330001220491](images/image-20210330001220491.png)
 
-- AbstractAutoProxyCreator#getEarlyBeanReference 在早期引用的时，对目标bean创建代理对象。（只有存在循环依赖时，才会使用此方式创建代理对象）
+- AbstractAutoProxyCreator#postProcessAfterInitialization
+
+  - 在bean初始化完毕后，对目标bean创建代理对象。
+
+- AbstractAutoProxyCreator#getEarlyBeanReference
+
+  - 在早期引用的时，对目标bean创建代理对象。
+  - 注：只有存在循环依赖时，才会使用此方式创建代理对象
 
 - AbstractAutoProxyCreator#postProcessBeforeInstantiation
 
-  ![image-20210330001220491](images/image-20210330001220491.png)
+  - 在spring bean生命周期中的**实例化**之前，可以以自定义的方式实例化目标对象，跳过spring默认的实例化过程。然后创建代理对象。
+
+  - ![image-20210329172855706](images/image-20210329172855706.png)
+
+  - ![image-20210403135258554](images/image-20210403135258554.png)
+  - TargetSource 官方文档: https://docs.spring.io/spring/docs/5.0.18.RELEASE/spring-framework-reference/core.html#aop-targetsource
+  - TargetSource 中文文档: https://www.php.cn/manual/view/21815.html
 
 
 
@@ -257,5 +267,6 @@ org.springframework.aop.framework.CglibAopProxy
 
 # 参考
 
-## [死磕Spring AOP系列5：设计模式在AOP中的使用](https://blog.51cto.com/dba10g/1786250)
+## [Spring中文文档](https://www.php.cn/manual/view/21776.html)
 
+## [死磕Spring AOP系列5：设计模式在AOP中的使用](https://blog.51cto.com/dba10g/1786250)
