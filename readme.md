@@ -8,7 +8,7 @@
 - [bean工厂 BeanFactory](Spring/BeanFactory/BeanFactory.md)
 - [bean定义 BeanDefinition](Spring/BeanDefinition/BeanDefinition.md)
 - [循环依赖 circularReference](Spring/CircularDependencies/CircularDependencies.md)
-
+- [AOP](Spring/AOP/aop.md)
 - 疑问&解答
   - [不支持静态方法&字段自动注入](Spring\疑问&解答\不支持静态方法&字段自动注入.md)
 
