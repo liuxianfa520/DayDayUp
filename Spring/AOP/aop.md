@@ -17,10 +17,11 @@
   - 如果proxyTargetClass=false并且目标class是接口，则用JDK动态代理
   
 - 在bean的哪些生命周期时创建aop代理对象？
+  
   - AbstractAutoProxyCreator#postProcessAfterInitialization
-- AbstractAutoProxyCreator#getEarlyBeanReference
+  - AbstractAutoProxyCreator#getEarlyBeanReference
   - AbstractAutoProxyCreator#postProcessBeforeInstantiation
-- 详见此篇文章最后，单独章节 
+  - 详见此篇文章最后，单独章节 
   
 - 在什么时候解析带有 @Aspect 注解的切面？
 
@@ -211,6 +212,7 @@ Pointcut 其他实现类：
 - 基于正则的方法切点 JdkRegexpMethodPointcut          [官方文档](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#aop-api-pointcuts-regex)
 
 - 动态切点    [官方文档](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#aop-api-pointcuts-dynamic)
+  
   - 
 
 
@@ -261,11 +263,61 @@ Pointcut 其他实现类：
 
 
 
+把Advice包装成Advisor的方法：
+
+![image-20210404213203261](images/image-20210404213203261.png)
+
+#### AdvisorAdapter
+
+- Advisor的适配器
+
+- org.springframework.aop.framework.adapter.AdvisorAdapter
+
+- 设计模式：适配器模式
+- 总共有三个子类
+- ![image-20210404225800656](images/image-20210404225800656.png)
+
+
+
+
+
 ## 4、ProxyFactoryBean
 
 org.springframework.aop.framework.ProxyFactoryBean
 
+测试用例：org.springframework.aop.framework.ProxyFactoryBeanTests
+
 ![image-20210404003827589](images/image-20210404003827589.png)
+
+本质上是个 FactoryBean 。可以很方便的对一个bean创建aop代理对象。
+
+有几个很重要的属性：
+
+- target 设置被代理的目标对象  <property name="target"><ref bean="test"/></property>
+
+- targetName 被代理对象的beanName
+
+- interfaces 目标对象实现的接口  <property name="interfaces"><value>xx.ITestBean</value></property>
+
+- interceptorNames 设置拦截器。最后一个元素也可以设置为 目标对象的beanName 或 目标对象的 TargetSource 的beanName
+
+- ```xml
+  <bean id="testBean" class="org.springframework.tests.sample.beans.TestBean"/>
+  
+  <bean id="debugInterceptor" class="org.springframework.tests.aop.interceptor.NopInterceptor"/>
+  <bean id="debugInterceptor" class="org.springframework.aop.interceptor.DebugInterceptor"/>
+  
+  <bean id="test1" class="org.springframework.aop.framework.ProxyFactoryBean">
+    <!-- 设置两个拦截器 ，最后一个设置为目标对象的beanName -->
+    <property name="interceptorNames"><value>debugInterceptor,debugInterceptor,testBean</value></property>
+  </bean>
+  ```
+
+- 如果使用任意方式都无法找到 target ，则在方法调用的时候，就会NPE.
+
+- [官方文档](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#aop-pfb)
+
+- [中文文档](https://www.php.cn/manual/view/21799.html)
 
 
 
