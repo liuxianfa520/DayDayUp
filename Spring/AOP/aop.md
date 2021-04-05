@@ -221,7 +221,7 @@ Pointcut 其他实现类：
 
 ## 2、通知 Advice
 
-- 官方文档：[Advice API in Spring](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#aop-api-advice)
+- 官方文档：[Advice API in Spring](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#aop-api-advice)              [中文文档](https://www.php.cn/manual/view/21790.html)
 
 - **每个通知都是一个Spring bean。**
 
@@ -231,6 +231,8 @@ Pointcut 其他实现类：
   - org.springframework.aop.Advisor#isPerInstance
 
 #### Spring里的通知类型
+
+- [官方文档](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#aop-api-advice-types)           [中文文档](https://www.php.cn/manual/view/21790.html#aop-api-advice-types)
 
 - 拦截环绕通知  MethodInterceptor 
 
@@ -246,6 +248,8 @@ Pointcut 其他实现类：
 
 - 引入通知  IntroductionInterceptor ？？？ 
 
+  - ![image-20210405200845266](images/image-20210405200845266.png)
+  - 引入通知不能和任何切入点一起使用，因为它是应用在类级别而不是方法级别。 
   - https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#aop-api-advice-introduction
   - https://www.php.cn/manual/view/21790.html#aop-api-advice-introduction
 
@@ -270,12 +274,31 @@ Pointcut 其他实现类：
 #### AdvisorAdapter
 
 - Advisor的适配器
-
 - org.springframework.aop.framework.adapter.AdvisorAdapter
-
 - 设计模式：适配器模式
 - 总共有三个子类
 - ![image-20210404225800656](images/image-20210404225800656.png)
+
+#### Advisor 和 Advice 的区别
+
+这一小节只是的个人理解。
+
+- 我们知道AOP是面向切面编程，那如何理解AOP描述了什么事情呢？如何理解Advisor和Advice两个接口的区别呢？
+  - 翻译过来，Advice表示通知；Advisor表示通知器。
+
+- 可以从下面 `Advisor` 接口的实现上发现一个问题：并没有直接实现`Advisor`接口的实现类。*（PrototypePlaceholderAdvisor是私有内部类，忽略之。因为这个内部类必须依附于其外部类才能使用。）*
+
+  ![image-20210405230434059](images/image-20210405230434059.png)
+
+- 个人理解为：`Advice`只是对**增强逻辑**的抽象（也就是描述了要**做什么**），但我们不知道要在**哪里**做这些事情。
+
+所以才需要有 `Pointcut`切入点接口：这个接口描述了**要在哪里做**
+
+- `Advice`和`Pointcut`配合起来描述了：**我们要在哪里做增强。**也就是 `org.springframework.aop.PointcutAdvisor` 接口。
+- 举一个房屋中介的例子来理解：
+  - Advisor可以理解为：卖方中介本人，这中介会快速地帮房主卖掉房子，事成之后，收取一定的手续费。
+  - 拆解一下：中介这个人拥有卖房子的能力。也就是Advice
+  - 但是中介也不是随便碰到一个人就去卖人家的房子。那肯定是先要判断一下哪些人是需要卖房子的。也就是Pointcut切入点。
 
 
 
@@ -318,6 +341,76 @@ org.springframework.aop.framework.ProxyFactoryBean
 - [官方文档](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#aop-pfb)
 
 - [中文文档](https://www.php.cn/manual/view/21799.html)
+
+
+
+
+
+## 5、ProxyFactory
+
+- org.springframework.aop.framework.ProxyFactory
+- 测试用例：org.springframework.aop.framework.ProxyFactoryTests
+- It is easy to create AOP proxies programmatically with Spring. This lets you use Spring AOP without dependency on Spring IoC. 使用Spring以编程方式创建AOP代理是很容易的。这使你可以使用Spring AOP而不必依赖于Spring IoC。
+```java
+  ProxyFactory factory = new ProxyFactory(myBusinessInterfaceImpl); 
+  factory.addAdvice(myMethodInterceptor); 
+  factory.addAdvisor(myAdvisor); 
+  MyBusinessInterface tb = (MyBusinessInterface) factory.getProxy();
+```
+
+- 官方文档：[使用ProxyFactory以编程方式(不使用SpringIoc容器)创建aop代理](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#aop-prog)
+- 中文文档：https://www.php.cn/manual/view/21807.html
+- 问题：ProxyFactory 和 AopProxyFactory 有什么区别 ？？？
+
+
+
+## 6、Advised
+
+- Advised 类可以理解为：用来对多个Advice通知和Advisor通知器集合的管理工具类。
+- 主要的方法：
+
+| 方法 | 描述 |
+| ---- | ---- |
+| Advisor[] getAdvisors(); | 返回管理的Advisor集合 |
+| void addAdvice(Advice advice) throws AopConfigException; | 在集合最后添加Advice通知 |
+| void addAdvice(int pos, Advice advice) throws AopConfigException; | 在集合指定下标位置添加Advice通知 |
+| void addAdvisor(Advisor advisor) throws AopConfigException; | 在集合最后添加Advisor通知器 |
+| void addAdvisor(int pos, Advisor advisor) throws AopConfigException; | 在集合指定下标位置添加Advisor通知器 |
+| int indexOf(Advisor advisor); | 获取通知器的下标 |
+| boolean removeAdvisor(Advisor advisor) throws AopConfigException; | 移除Advisor通知器 |
+| void removeAdvisor(int index) throws AopConfigException; | 移除指定下标的Advisor通知器 |
+| boolean replaceAdvisor(Advisor a, Advisor b) throws AopConfigException; | 替换Advisor通知器 |
+| boolean isFrozen(); | 是否冻结配置（冻结配置之后再修改就会报错） |
+
+- 官方文档：[Manipulating Advised Objects](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#aop-api-advised)
+- 中文文档：[操作被通知对象](https://www.php.cn/manual/view/21808.html)
+
+
+
+## 7、使用自动代理 auto-proxy
+
+`org.springframework.aop.framework.autoproxy`包提供了标准自动代理创建器。
+
+- BeanNameAutoProxyCreator 为指定的beanName或beanName通配符的bean自动创建代理对象。
+
+  - ```xml
+    <bean class="org.springframework.aop.framework.autoproxy.BeanNameAutoProxyCreator">
+    	<!-- 指定需要创建aop代理的beanName -->
+        <property name="beanNames" value="jdk*,onlyJdk"/> 
+        <property name="interceptorNames">
+            <list><value>myInterceptor</value></list>
+        </property>
+    </bean>
+    ```
+
+- DefaultAdvisorAutoProxyCreator 
+
+  - 会自动应用上下文中合格的通知器Advisor。使用步骤：
+  - 1、在容器中注入 DefaultAdvisorAutoProxyCreator 
+  - 2、在上下文中注入任意数量的**通知器(Advisor的子类)**。
+    - 注意必须注入的是**通知器Advisor**而不仅仅是**拦截器MethodInterceptor**或者其它**通知Advice**。 这点是必要的，因为必须有一个切入点被评估，以便检查每个通知候选bean定义的合适性。
+    - 这里需要很明确的区分出下面几个接口的概念：Advice、MethodInterceptor、Advisor
+    - [官方文档](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#aop-api-autoproxy-default)           [中文文档](https://www.php.cn/manual/view/21809.html#aop-api-autoproxy-default)        
 
 
 
@@ -428,12 +521,6 @@ org.springframework.aop.framework.CglibAopProxy
 
 
 
-
-# ProxyFactory
-
-- org.springframework.aop.framework.ProxyFactory
-- 疑问：ProxyFactory 和 AopProxyFactory 有什么区别？？？？？
-- 
 
 
 
