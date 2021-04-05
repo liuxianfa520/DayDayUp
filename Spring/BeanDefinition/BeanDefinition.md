@@ -1,4 +1,21 @@
 # BeanDefinition
+
+- BeanDefinition
+
+  [**Table 1. The bean definition**](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-definition)
+
+  |         Property         | Explained in…                                                |
+  | :----------------------: | :----------------------------------------------------------- |
+  |          Class           | [Instantiating Beans](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-class) |
+  |           Name           | [Naming Beans](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-beanname) |
+  |          Scope           | [Bean Scopes](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-scopes) |
+  |  Constructor arguments   | [Dependency Injection](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-collaborators) |
+  |        Properties        | [Dependency Injection](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-collaborators) |
+  |     Autowiring mode      | [Autowiring Collaborators](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-autowire) |
+  | Lazy initialization mode | [Lazy-initialized Beans](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-lazy-init) |
+  |  Initialization method   | [Initialization Callbacks](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-lifecycle-initializingbean) |
+  |    Destruction method    | [Destruction Callbacks](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-lifecycle-disposablebean) |
+
 - BeanDefinitionReader
 
   - ```java
@@ -10,6 +27,8 @@
   - 接口定义了：从各种资源中，加载 `BeanDefinition`，并注册到 `BeanDefinitionRegistry` 中
   
   - 返回int：表示从此资源加载的 `BeanDefinition` 的数量
+  
+  - [官方文档](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-client)
   
 - BeanDefinitionParser
 
@@ -55,6 +74,7 @@
   - 实现`BeanDefinitionParser`
   - `com.alibaba.dubbo.config.spring.schema.DubboNamespaceHandler`
   - META-INF\spring.handlers 中配置：http\://code.alibabatech.com/schema/dubbo=com.alibaba.dubbo.config.spring.schema.DubboNamespaceHandler
+  - 官方文档：[创作XML Schema](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#xml-custom)
 - *超纲问题：使用@Controller、@Service、@Component注解的类，spring是如何解析的呢？*
   - *org.springframework.context.annotation.ConfigurationClassPostProcessor#postProcessBeanDefinitionRegistry*
   - *这是一个 **bean工厂注册中心后置处理器：BeanDefinitionRegistryPostProcessor***
@@ -74,5 +94,13 @@ org.springframework.beans.factory.xml.XmlBeanFactoryTests#testLoadBeanDefinition
 
 # 参考：
 
-spring官方文档:[**Table 1. The bean definition**](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-definition)
+### 官方文档:[Table 1. The bean definition](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-definition)
+
+### 中文文档:[多种bean](https://www.php.cn/manual/view/21581.html)
+
+### BeanDefinition#isAbstract 的一个使用场景:
+
+- 如果你有一个（父）bean定义你希望仅仅作为模版使用，而这个定义明确规定了一个类，你必须把abstract参数设置为true，否则应用程序上下文将试图预先初始化它。
+- 官方文档: https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#aop-concise-proxy
+- 中文文档: https://www.php.cn/manual/view/21806.html
 
