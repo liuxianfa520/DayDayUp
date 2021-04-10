@@ -2,9 +2,9 @@ package com.anxiaole.multitenancy.test.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.anxiaole.multitenancy.TenantIdHolder;
 import com.anxiaole.multitenancy.test.dao.UserDao;
 import com.anxiaole.multitenancy.test.mock.MockAddTenant;
+import com.anxiaole.multitenancy.utils.TenantIdHolder;
 import com.anxiaole.multitenancy.utils.Utils;
 
 import org.I0Itec.zkclient.ZkClient;
@@ -12,6 +12,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.net.URLDecoder;
+
+import lombok.SneakyThrows;
 
 /**
  * @author LiuXianfa
@@ -60,10 +64,14 @@ public class HelloController {
      * @param driverclassname
      * @return
      */
-    @RequestMapping("changeJdbc")
+    @SneakyThrows
+    @RequestMapping("addOrUpdateTenantDataSource")
     public JSONObject changeJdbc(String username, String password, String url, String driverclassname) {
         String path = Utils.tenantIdToPath(TenantIdHolder.getTenantId());
-        String jdbc = zkClient.readData(path);
+        String jdbc = zkClient.readData(path, true);
+        if (jdbc == null) {
+            jdbc = "{}";
+        }
         JSONObject jsonObject = JSON.parseObject(jdbc);
         if (StringUtils.hasText(username)) {
             jsonObject.put("username", username);
@@ -72,12 +80,22 @@ public class HelloController {
             jsonObject.put("password", password);
         }
         if (StringUtils.hasText(url)) {
-            jsonObject.put("url", url);
+            jsonObject.put("url", URLDecoder.decode(url, "UTF-8"));
         }
         if (StringUtils.hasText(driverclassname)) {
             jsonObject.put("driverclassname", driverclassname);
         }
+        if (!zkClient.exists(path)) {
+            zkClient.createPersistent(path);
+        }
         zkClient.writeData(path, JSON.toJSONString(jsonObject));
         return JSON.parseObject(zkClient.readData(path));
+    }
+
+    @RequestMapping("deleteTenant")
+    public String deleteTenant() {
+        String path = Utils.tenantIdToPath(TenantIdHolder.getTenantId());
+        zkClient.delete(path);
+        return "删除成功";
     }
 }

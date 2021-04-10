@@ -1,5 +1,6 @@
 package com.anxiaole.multitenancy;
 
+import com.anxiaole.multitenancy.initAllOnStartup.InitAllOnStartupRoutingDataSource;
 import com.anxiaole.multitenancy.lazyLoad.LazyLoadRoutingDataSource;
 
 import org.I0Itec.zkclient.ZkClient;

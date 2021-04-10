@@ -1,0 +1,19 @@
+GET http://localhost:8080/hello?tenantId=1
+
+###
+GET http://localhost:8080/hello?tenantId=2
+
+
+### 把密码修改错误
+GET http://localhost:8080/addOrUpdateTenantDataSource?tenantId=1&username=xxx
+
+
+### 把密码修改正确
+GET http://localhost:8080/addOrUpdateTenantDataSource?tenantId=1&username=root&password=tiger
+
+### 新增一个租户 租户id = 3
+GET http://localhost:8080/addOrUpdateTenantDataSource?tenantId=3&username=root&password=tiger&driverclassname=com.mysql.jdbc.Driver&url=jdbc%3Amysql%3A%2F%2Flocalhost%3A3306%2Ftest1
+
+
+### 删除租户
+GET http://localhost:8080/deleteTenant?tenantId=1

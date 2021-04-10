@@ -1,6 +1,6 @@
 package com.anxiaole.multitenancy.test.interceptor;
 
-import com.anxiaole.multitenancy.TenantIdHolder;
+import com.anxiaole.multitenancy.utils.TenantIdHolder;
 
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;

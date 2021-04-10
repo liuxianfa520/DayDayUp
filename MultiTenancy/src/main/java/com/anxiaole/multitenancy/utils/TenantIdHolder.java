@@ -1,4 +1,4 @@
-package com.anxiaole.multitenancy;
+package com.anxiaole.multitenancy.utils;
 
 /**
  * @author LiuXianfa
