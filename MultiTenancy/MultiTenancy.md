@@ -40,12 +40,21 @@
 # Nb多租户数据库切换方案
 - NewBanker udsc-config
 
-
+```xml
+<!-- 多租户数据源 -->
+<bean id="dataSource" class="com.newbanker.udsc.config.ds.NBDataSource" destroy-method="close" />
+```
 
 # 思考
 
 - 如果是让我来从零设计一个方案。我会如何思考？如何在网上查找资料？
+  - NewBanker udsc-config直接在beans.xml中配置NbDataSource的方式，其实是最原始的配置方式。偏方治大病：
+  - 很久以前还没有SpringBoot时，配置数据源都是需要在beans.xml中配置一个 javax.sql.DataSource 实现类
+  - 那时候，配置的都是 c3p0或dbcp的数据源 。还有 mybatis 中什么SQLSessionFactory都需要自己配置。
 - 我的思路估计也会使用 **AbstractRoutingDataSource** 来实现。
+  - 目前提供的有两种实现：
+  - 一种是在项目启动时，把链接上配置中心ZooKeeper，把所有租户的数据源都初始化好：
+  - 一种是懒加载模式的：com.anxiaole.multitenancy.lazyLoad.LazyLoadRoutingDataSource
 - 详见  [MultiTenancyApplication.java](src\main\java\com\anxiaole\multitenancy\MultiTenancyApplication.java) 验证步骤：
   - 1、数据库中执行 \DayDayUp\MultiTenancy\src\main\resources\sql\db.sql
   - 2、本地启动 ZooKeeper  使用默认端口号:2181

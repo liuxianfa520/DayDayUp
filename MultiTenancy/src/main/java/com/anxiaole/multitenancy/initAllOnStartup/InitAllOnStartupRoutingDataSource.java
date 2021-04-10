@@ -2,6 +2,8 @@ package com.anxiaole.multitenancy.initAllOnStartup;
 
 import com.alibaba.druid.pool.DruidDataSourceFactory;
 import com.alibaba.fastjson.JSON;
+import com.anxiaole.multitenancy.TenantIdHolder;
+import com.anxiaole.multitenancy.exception.CreateDataSourceException;
 
 import org.I0Itec.zkclient.IZkDataListener;
 import org.I0Itec.zkclient.ZkClient;
@@ -19,7 +21,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 
-import static com.anxiaole.multitenancy.TenantIdHolder.getTenantId;
+import static com.anxiaole.multitenancy.utils.Utils.jdbcPrefix;
+import static com.anxiaole.multitenancy.utils.Utils.pathToTenantId;
+import static com.anxiaole.multitenancy.utils.Utils.tenantIdToPath;
 
 /**
  * @author LiuXianfa
@@ -31,7 +35,7 @@ public class InitAllOnStartupRoutingDataSource extends AbstractRoutingDataSource
 
     @Override
     protected Object determineCurrentLookupKey() {
-        return getTenantId();
+        return TenantIdHolder.getTenantId();
     }
 
 
@@ -39,13 +43,6 @@ public class InitAllOnStartupRoutingDataSource extends AbstractRoutingDataSource
     ZkClient zkClient;
 
     private static final ConcurrentHashMap<Object, Object> targetDataSources = new ConcurrentHashMap<>();
-
-    /**
-     * 数据库连接配置在ZooKeeper中的前缀
-     */
-    private static final String jdbcPrefix = "/jdbcConfig";
-    private static final String jdbcPrefix2 = jdbcPrefix + "/";
-
 
     class ZkDataListener implements org.I0Itec.zkclient.IZkDataListener {
         @Override
@@ -115,10 +112,6 @@ public class InitAllOnStartupRoutingDataSource extends AbstractRoutingDataSource
         }
     }
 
-    private String pathToTenantId(String dataPath) {
-        return dataPath.replace(jdbcPrefix2, "");
-    }
-
     private void changeRoutingDataSource(String tenantId, ZkClient zkClient) {
         DataSource dataSource = buildDataSource(tenantId, zkClient);
         targetDataSources.put(tenantId, dataSource);
@@ -132,7 +125,7 @@ public class InitAllOnStartupRoutingDataSource extends AbstractRoutingDataSource
     }
 
     private DataSource buildDataSource(String tenantId, ZkClient zkClient, IZkDataListener dataChangeListener) {
-        String path = jdbcPrefix2 + tenantId;
+        String path = tenantIdToPath(tenantId);
         if (dataChangeListener != null) {
             // 监听节点数据变化.
             zkClient.subscribeDataChanges(path, dataChangeListener);
@@ -144,6 +137,7 @@ public class InitAllOnStartupRoutingDataSource extends AbstractRoutingDataSource
             dataSource = DruidDataSourceFactory.createDataSource(properties);
         } catch (Exception e) {
             log.error("创建Druid数据源失败.", e);
+            throw new CreateDataSourceException(tenantId, e);
         }
         return dataSource;
     }

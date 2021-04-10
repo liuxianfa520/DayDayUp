@@ -1,16 +1,12 @@
 package com.anxiaole.multitenancy.test.controller;
 
 import com.anxiaole.multitenancy.TenantIdHolder;
+import com.anxiaole.multitenancy.test.dao.UserDao;
 import com.anxiaole.multitenancy.test.mock.MockAddTenant;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.sql.ResultSet;
-
-import lombok.SneakyThrows;
 
 /**
  * @author LiuXianfa
@@ -19,6 +15,9 @@ import lombok.SneakyThrows;
  */
 @RestController
 public class HelloController {
+
+    @Autowired
+    UserDao userDao;
 
     /**
      * <pre>
@@ -33,25 +32,7 @@ public class HelloController {
      */
     @RequestMapping("hello")
     public String hello() {
-        String name = findFirst();
+        String name = userDao.findFirstUserName();
         return String.format("(当前租户id:%s)   你好:%s.    ", TenantIdHolder.getTenantId(), name);
-    }
-
-    @Autowired
-    AbstractRoutingDataSource routingDataSource;
-
-    @SneakyThrows
-    private String findFirst() {
-        String sql = "select name from user limit 1";
-
-        try (ResultSet rs = routingDataSource.getConnection().prepareStatement(sql).executeQuery()) {
-            while (rs.next()) {
-                String name = rs.getString("name");
-                if (name != null) {
-                    return name;
-                }
-            }
-        }
-        throw new RuntimeException("查询数据库失败!");
     }
 }

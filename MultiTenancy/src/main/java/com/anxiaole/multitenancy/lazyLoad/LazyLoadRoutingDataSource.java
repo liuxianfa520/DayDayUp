@@ -19,6 +19,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 
+import static com.anxiaole.multitenancy.utils.Utils.jdbcPrefix;
+import static com.anxiaole.multitenancy.utils.Utils.pathToTenantId;
+import static com.anxiaole.multitenancy.utils.Utils.tenantIdToPath;
+
 /**
  * 懒加载租户数据源 —— 在程序使用租户的数据源时,才去初始化此租户的数据源.
  *
@@ -55,13 +59,6 @@ public class LazyLoadRoutingDataSource extends AbstractRoutingDataSource {
     ZkClient zkClient;
 
     private static final ConcurrentHashMap<Object, Object> targetDataSources = new ConcurrentHashMap<>();
-
-    /**
-     * 数据库连接配置在ZooKeeper中的前缀
-     */
-    private static final String jdbcPrefix = "/jdbcConfig";
-    private static final String jdbcPrefix2 = jdbcPrefix + "/";
-
 
     class ZkDataListener implements IZkDataListener {
         @Override
@@ -100,10 +97,6 @@ public class LazyLoadRoutingDataSource extends AbstractRoutingDataSource {
         });
     }
 
-    private String pathToTenantId(String dataPath) {
-        return dataPath.replace(jdbcPrefix2, "");
-    }
-
     private DataSource initTenantDataSource(String tenantId) {
         return initTenantDataSource(tenantId, null);
     }
@@ -123,7 +116,7 @@ public class LazyLoadRoutingDataSource extends AbstractRoutingDataSource {
     }
 
     private DataSource createDataSource(String tenantId, ZkClient zkClient, IZkDataListener dataChangeListener) {
-        String path = jdbcPrefix2 + tenantId;
+        String path = tenantIdToPath(tenantId);
         if (dataChangeListener != null) {
             // 监听节点数据变化.
             zkClient.subscribeDataChanges(path, dataChangeListener);
