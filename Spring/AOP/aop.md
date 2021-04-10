@@ -561,10 +561,10 @@ org.springframework.aop.framework.CglibAopProxy
 # 总结
 
 - 以上：列出了四种创建aop代理对象的方式：（可能不是全部）
-  - ProxyFactoryBean
-  - ProxyFactory
-  - auto-proxy
-  - AspectJProxyFactory
+  - ProxyFactoryBean 使用springIOC、FactoryBean、指定目标对象、指定Advice 来创建代理对象。
+  - ProxyFactory 不使用springIOC、通过编程方式 创建代理对象。
+  - auto-proxy 使用BeanPostProcessor自动创建代理对象
+  - AspectJProxyFactory 指定@AspectJ 、通过编程方式 创建代理对象。
 
 
 
