@@ -150,10 +150,16 @@ public final class LoginServiceImpl$Proxy extends Proxy implements LoginService 
 2、优点:
      无需要求被代理类实现接口.对代码侵入性较低.
 3、缺点:
-     需要引入单独的cglib包和asm包等.作者只有一个人.后续版本升级维护等方面,可能没有jdk原生动态代理有优势.
-     无法对final类和final方法进行增强.(因为是生成的子类,final类和final方法都不能被重写.)
+     1)、需要引入单独的cglib包和asm包等.作者只有一个人.后续版本升级维护等方面,可能没有jdk原生动态代理有优势.
+     2)、无法对final类和final方法进行增强.(因为是生成的子类,final类和final方法都不能被重写.)
+     上面两条的 官方文档:https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#aop-api-proxying-class
+     3)、在spring 4.0以前,被代理对象的构造方法会被调用两次.在spring4.x被代理对象的构造方法就不会被调用两次了.
+         官方文档原文:As of Spring 4.0, the constructor of your proxied object is NOT called twice anymore, since the CGLIB proxy instance is created through Objenesis.Only if your JVM does not allow for constructor bypassing, you might see double invocations and corresponding debug log entries from Spring’s AOP support.
+         官方文档:https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#aop-proxying
 4、性能:
      据说和jdk8的动态代理对比,性能方面已经差不多了.
+     官方文档对性能方面的描述:There is little performance difference between CGLIB proxying and dynamic proxies.Performance should not be a decisive consideration in this case.
+     文档地址:https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#aop-api-proxying-class
 5、视频地址:https://www.bilibili.com/video/BV1SJ411v7fq
 6、执行此代码之后,会在[项目根目录 + /com/atguigu/test/cglibDynamicProxy/] 目录下生成代理类class文件.
 7、从动态生成的代理类class文件可见,代理方法实现为:
@@ -284,8 +290,9 @@ Pointcut 其他实现类：
 这一小节只是的个人理解。
 
 - 我们知道AOP是面向切面编程，那如何理解AOP描述了什么事情呢？如何理解Advisor和Advice两个接口的区别呢？
-  - 翻译过来，Advice表示通知；Advisor表示通知器。
-
+  
+- 翻译过来，Advice表示通知；Advisor表示通知器。
+  
 - 可以从下面 `Advisor` 接口的实现上发现一个问题：并没有直接实现`Advisor`接口的实现类。*（PrototypePlaceholderAdvisor是私有内部类，忽略之。因为这个内部类必须依附于其外部类才能使用。）*
 
   ![image-20210405230434059](images/image-20210405230434059.png)
