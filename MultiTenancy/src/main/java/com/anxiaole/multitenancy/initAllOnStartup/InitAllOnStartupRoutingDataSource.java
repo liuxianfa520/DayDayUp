@@ -1,5 +1,6 @@
 package com.anxiaole.multitenancy.initAllOnStartup;
 
+import com.alibaba.druid.pool.DruidDataSource;
 import com.alibaba.druid.pool.DruidDataSourceFactory;
 import com.alibaba.fastjson.JSON;
 import com.anxiaole.multitenancy.TenantIdHolder;
@@ -135,6 +136,14 @@ public class InitAllOnStartupRoutingDataSource extends AbstractRoutingDataSource
         DataSource dataSource = null;
         try {
             dataSource = DruidDataSourceFactory.createDataSource(properties);
+            if (dataSource instanceof DruidDataSource) {
+                // 获取链接时:失败重试10次.
+                ((DruidDataSource) dataSource).setConnectionErrorRetryAttempts(10);
+                // 获取链接时:重试次数结束后,跳出循环
+                ((DruidDataSource) dataSource).setBreakAfterAcquireFailure(true);
+                // 获取数据库链接失败超过重试次数后:快速失败
+                ((DruidDataSource) dataSource).setFailFast(true);
+            }
         } catch (Exception e) {
             log.error("创建Druid数据源失败.", e);
             throw new CreateDataSourceException(tenantId, e);
