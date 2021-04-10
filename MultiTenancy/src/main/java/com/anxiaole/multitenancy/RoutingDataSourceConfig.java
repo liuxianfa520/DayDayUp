@@ -1,6 +1,5 @@
 package com.anxiaole.multitenancy;
 
-import com.anxiaole.multitenancy.initAllOnStartup.InitAllOnStartupRoutingDataSource;
 import com.anxiaole.multitenancy.lazyLoad.LazyLoadRoutingDataSource;
 
 import org.I0Itec.zkclient.ZkClient;
@@ -21,6 +20,7 @@ import java.util.Collections;
  */
 @Configurable
 @Component
+//@Import(AopConfig.class) // 这是一种错误的实现:使用aop无法实现.
 public class RoutingDataSourceConfig {
 
     @Value("${zk.host:localhost:2181}")
