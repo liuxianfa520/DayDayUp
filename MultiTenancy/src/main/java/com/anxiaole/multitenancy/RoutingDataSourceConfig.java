@@ -1,6 +1,6 @@
 package com.anxiaole.multitenancy;
 
-import com.anxiaole.multitenancy.initAllOnStartup.InitAllOnStartupRoutingDataSource;
+import com.anxiaole.multitenancy.lazyLoad.LazyLoadRoutingDataSource;
 
 import org.I0Itec.zkclient.ZkClient;
 import org.springframework.beans.factory.annotation.Configurable;
@@ -32,7 +32,7 @@ public class RoutingDataSourceConfig {
 
     @Bean
     public AbstractRoutingDataSource routingDataSource() {
-        InitAllOnStartupRoutingDataSource routingDataSource = new InitAllOnStartupRoutingDataSource();
+        LazyLoadRoutingDataSource routingDataSource = new LazyLoadRoutingDataSource();
         routingDataSource.setTargetDataSources(Collections.emptyMap());
         return routingDataSource;
     }
