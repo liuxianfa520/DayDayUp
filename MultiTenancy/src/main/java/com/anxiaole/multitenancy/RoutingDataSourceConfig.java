@@ -1,14 +1,19 @@
 package com.anxiaole.multitenancy;
 
+import com.anxiaole.multitenancy.initAllOnStartup.InitAllOnStartupRoutingDataSource;
+
 import org.I0Itec.zkclient.ZkClient;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 
 /**
+ * 主配置类
+ *
  * @author LiuXianfa
  * @email xianfaliu@newbanker.cn
  * @date 4/8 19:14
@@ -26,8 +31,8 @@ public class RoutingDataSourceConfig {
     }
 
     @Bean
-    public RoutingDataSource routingDataSource() {
-        RoutingDataSource routingDataSource = new RoutingDataSource();
+    public AbstractRoutingDataSource routingDataSource() {
+        InitAllOnStartupRoutingDataSource routingDataSource = new InitAllOnStartupRoutingDataSource();
         routingDataSource.setTargetDataSources(Collections.emptyMap());
         return routingDataSource;
     }

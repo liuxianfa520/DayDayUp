@@ -1,4 +1,4 @@
-package com.anxiaole.multitenancy.interceptor;
+package com.anxiaole.multitenancy.test.interceptor;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

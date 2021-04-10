@@ -1,4 +1,4 @@
-package com.anxiaole.multitenancy;
+package com.anxiaole.multitenancy.initAllOnStartup;
 
 import com.alibaba.druid.pool.DruidDataSourceFactory;
 import com.alibaba.fastjson.JSON;
@@ -6,7 +6,7 @@ import com.alibaba.fastjson.JSON;
 import org.I0Itec.zkclient.IZkDataListener;
 import org.I0Itec.zkclient.ZkClient;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
 import org.springframework.util.CollectionUtils;
 
 import java.util.Collections;
@@ -19,17 +19,22 @@ import javax.sql.DataSource;
 
 import lombok.extern.log4j.Log4j;
 
+import static com.anxiaole.multitenancy.TenantIdHolder.getTenantId;
+
 /**
  * @author LiuXianfa
  * @email xianfaliu@newbanker.cn
- * @date 4/8 19:20
+ * @date 4/8 19:05
  */
-@Component
 @Log4j
-public class DataSourceChangeListener {
+public class InitAllOnStartupRoutingDataSource extends AbstractRoutingDataSource {
 
-    @Autowired
-    RoutingDataSource routingDataSource;
+
+    @Override
+    protected Object determineCurrentLookupKey() {
+        return getTenantId();
+    }
+
 
     @Autowired
     ZkClient zkClient;
@@ -56,8 +61,8 @@ public class DataSourceChangeListener {
 
             String tenantId = pathToTenantId(dataPath);
             targetDataSources.remove(tenantId);
-            routingDataSource.setTargetDataSources(targetDataSources);
-            routingDataSource.afterPropertiesSet();
+            InitAllOnStartupRoutingDataSource.this.setTargetDataSources(targetDataSources);
+            InitAllOnStartupRoutingDataSource.this.afterPropertiesSet();
         }
     }
 
@@ -71,9 +76,9 @@ public class DataSourceChangeListener {
             DataSource dataSource = buildDataSource(tenantId, zkClient, new ZkDataListener());
             targetDataSources.put(tenantId, dataSource);
         }
-        routingDataSource.setTargetDataSources(targetDataSources);
+        this.setTargetDataSources(targetDataSources);
         // 必须执行此操作，才会重新初始化AbstractRoutingDataSource 中的 resolvedDataSources，也只有这样，动态切换才会起效
-        routingDataSource.afterPropertiesSet();
+        this.afterPropertiesSet();
 
 
         // 监听子 jdbcPrefix 的节点变化.比如新增了一个租户、删除了一个租户.
@@ -96,8 +101,8 @@ public class DataSourceChangeListener {
             }
 
             // 3、重新初始化数据源
-            routingDataSource.setTargetDataSources(targetDataSources);
-            routingDataSource.afterPropertiesSet();
+            this.setTargetDataSources(targetDataSources);
+            this.afterPropertiesSet();
         });
     }
 
@@ -118,9 +123,9 @@ public class DataSourceChangeListener {
     private void changeRoutingDataSource(String tenantId, ZkClient zkClient) {
         DataSource dataSource = buildDataSource(tenantId, zkClient);
         targetDataSources.put(tenantId, dataSource);
-        routingDataSource.setTargetDataSources(targetDataSources);
+        this.setTargetDataSources(targetDataSources);
         // 必须执行此操作，才会重新初始化AbstractRoutingDataSource 中的 resolvedDataSources，也只有这样，动态切换才会起效
-        routingDataSource.afterPropertiesSet();
+        this.afterPropertiesSet();
     }
 
     private DataSource buildDataSource(String tenantId, ZkClient zkClient) {

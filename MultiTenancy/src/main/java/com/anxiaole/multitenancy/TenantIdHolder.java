@@ -1,20 +1,15 @@
 package com.anxiaole.multitenancy;
 
-import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
-
 /**
  * @author LiuXianfa
  * @email xianfaliu@newbanker.cn
- * @date 4/8 19:05
+ * @date 4/10 22:16
  */
-public class RoutingDataSource extends AbstractRoutingDataSource {
-
-    public static final ThreadLocal<String> tenantIdHolder = new ThreadLocal();
-
-    @Override
-    protected Object determineCurrentLookupKey() {
-        return getTenantId();
+public class TenantIdHolder {
+    private TenantIdHolder() {
     }
+
+    private static final ThreadLocal<String> tenantIdHolder = new ThreadLocal();
 
     public static void setTenantId(String tenantId) {
         tenantIdHolder.set(tenantId);
@@ -27,5 +22,4 @@ public class RoutingDataSource extends AbstractRoutingDataSource {
     public static void clear() {
         tenantIdHolder.remove();
     }
-
 }

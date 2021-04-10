@@ -1,6 +1,6 @@
-package com.anxiaole.multitenancy.interceptor;
+package com.anxiaole.multitenancy.test.interceptor;
 
-import com.anxiaole.multitenancy.RoutingDataSource;
+import com.anxiaole.multitenancy.TenantIdHolder;
 
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -25,13 +25,13 @@ public class TenantChooseInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         String tenantId = request.getHeader(key);
         if (StringUtils.hasText(tenantId)) {
-            RoutingDataSource.setTenantId(tenantId);
+            TenantIdHolder.setTenantId(tenantId);
             return true;
         }
 
         tenantId = request.getParameter(key);
         if (StringUtils.hasText(tenantId)) {
-            RoutingDataSource.setTenantId(tenantId);
+            TenantIdHolder.setTenantId(tenantId);
             return true;
         }
 
@@ -43,6 +43,6 @@ public class TenantChooseInterceptor implements HandlerInterceptor {
 
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
-        RoutingDataSource.clear();
+        TenantIdHolder.clear();
     }
 }
