@@ -38,8 +38,7 @@
 
 
 # Nb多租户数据库切换方案
-
-
+- NewBanker udsc-config
 
 
 
@@ -47,9 +46,14 @@
 
 - 如果是让我来从零设计一个方案。我会如何思考？如何在网上查找资料？
 - 我的思路估计也会使用 **AbstractRoutingDataSource** 来实现。
-
-  - 经过验证，**AbstractRoutingDataSource** 无法实现。
-
+- 详见  [MultiTenancyApplication.java](src\main\java\com\anxiaole\multitenancy\MultiTenancyApplication.java) 验证步骤：
+  - 1、数据库中执行 \DayDayUp\MultiTenancy\src\main\resources\sql\db.sql
+  - 2、本地启动 ZooKeeper  使用默认端口号:2181
+  - 3、修改数据库连接账号、密码.
+  - 4、启动项目.
+  - 5、调用接口:
+  - 调用  http://localhost:8080/hello?tenantId=1 接口,会返回:   (当前租户id:1)   你好:[这是从数据库2中查询出来的名字].
+  - 调用  http://localhost:8080/hello?tenantId=2 接口,会返回:   (当前租户id:2)   你好:[这是从数据库2中查询出来的名字].
 
 
 
