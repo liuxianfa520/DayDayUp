@@ -309,17 +309,42 @@ Pointcut 其他实现类：
 
 
 
+## 4、Advised
+
+- Advised 类可以理解为：用来对多个Advice通知和Advisor通知器集合的管理工具类。
+- 主要的方法：
+
+| 方法                                                         | 描述                                       |
+| ------------------------------------------------------------ | ------------------------------------------ |
+| Advisor[] getAdvisors();                                     | 返回管理的Advisor集合                      |
+| void addAdvice(Advice advice) throws AopConfigException;     | 在集合最后添加Advice通知                   |
+| void addAdvice(int pos, Advice advice) throws AopConfigException; | 在集合指定下标位置添加Advice通知           |
+| void addAdvisor(Advisor advisor) throws AopConfigException;  | 在集合最后添加Advisor通知器                |
+| void addAdvisor(int pos, Advisor advisor) throws AopConfigException; | 在集合指定下标位置添加Advisor通知器        |
+| int indexOf(Advisor advisor);                                | 获取通知器的下标                           |
+| boolean removeAdvisor(Advisor advisor) throws AopConfigException; | 移除Advisor通知器                          |
+| void removeAdvisor(int index) throws AopConfigException;     | 移除指定下标的Advisor通知器                |
+| boolean replaceAdvisor(Advisor a, Advisor b) throws AopConfigException; | 替换Advisor通知器                          |
+| boolean isFrozen();                                          | 是否冻结配置（冻结配置之后再修改就会报错） |
+
+- 官方文档：[Manipulating Advised Objects](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#aop-api-advised)
+- 中文文档：[操作被通知对象](https://www.php.cn/manual/view/21808.html)
 
 
-## 4、ProxyFactoryBean
 
-org.springframework.aop.framework.ProxyFactoryBean
+
+
+## 5、ProxyFactoryBean
+
+**org.springframework.aop.framework.ProxyFactoryBean**
+
+**本质上是个 FactoryBean 。可以很方便的对一个bean创建aop代理对象。**
 
 测试用例：org.springframework.aop.framework.ProxyFactoryBeanTests
 
 ![image-20210404003827589](images/image-20210404003827589.png)
 
-本质上是个 FactoryBean 。可以很方便的对一个bean创建aop代理对象。
+
 
 有几个很重要的属性：
 
@@ -353,11 +378,10 @@ org.springframework.aop.framework.ProxyFactoryBean
 
 
 
-## 5、ProxyFactory
+## 6、ProxyFactory
 
 - org.springframework.aop.framework.ProxyFactory
-- 测试用例：org.springframework.aop.framework.ProxyFactoryTests
-- It is easy to create AOP proxies programmatically with Spring. This lets you use Spring AOP without dependency on Spring IoC. 使用Spring以编程方式创建AOP代理是很容易的。这使你可以使用Spring AOP而不必依赖于Spring IoC。
+- 以编程方式创建SpringAOP代理：使用Spring AOP而不依赖于Spring IoC。It is easy to create AOP proxies programmatically with Spring. This lets you use Spring AOP without dependency on Spring IoC. 
 ```java
   ProxyFactory factory = new ProxyFactory(myBusinessInterfaceImpl); 
   factory.addAdvice(myMethodInterceptor); 
@@ -365,36 +389,55 @@ org.springframework.aop.framework.ProxyFactoryBean
   MyBusinessInterface tb = (MyBusinessInterface) factory.getProxy();
 ```
 
+- 测试用例：org.springframework.aop.framework.ProxyFactoryTests
 - 官方文档：[使用ProxyFactory以编程方式(不使用SpringIoc容器)创建aop代理](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#aop-prog)
 - 中文文档：https://www.php.cn/manual/view/21807.html
 - 问题：ProxyFactory 和 AopProxyFactory 有什么区别 ？？？
 
 
 
-## 6、Advised
 
-- Advised 类可以理解为：用来对多个Advice通知和Advisor通知器集合的管理工具类。
-- 主要的方法：
 
-| 方法 | 描述 |
-| ---- | ---- |
-| Advisor[] getAdvisors(); | 返回管理的Advisor集合 |
-| void addAdvice(Advice advice) throws AopConfigException; | 在集合最后添加Advice通知 |
-| void addAdvice(int pos, Advice advice) throws AopConfigException; | 在集合指定下标位置添加Advice通知 |
-| void addAdvisor(Advisor advisor) throws AopConfigException; | 在集合最后添加Advisor通知器 |
-| void addAdvisor(int pos, Advisor advisor) throws AopConfigException; | 在集合指定下标位置添加Advisor通知器 |
-| int indexOf(Advisor advisor); | 获取通知器的下标 |
-| boolean removeAdvisor(Advisor advisor) throws AopConfigException; | 移除Advisor通知器 |
-| void removeAdvisor(int index) throws AopConfigException; | 移除指定下标的Advisor通知器 |
-| boolean replaceAdvisor(Advisor a, Advisor b) throws AopConfigException; | 替换Advisor通知器 |
-| boolean isFrozen(); | 是否冻结配置（冻结配置之后再修改就会报错） |
 
-- 官方文档：[Manipulating Advised Objects](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#aop-api-advised)
-- 中文文档：[操作被通知对象](https://www.php.cn/manual/view/21808.html)
+
+## 7、AspectJProxyFactory
+
+另一种通过编程的方式创建代理对象：使用 AspectJProxyFactory 来创建代理对象，从而通知（增强）目标对象。
+
+```java
+AspectJProxyFactory factory = new AspectJProxyFactory(targetObject);
+
+// add an aspect, the class must be an @AspectJ aspect
+// you can call this as many times as you need with different aspects
+factory.addAspect(SecurityManager.class);
+
+// you can also add existing aspect instances, the type of the object supplied must be an @AspectJ aspect
+factory.addAspect(usageTracker);
+
+// now get the proxy object...
+MyInterfaceType proxy = factory.getProxy();
+```
+
+[官方文档](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#aop-aspectj-programmatic)       [中文文档](https://www.php.cn/manual/view/21758.html) 
+
+*备注：在官方文档中，这种方式是在 auto-proxy 自动代理 之后讲解的。如果理解了 auto-proxy 创建代理的模式，这个类也就很容易理解了。我放这里便于和上面的 【ProxyFactory——通过编程方式创建代理对象】来一起理解。*
+
+*猜测 AspectJProxyFactory 应该是用到了很多 auto-proxy 的功能来实现的。*
+
+- *比如 factory.addAspect(SecurityManager.class); 添加的@AspectJ类，是需要用AspectJAdvisorFactory来解析成【通知和切点】的。*
+- *比如也需要用AopProxyFactory来判断目标对象是使用jdk还是cglib动态代理。*
+- *也需要JdkDynamicAopProxy或CglibAopProxy来创建代理对象*
+- *todo：以上只是猜测。还没看源码验证。？？？？*
+
+
+
+
 
 
 
 ## 7、使用自动代理 auto-proxy
+
+**基本思路就是使用 bean后置处理器 在创建bean生命周期过程中，创建目标对象的代理对象。**
 
 `org.springframework.aop.framework.autoproxy`包提供了标准自动代理创建器。
 
@@ -431,7 +474,9 @@ org.springframework.aop.framework.ProxyFactoryBean
 
 
 
-## 5、切面增强器创建工厂 AspectJAdvisorFactory
+### AspectJAdvisorFactory
+
+**第一步：先找到spring中所有的切面，然后解析成 Advice/Advisor/Advised .也就是找到通知和切面信息**
 
 ![image-20210403221243797](images/image-20210403221243797.png)
 
@@ -441,9 +486,15 @@ org.springframework.aop.framework.ProxyFactoryBean
 
 
 
-## 6、AopProxyFactory
+### AopProxyFactory
 
 org.springframework.aop.framework.AopProxyFactory
+
+**第二步：AOP代理工厂**
+
+**因为有两种代理模式可选：jdk动态代理和cglib动态代理，所以使用工厂模式，把具体如何选择做了封装。**
+
+**主要是创建AopProxy**
 
 ![image-20210329232853572](images/image-20210329232853572.png)
 
@@ -457,43 +508,11 @@ org.springframework.aop.framework.AopProxyFactory
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-## 7、AopProxy
+### AopProxy
 
 org.springframework.aop.framework.AopProxy
+
+**第三步：jdk/cglib如何生成代理对象。也就是 getProxy() 方法。**
 
 ![image-20210329234440869](images/image-20210329234440869.png)
 
@@ -503,7 +522,7 @@ org.springframework.aop.framework.AopProxy
 
 
 
-# spring中JDK动态代理
+#### JDK动态代理
 
 org.springframework.aop.framework.JdkDynamicAopProxy
 
@@ -513,7 +532,7 @@ org.springframework.aop.framework.JdkDynamicAopProxy
 
 
 
-# spring中Cglib动态代理
+#### Cglib动态代理
 
 org.springframework.aop.framework.CglibAopProxy
 
@@ -531,7 +550,37 @@ org.springframework.aop.framework.CglibAopProxy
 
 
 
-# 在bean的哪些生命周期时创建aop代理对象？
+
+
+
+
+
+
+
+
+# 总结
+
+- 以上：列出了四种创建aop代理对象的方式：（可能不是全部）
+  - ProxyFactoryBean
+  - ProxyFactory
+  - auto-proxy
+  - AspectJProxyFactory
+
+
+
+
+
+
+
+
+
+
+
+
+
+# 问题
+
+## 1、在bean的哪些生命周期时创建aop代理对象？
 
 ![image-20210330001415390](images/image-20210330001415390.png)
 
