@@ -1,13 +1,3 @@
-# AbstractAutoProxyCreator
-
-![image-20210329001410343](images/image-20210329001410343.png)
-
-- 抽象自动代理创建器
-
-
-
-
-
 # 问题
 
 - 默认aop创建动态代理对象有哪两种实现？如何对其进行修改？
@@ -435,11 +425,16 @@ MyInterfaceType proxy = factory.getProxy();
 
 
 
-## 7、使用自动代理 auto-proxy
+## 8、使用自动代理 auto-proxy
 
 **基本思路就是使用 bean后置处理器 在创建bean生命周期过程中，创建目标对象的代理对象。**
-
 `org.springframework.aop.framework.autoproxy`包提供了标准自动代理创建器。
+
+- AbstractAutoProxyCreator  抽象自动代理创建器
+
+![image-20210411224918264](images/image-20210411224918264.png)
+
+
 
 - BeanNameAutoProxyCreator 为指定的beanName或beanName通配符的bean自动创建代理对象。
 
@@ -467,14 +462,7 @@ MyInterfaceType proxy = factory.getProxy();
 
 
 
-
-
-
-
-
-
-
-### AspectJAdvisorFactory
+### 8.1) AspectJAdvisorFactory
 
 **第一步：先找到spring中所有的切面，然后解析成 Advice/Advisor/Advised .也就是找到通知和切面信息**
 
@@ -486,7 +474,7 @@ MyInterfaceType proxy = factory.getProxy();
 
 
 
-### AopProxyFactory
+### 8.2) AopProxyFactory
 
 org.springframework.aop.framework.AopProxyFactory
 
@@ -508,7 +496,7 @@ org.springframework.aop.framework.AopProxyFactory
 
 
 
-### AopProxy
+### 8.3) AopProxy
 
 org.springframework.aop.framework.AopProxy
 
@@ -522,7 +510,7 @@ org.springframework.aop.framework.AopProxy
 
 
 
-#### JDK动态代理
+#### (1) JDK动态代理
 
 org.springframework.aop.framework.JdkDynamicAopProxy
 
@@ -532,7 +520,7 @@ org.springframework.aop.framework.JdkDynamicAopProxy
 
 
 
-#### Cglib动态代理
+#### (2) Cglib动态代理
 
 org.springframework.aop.framework.CglibAopProxy
 
