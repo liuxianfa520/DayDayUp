@@ -67,6 +67,109 @@
 
 
 
+
+# 发现一个潜在的bug
+
+## 问题描述
+
+在自己实现`多租户数据源切换`的时候，发现一种场景：
+
+如果租户在ZooKeeper中配置了数据源，但是配置的数据源是错误的：比如配置账号密码错误，从而导致在连接数据源的时候，根本无法成功连接。此时Druid默认的处理方式是：**主线程等待，创建子线程轮询，直到成功。**
+
+- Druid数据源默认这样处理的原因是：大多数据服务都是在启动时连接数据库，如果数据库连接不上，主线程就会一直等待 `TIMED_WAITING (parking)` 直到获取数据库连接成功。并且在等待之前，会创建一个线程： `com.alibaba.druid.pool.DruidDataSource.CreateConnectionThread` 。此线程一直尝试获取数据库连接。直到成功。
+- 这样默认处理的目的就是：在启动时检查数据库配置是否正确，如果不正确，项目就一直启动不起来。此时开发人员就会去检查配置文件等。
+
+- 但是对于多租户场景，是在查询/修改租户数据库的时候，才去初始化数据源。如果此租户jdbc配置错误，使用Druid数据源默认配置，则会导致查询数据库的当前线程阻塞。
+
+如果某一时刻，此租户涌入大量http请求，会把tomcat的http-nio线程池直接打满（全都是阻塞状态-等待数据库连接成功的线程）。从而导致应用程序无法处理其他租户的任何http请求。
+
+
+
+
+
+## 验证猜想
+
+在本地的 `MultiTenancy` 项目验证：
+
+1、设置tomcat最大线程数量为10：
+
+```yml
+server:
+  tomcat:
+    threads:
+      max: 10
+    accept-count: 5
+    max-connections: 10
+    connection-timeout: 10s
+```
+
+2、暂时注释掉优化配置
+
+![image-20210411191732216](images/image-20210411191732216.png)
+
+3、启动项目 MultiTenancyApplication
+
+4、把租户为1的数据源配置修改错误，然后疯狂调用接口
+
+![image-20210411192057618](images/image-20210411192057618.png)
+
+5、jstack <pid> | grep getConnection -b7
+
+![image-20210411192633284](images/image-20210411192633284.png)
+
+6、查看一下总共有多少tomcat线程在阻塞状态。（需要调用很多次接口）
+
+![image-20210411193209297](images/image-20210411193209297.png)
+
+7、当所有的tomcat线程都在阻塞状态时，此时调用任何接口，会发现请求直接被拒绝了：
+
+后续的所有接口都是失败。
+
+![image-20210411193855411](images/image-20210411193855411.png)
+
+
+
+
+
+
+
+## 服务器上验证
+
+在本地验证完，我想看一下我们公司服务器的有没有此问题。（感觉也是有的。）
+
+连接上服务器，查看 sc-service 微服务：
+
+这里看到已经有一个Dubbo线程在阻塞了。如果此租户的dubbo请求来的比较多，那对应的dubbo线程池也会被占满。（dubbo也有线程池专门处理consumer的请求，其实原理和tomcat的线程池一样）
+
+![image-20210411194744843](images/image-20210411194744843.png)
+
+
+
+2、附录：Druid创建数据库连接的线程
+
+![image-20210411200214623](images/image-20210411200214623.png)
+
+
+
+## 解决方案
+
+创建数据源之后，主要是设置三个参数：
+
+```java
+DruidDataSource dataSource = DruidDataSourceFactory.createDataSource(properties);
+// 获取链接时:失败重试10次.默认是1
+dataSource.setConnectionErrorRetryAttempts(10);
+
+// 下面这两个缺一不可：
+// 获取链接时:重试次数结束后,跳出循环
+dataSource.setBreakAfterAcquireFailure(true);
+// 获取数据库链接失败超过重试次数后:快速失败
+dataSource.setFailFast(true);
+```
+
+
+
+
 # 参考文章
 
 [Multi-tenant SaaS database tenancy patterns](https://docs.microsoft.com/en-us/azure/sql-database/saas-tenancy-app-design-patterns)
