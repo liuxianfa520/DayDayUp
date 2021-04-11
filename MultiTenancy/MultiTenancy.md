@@ -151,6 +151,29 @@ server:
 
 
 
+## bug现象
+
+如果这个bug发生了，在排查的时候，会有以下现象：
+
+- 对应微服务的所有接口都无法返回，都是拒绝状态。其他微服务的接口正常。
+
+  - 如果一个微服务有多个副本，还会造成如下症状：
+
+  - 此微服务的所有接口，发生间歇性的异常。（微服务A存在2个副本，则微服务A的所有接口一次正常，一次异常）
+  - 因为请求被nginx轮询的转发到微服务A的不同upstream节点上了。
+
+- 在服务器排查时，cpu、内存、io都是正常的：
+
+  使用 `arthas` 的 `dashboard` 命令查看cpu和内存占用：
+
+  ![image-20210411202354006](images/image-20210411202354006.png)
+
+- 如果是遇到问题再排查的话，只能使用 `jstack <pid> | grep http-nio -A3 ` 命令，发现 线程名包含 `http-nio` 的线程都是 WAITING 状态，才能找到一些线索。然后在根据线程栈来慢慢排查。最后能排查到是 `DruidDataSource#getConnection` 阻塞导致的。
+
+
+
+
+
 ## 解决方案
 
 创建数据源之后，主要是设置三个参数：
@@ -166,6 +189,10 @@ dataSource.setBreakAfterAcquireFailure(true);
 // 获取数据库链接失败超过重试次数后:快速失败
 dataSource.setFailFast(true);
 ```
+
+![image-20210411201549184](images/image-20210411201549184.png)
+
+![image-20210411201711334](images/image-20210411201711334.png)
 
 
 
