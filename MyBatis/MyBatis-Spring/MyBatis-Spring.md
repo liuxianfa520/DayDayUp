@@ -172,7 +172,9 @@ org.mybatis.spring.mapper.MapperFactoryBean#getObject
 
 # SqlSessionTemplate 
 
-使用：
+先简单说一下这个类的使用步骤：
+
+配置：
 
 ```xml
 <bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
@@ -180,10 +182,73 @@ org.mybatis.spring.mapper.MapperFactoryBean#getObject
 </bean>
 ```
 
+使用：
+
+```java
+@Service
+public class UserService {
+	@Autowired
+    private SqlSessionTemplate sqlSessionTemplate;
+    
+    public void findFirst() {
+        // 这两种调用方式的到的效果都是一样的：都会查询到用户表的第一条数据。
+    	User user1 = sqlSessionTemplate.getMapper(UserMapper.class).findFirst();
+    	User user2 = sqlSessionTemplate.selectOne("com.xxx.dao.UserMapper.findFirst");
+        // 注意 selectOne(String statement); 方法的参数是statement id。不是sql语句。
+    }
+    public void updateById(User user) {
+        UserMapper mapper = sqlSessionTemplate.getMapper(UserMapper.class);
+        mapper.updateById(user); // 这里不需要程序员自己commit。方法如果正常执行结束，会自动调用commit方法。
+    }
+}
+```
+
+是不是很简单。
+
+而如果我们使用 SqlSessionFactory 实现上面的逻辑需要：
+
+配置：
+
+```xml
+  <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+    <property name="dataSource" ref="dataSource"/>
+  </bean>
+```
+
+使用：
+
+```java
+@Service
+public class UserService {
+	@Autowired
+    private SqlSessionFactory sqlSessionFactory;
+    
+    public void findFirst() {
+        SqlSession session = sqlSessionFactory.openSession();
+        UserMapper mapper = session.getMapper(UserMapper.class);
+        User user = mapper.selectById(1);
+    }
+    public void updateById(User user) {
+        SqlSession session = sqlSessionFactory.openSession();
+        UserMapper mapper = session.getMapper(UserMapper.class);
+        mapper.updateById(user);
+        session.commit(); // 需要自己提交事务。
+    }
+}
+```
+
+> 个人感觉：使用SqlSessionTemplate最主要的优点：
+>
+> 避免每次都需要 `SqlSessionFactory#openSession()` 获得`SqlSession`  (使用jdk动态代理实现)
+
+
+
 通过配置文件可以看到，整个应用程序中只需要配置一个 `SqlSessionTemplate` 就可以了。但是本身 SqlSessionTemplate 就是 `SQLSession`：
 
 ![image-20210418233425460](images/image-20210418233425460.png)
-【疑问】那问题就来了：每个线程都对应一个sqlSession对象.但是每个线程调用getSqlSession()方法都会返回这个单例的`SqlSessionTemplate` 对象，`SqlSessionTemplate` 是如何获得当前线程对应的SqlSession的呢？
+【疑问】那问题就来了：每个线程都对应一个`SqlSession`对象。但是每个线程调用`getSqlSession()方法`都会返回这个单例的`SqlSessionTemplate` 对象，`SqlSessionTemplate` 是如何获得当前线程对应的SqlSession的呢？
+
+
 
 
 
