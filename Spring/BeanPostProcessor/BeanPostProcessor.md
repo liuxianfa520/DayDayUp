@@ -87,6 +87,24 @@ org.springframework.context.support.ApplicationContextAwareProcessor
 
 
 
+# SmartInstantiationAwareBeanPostProcessor
+
+此接口是 上一章节 InstantiationAwareBeanPostProcessor 的子接口，又添加了三个方法：
+
+![image-20210412194844502](images/image-20210412194844502.png)
+
+其中最后一个方法  `Object getEarlyBeanReference(Object bean, String beanName)` 在aop中使用到了：
+
+> **AbstractAutoProxyCreator#getEarlyBeanReference**
+>
+> - 在早期引用的时，对目标bean创建代理对象。
+>
+> - 注：只有存在循环依赖时，才会使用此方式创建代理对象
+>
+>   详见[《aop.md》中：在bean的哪些生命周期时创建aop代理对象？](../AOP/aop.md)
+
+
+
 
 
 
@@ -101,11 +119,14 @@ org.springframework.context.support.ApplicationContextAwareProcessor
 
 新增了两个方法：
 
+- 在bean销毁方法调用之前，可以做一些事情。
+
 ```java
 void postProcessBeforeDestruction(Object bean, String beanName)
 ```
 
-在bean销毁方法调用之前，可以做一些事情。
+- 确定给定的bean实例是否需要此后处理器销毁。
+  默认实现返回true 。 如果Spring 5之前版本未实现此方法则Spring会默认为true。
 
 ```java
 default boolean requiresDestruction(Object bean) {
@@ -113,8 +134,6 @@ default boolean requiresDestruction(Object bean) {
 }
 ```
 
-确定给定的bean实例是否需要此后处理器销毁。
-默认实现返回true 。 如果DestructionAwareBeanPostProcessor的5之前版本的实现未提供此方法的具体实现，则Spring也会默默假定为true 。
 
 
 
@@ -123,6 +142,28 @@ default boolean requiresDestruction(Object bean) {
 
 
 
+# 不同容器的处理方式
+
+> 重要的一点是，`BeanFactory`和`ApplicationContext`对待bean后置处理器稍有不同。`ApplicationContext`会自动检测在配置文件中实现了`BeanPostProcessor`接口的所有bean，并把它们注册为后置处理器，然后在容器创建bean的适当时候调用它。部署一个后置处理器同部署其他的bean并没有什么区别。而使用`BeanFactory`实现的时候，bean 后置处理器必须通过下面类似的代码显式地去注册：
+>
+> ```java
+> ConfigurableBeanFactory factory = new XmlBeanFactory(...);
+>             
+> // 需要手动注册需要的 BeanPostProcessor
+> MyBeanPostProcessor postProcessor = new MyBeanPostProcessor();
+> factory.addBeanPostProcessor(postProcessor);
+> 
+> // 开始使用factory
+> factory.getBean("xxxxx");
+> ```
+>
+> 因为显式注册的步骤不是很方便，这也是为什么在各种Spring应用中首选`ApplicationContext`的一个原因，特别是在使用`BeanPostProcessor`时。
+
+对于上面的描述，你是否有这样的疑问：`ApplicationContext`为什么就能够自动检测`BeanPostProcessor`呢？
+
+其实在 refresh() 方法中有  `registerBeanPostProcessors(beanFactory);` 方法去处理这部分逻辑：
+
+![image-20210412193802042](images/image-20210412193802042.png)
 
 
 
@@ -138,7 +179,7 @@ default boolean requiresDestruction(Object bean) {
 
 - 理解：所有的bean后置处理器都实现了相同的接口，每个子类存在不同的实现逻辑：可以根据参数在子类的方法中判断如何进行处理：
   - 有的对bean做了修改
-    - aop
+    - aop   详见 [aop.md](..\AOP\aop.md)
       - AbstractAutoProxyCreator#getEarlyBeanReference 在早期引用的时，对目标bean创建代理对象。（只有存在循环依赖时，才会使用此方式创建代理对象）
       - AbstractAutoProxyCreator#postProcessAfterInitialization 在bean初始化完毕后，对目标bean创建代理对象。
   - 有的对bean中方法进行调用
