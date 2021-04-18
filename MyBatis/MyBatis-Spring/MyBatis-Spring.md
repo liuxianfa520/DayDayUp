@@ -246,6 +246,7 @@ public class UserService {
 通过配置文件可以看到，整个应用程序中只需要配置一个 `SqlSessionTemplate` 就可以了。但是本身 SqlSessionTemplate 就是 `SQLSession`：
 
 ![image-20210418233425460](images/image-20210418233425460.png)
+
 【疑问】那问题就来了：每个线程都对应一个`SqlSession`对象。但是每个线程调用`getSqlSession()方法`都会返回这个单例的`SqlSessionTemplate` 对象，`SqlSessionTemplate` 是如何获得当前线程对应的SqlSession的呢？
 
 
