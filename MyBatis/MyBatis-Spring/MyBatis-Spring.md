@@ -96,6 +96,94 @@
 
   ![image-20210418160118167](images/image-20210418160118167.png)
 
+那这个 MapperFactoryBean 是如何实现呢？
+
+
+
+
+
+# 【疑问】为什么调用Mapper.java中的方法就可实现crud?
+
+- 以前背面试题时，面试宝典告诉我们：是使用**`jdk动态代理`**实现的。
+- 详见下面一章节的内容：MapperFactoryBean
+
+
+
+# MapperFactoryBean
+
+![image-20210418220637956](images/image-20210418220637956.png)
+
+## 类层次结构
+
+是 `org.springframework.beans.factory.InitializingBean` 和 `org.springframework.beans.factory.FactoryBean`两个接口的实现。所以主要需要看以下两个方法：
+
+- afterPropertiesSet() 方法
+- getObject() 方法
+
+从bean的生命周期先后顺序来说，应该先看 `afterPropertiesSet()` 方法，这个方法是在`bean填充之后`被调用的。
+
+而`MapperFactoryBean#getObject`方法在bean已经初始化完毕，才会被调用。
+
+## afterPropertiesSet() 方法
+
+主要是检查配置，然后初始化：
+
+![image-20210418221729891](images/image-20210418221729891.png)
+
+![image-20210418222003453](images/image-20210418222003453.png)
+
+把 `MapperProxyFactory` 添加到`knownMappers`，这个`afterPropertiesSet()` 方法逻辑就结束了。
+
+## getObject() 方法
+
+org.mybatis.spring.mapper.MapperFactoryBean#getObject
+
+![image-20210418224604006](images/image-20210418224604006.png)
+
+`getSqlSession()` 方法返回的是一个 SqlSession 接口的实现类，而实际上此处返回的是：`SqlSessionTemplate` 。
+
+> *我们知道 SqlSession 主要都是通过 `SqlSessionFactory#openSession()` 方法返回的，而且不同线程对应不同的 `SqlSession` 实例对象。那这里`SqlSessionTemplate` 是如何和对应线程绑定的呢？？？？这个问题下面 [SqlSessionTemplate]() 一节来详细讨论。*
+
+ `getMapper()` 方法获得Mapper接口的代理对象：
+
+![image-20210418222329943](images/image-20210418222329943.png)
+
+> 【疑问】org.apache.ibatis.binding.MapperRegistry#getMapper 返回值没有缓存吗？难道每次getMapper时，都需要创建一个代理对象？
+>
+> 以下只是猜测，暂时还没有看到实际的源码做支撑，如果有朋友知道此问题的答案，欢迎提Issues一起沟通学习，感谢：
+>
+> 貌似MyBatis并没有对代理对象做任何缓存。但Mapper接口默认scope=singleton的，在和spring容器结合后，一个Mapper接口就对应一个bean对象。
+>
+> 而不是需要在每次调用mapper中的select/update/delete/save方法的时候，都需要调用 getMapper() 去使用jdk动态代理去创建代理对象。
+
+## MapperProxyFactory
+
+为目标Mapper接口创建代理对象的。
+
+![image-20210418222542476](images/image-20210418222542476.png)
+
+具体mapper是如何解析出SQL语句、如何执行SQL语句，都在 `org.apache.ibatis.binding.MapperProxy#invoke` 方法中了。
+
+这个方法在这里就不展开说了。详见：todo：
+
+
+
+
+
+# SqlSessionTemplate 
+
+使用：
+
+```xml
+<bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+   <constructor-arg ref="sqlSessionFactory" />
+</bean>
+```
+
+通过配置文件可以看到，整个应用程序中只需要配置一个 `SqlSessionTemplate` 就可以了。但是本身 SqlSessionTemplate 就是 `SQLSession`：
+
+![image-20210418233425460](images/image-20210418233425460.png)
+【疑问】那问题就来了：每个线程都对应一个sqlSession对象.但是每个线程调用getSqlSession()方法都会返回这个单例的`SqlSessionTemplate` 对象，`SqlSessionTemplate` 是如何获得当前线程对应的SqlSession的呢？
 
 
 
@@ -104,11 +192,24 @@
 
 
 
-# 【疑问】为什么指定Mapper.java 并指定Mapper.xml 就可以对数据库进行crud?
 
-- 以前背面试题时，面试宝典告诉我们：是使用**`jdk动态代理`**实现的。那我们就来一探究竟。
-- 这个问题应该是 MyBatis 源码中的内容，而不是 mybatis-spring 中的内容。
-- todo：详见文档：[使用jdk动态代理实现的Mapper.java]()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
