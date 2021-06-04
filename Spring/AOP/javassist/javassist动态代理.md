@@ -19,5 +19,5 @@
 
 二、测试类：
 
-详见：com.anxiaole.javassist.proxy.JavassistProxyTest
+详见：[com.anxiaole.javassist.proxy.JavassistProxyTest](.\src\main\java\com\anxiaole\javassist\proxy\JavassistProxyTest.java)
 
