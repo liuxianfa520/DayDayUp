@@ -1,3 +1,5 @@
+# 问题
+
 在项目启动时，经常会遇到如下警告：
 
 ```
@@ -27,6 +29,10 @@ SLF4J: Actual binding is of type [ch.qos.logback.classic.util.ContextSelectorSta
 
 
 # slf4j 设计模式
+
+> slf4j和commons-logging都是facade设计模式的`抽象`，用于统一各种日志框架，
+>
+> 底层依赖于具体的日志框架实现，如log4j、logback、log4j2、jdk logging，并且需要引入相应的`桥接jar依赖`。
 
 1、`门面模式`、`适配器模式`。详见：[【java】slf4j中的适配器与桥接是怎样工作的？](https://www.bilibili.com/video/BV1FJ411R78C)
 
