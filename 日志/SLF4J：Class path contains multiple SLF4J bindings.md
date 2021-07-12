@@ -20,6 +20,10 @@ SLF4J: Actual binding is of type [ch.qos.logback.classic.util.ContextSelectorSta
 
 [上面视频配套的github文档](https://github.com/sunwu51/notebook/blob/master/19.11/log_java%E6%97%A5%E5%BF%97%E6%A1%86%E6%9E%B6.md)
 
+![img](images/concrete-bindings.png) 图片来源：http://www.slf4j.org/images/concrete-bindings.png
+
+
+
 
 
 # slf4j 设计模式
