@@ -61,7 +61,7 @@ Spring核心原理和模式，波波微课
 装饰Decorator|[code](patterns/structural/decorator)|[ppt](ppts/装饰模式.pdf)|[video](http://v.qq.com/x/page/p0636w3d6s2.html)|org.apache.ibatis.cache.Cache<br />org.apache.ibatis.executor.CachingExecutor
 适配器Adapter|[code](patterns/structural/adapter)|[  ](ppts/适配器.pdf)|[video](https://v.qq.com/x/page/w0632njvzkw.html)|org.springframework.web.servlet.HandlerAdapter<br />org.apache.ibatis.logging.Log
 门面Facade|[code](patterns/structural/facade)|[ppt](ppts/门面模式.pdf)|[video](https://v.qq.com/x/page/m06379lgexy.html)|org.apache.ibatis.session.SqlSession<br />[slf4j](https://gitee.com/anxiaole/DayDayUp/blob/master/%E6%97%A5%E5%BF%97/SLF4J%EF%BC%9AClass%20path%20contains%20multiple%20SLF4J%20bindings.md)
-组合Composite|[code](patterns/structural/composite)|[ppt](ppts/组合模式.pdf)|[video](https://v.qq.com/x/page/t0634x9lbew.html)|[org.apache.ibatis.scripting.xmltags.MixedSqlNode](https://gitee.com/anxiaole/spring-framework/blob/5.0.x/core-spring-patterns/%E8%A3%85%E9%A5%B0%E6%A8%A1%E5%BC%8F%E5%92%8C%E7%BB%84%E5%90%88%E6%A8%A1%E5%BC%8F.md)
+组合Composite|[code](patterns/structural/composite)|[ppt](ppts/组合模式.pdf)|[video](https://v.qq.com/x/page/t0634x9lbew.html)|[org.apache.ibatis.scripting.xmltags.MixedSqlNode](https://gitee.com/anxiaole/DayDayUp/tree/master/设计模式/装饰模式和组合模式.md)
 
 
 ### 3. 行为模式
@@ -119,4 +119,4 @@ Spring核心原理和模式，波波微课
 
 ## 装饰者模式和组合模式的区别？
 
-[点击跳转](https://gitee.com/anxiaole/spring-framework/blob/5.0.x/core-spring-patterns/%E8%A3%85%E9%A5%B0%E6%A8%A1%E5%BC%8F%E5%92%8C%E7%BB%84%E5%90%88%E6%A8%A1%E5%BC%8F.md)
+[点击跳转](https://gitee.com/anxiaole/DayDayUp/tree/master/设计模式/装饰模式和组合模式.md)
