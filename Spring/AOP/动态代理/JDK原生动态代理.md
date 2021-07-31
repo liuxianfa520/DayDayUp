@@ -456,17 +456,50 @@ public class ProxyGenerator {
 }
 ```
 
+创建`代理类`的逻辑，其实就是：
+
+- 生成代理类的类名、父类 `java.lang.reflect.Proxy` 、实现的接口等
+- 生成代理类的方法、字段、构造方法、静态方法等
+- 生成代理类的常量池、访问标识符
+- 最后还往类二进制byte[]数组中添加了0   （我也不知道是为啥？难道是类填充？？这是猜测，我也不知道）
+- 最后使用  `return byteArrayOutputStream.toByteArray();`  返回byte[]数组.也就是class类的二进制数据数组.
+
+再往里面的细节，有兴趣的可以去分析分析。
+
+> 我要偷懒了：
+>
+> 其实我们把生成的代理类输出到磁盘中，反编译之后，就知道代理类中都有什么内容、就知道代理类的实现了。
+>
+> 根据反编译的代理类class文件，再来看这生成代理类的过程，大致能理解了。
+>
+> 所以到这里，我要偷懒了，不继续往里面研究了。这里再说一下如何把生成的代理类class文件输出到磁盘中：（本文上面demo也有）
+>
+> ```java
+> // 把jdk动态代理生成的代理类class文件,输出到 [当前项目跟目录+包名] 目录里.
+> System.setProperty("sun.misc.ProxyGenerator.saveGeneratedFiles", "true");
+> // 详见:sun.misc.ProxyGenerator#saveGeneratedFiles
+> ```
 
 
 
+到这里我们已经拿到了代理类class的二进制数据，那么接下来就是要把byte[]转换成Class：
 
 ## 使用代理类二进制流定义Class
 
+```java
+byte[] proxyClassFile = ProxyGenerator.generateProxyClass(proxyName, interfaces, accessFlags);
+Class proxyClass = defineClass0(loader, proxyName, proxyClassFile, 0, proxyClassFile.length);
+```
 
+也就是 `defineClass0` 方法：
 
+```java
+private static native Class<?> defineClass0(ClassLoader loader, String name, byte[] b, int off, int len);
+```
 
+没办法了，此方法是静态`native`本地方法，看不了方法实现了。
 
-
+只需要知道，这个方法使用类加载器`loader`,把byte[]数组解析成名为`name`的类，并加载到jvm中。
 
 
 
