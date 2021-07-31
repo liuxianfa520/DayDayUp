@@ -114,7 +114,7 @@ public static void main(String[] args) throws Exception {
  import java.lang.reflect.Proxy;
  import java.lang.reflect.UndeclaredThrowableException;
 
- public final class LoginServiceImpl$Proxy extends Proxy implements LoginService {
+ public final class LoginServiceImpl$Proxy0 extends Proxy implements LoginService {
      
      // 使用反射从 com.service.LoginService 接口中获得login方法。
      private static Method m3 = Class.forName("com.service.LoginService")
@@ -130,8 +130,8 @@ public static void main(String[] args) throws Exception {
              super.h.invoke(this, m3, new Object[]{var1, var2});   
          } catch (RuntimeException | Error var4) {
              throw var4;
-         } catch (Throwable var5) {
-             throw new UndeclaredThrowableException(var5);
+         } catch (Throwable e) {
+             throw new UndeclaredThrowableException(e);
          }
      }
      
@@ -169,6 +169,11 @@ public static void main(String[] args) throws Exception {
 >
 > 否则可以直接看下一章节：[总结](#总结)
 
+结合下面 `newProxyInstance`静态方法，我们看到主要有两个步骤：
+
+- **查找**或**生成**指定的`代理类`
+- 调用代理类的构造方法，实例化代理对象。
+
 ```java
 public class Proxy implements java.io.Serializable {
   /** 
@@ -185,24 +190,22 @@ public class Proxy implements java.io.Serializable {
                                           Class<?>[] interfaces,
                                           InvocationHandler h) {
         Objects.requireNonNull(h);
-
-        final Class<?>[] intfs = interfaces.clone();
+        
+        // 安全管理器是一个允许应用程序实现安全策略的类。
+        // 它允许应用程序在执行一个可能不安全或敏感的操作前确定该操作是什么，以及是否是在允许执行该操作的安全上下文中执行它。
         final SecurityManager sm = System.getSecurityManager();
-        if (sm != null) {
-            checkProxyAccess(Reflection.getCallerClass(), loader, intfs);
-        }
+        // 忽略：安全管理器相关check的代码。
 
         /*
          * Look up or generate the designated proxy class.
-         * 1、查找或生成指定的代理类——在第一次生成代理类之后，会缓存起来。
+         * 1、查找或生成指定的代理类
          */
+        final Class<?>[] intfs = interfaces.clone();
         Class<?> cl = getProxyClass0(loader, intfs);
 
         // 2、调用构造方法，实例化对象。
         try {
-            if (sm != null) { // todo：？？？？？？？？
-                checkNewProxyPermission(Reflection.getCallerClass(), cl);
-            }
+            // 忽略：安全管理器相关check的代码。
 
             // 获得代理类的构造方法。构造方法的参数为：  InvocationHandler.class
             final Constructor<?> cons = cl.getConstructor(constructorParams);
@@ -224,17 +227,240 @@ public class Proxy implements java.io.Serializable {
 }    
 ```
 
+## 查找或生成指定的`代理类`
+
+```java
+    private static final WeakCache<ClassLoader, Class<?>[], Class<?>> proxyClassCache = 
+                         new WeakCache<>(new KeyFactory(), new ProxyClassFactory());
+
+    private static Class<?> getProxyClass0(ClassLoader loader, Class<?>... interfaces) {
+        // If the proxy class defined by the given loader implementing
+        // the given interfaces exists, this will simply return the cached copy;
+        // otherwise, it will create the proxy class via the ProxyClassFactory
+        // 翻译成中文：如果缓存中存在要求的代理类proxy class,就直接返回缓存
+        //           否则，将会通过 ProxyClassFactory 来创建代理类，并放到缓存中。
+        return proxyClassCache.get(loader, interfaces);
+    }
+```
+
+`proxyClassCache`是 `WeakCache<ClassLoader, Class<?>[], Class<?>>` 类型，是 `软引用缓存`  。java中的软引用不多说了，有不会的百度查一下。
+
+## 软引用缓存WeakCache
+
+这里的 `WeakCache`软引用缓存，就是用软引用思想，实现的缓存。其构造方法需要传入两个参数：
+
+```java
+    public WeakCache(BiFunction<K, P, ?> subKeyFactory, BiFunction<K, P, V> valueFactory) {
+        this.subKeyFactory = Objects.requireNonNull(subKeyFactory);
+        this.valueFactory = Objects.requireNonNull(valueFactory);
+    }
+```
+
+第一个是 `keyFactory`，顾名思义，就是创建key的工厂；
+
+第二个参数是 `valueFactory` 顾名思义，就是缓存中不存在值时，会使用此value工厂来创建对应的值，并保存到缓存中。
+
+在new实例化时：
+
+```java
+WeakCache<ClassLoader, Class<?>[], Class<?>> proxyClassCache = 
+                         new WeakCache<>(new KeyFactory(), new ProxyClassFactory());
+```
+
+传入的value创建工厂是：`ProxyClassFactory`，我们就来研究研究这个类，来探究一下`代理类`是如何被创建出来的。
+
+## 代理类工厂ProxyClassFactory
+
+java.lang.reflect.Proxy.ProxyClassFactory 类是在 java.lang.reflect.Proxy 类中的一个静态内部类，并实现了 `BiFunction`接口：
+
+```java
+    private static final class ProxyClassFactory implements BiFunction<ClassLoader, Class<?>[], Class<?>>
+    {
+        // prefix for all proxy class names   代理类的类名前缀
+        private static final String proxyClassNamePrefix = "$Proxy";
+
+        // next number to use for generation of unique proxy class names   
+        // 在生成代理类时，会在代理类中添加一个自增的数字来标识类名唯一。比如本例中，代理类的类名是：LoginServiceImpl$Proxy0
+        private static final AtomicLong nextUniqueNumber = new AtomicLong();
+    }        
+```
+
+`BiFunction`接口是java8中新增加的一个接口，其中方法是`apply`，使用两个参数，返回一个返回值。
+
+```java
+@FunctionalInterface
+public interface BiFunction<T, U, R> {
+    R apply(T t, U u);
+}
+```
+
+那我们仔细看一下 `ProxyClassFactory#apply` 方法，也是这个方法中写了`生成代理类`的逻辑：
+
+```java
+@Override
+public Class<?> apply(ClassLoader loader, Class<?>[] interfaces) {
+    // 忽略：对接口的各种校验 及 生成包名 proxyPkg 的逻辑。。。。
+    
+    // Choose a name for the proxy class to generate.
+    // 1、代理类的类名（类权限定名，包含包名）
+    long num = nextUniqueNumber.getAndIncrement();
+    String proxyName = proxyPkg + proxyClassNamePrefix + num; // 代理类的类名。proxyName
+
+    // Generate the specified proxy class.
+    // 2、生成指定的代理类。proxyClassFile 是代理类class的二进制数据流
+    byte[] proxyClassFile = ProxyGenerator.generateProxyClass(proxyName, interfaces, accessFlags);
+    try {
+        // 3、使用二进制流，定义Calss 并返回代理类的Class对象。
+        return defineClass0(loader, proxyName, proxyClassFile, 0, proxyClassFile.length);
+    } catch (ClassFormatError e) {
+        throw new IllegalArgumentException(e.toString());
+    }
+}
+```
+
+> 画外音：
+>
+> .java文件会编译成.class文件保存到磁盘中，在类加载的时候，会从磁盘上读取.class文件的二进制文件流，然后使用类加载器定义成class类并把类保存到内存中。
+>
+> 更多类加载的逻辑可以看  jvm——类加载器，这里不多赘述。
+>
+> 本章节我们的重点是：梳理生成代理类的逻辑。也就是下面一小节：
+
+## 生成代理类二进制流
+
+```java
+byte[] proxyClassFile = ProxyGenerator.generateProxyClass(proxyName, interfaces, accessFlags);
+```
+
+`sun.misc.ProxyGenerator` 根据包名看到，这已经是`sun`包中的了。所以并没有源码，下面看到的也是经过`反编译`的结果：
+
+![image-20210731160931999](images/image-20210731160931999.png)
 
 
 
 
 
+```java
+public class ProxyGenerator {
+  private String className;                      // 代理类类名
+  private Class<?>[] interfaces;                 // 代理类的所有接口
+  private int accessFlags;                       // 访问标识符,也就是public static final  这些.
+  private ProxyGenerator.ConstantPool cp = new ProxyGenerator.ConstantPool();  // 常量池.注意:这是类中的常量池,使用javap命令可以看到.学习过jvm就能理解了.
+  private List<ProxyGenerator.FieldInfo> fields = new ArrayList();            // 代理类中的所有字段
+  private List<ProxyGenerator.MethodInfo> methods = new ArrayList();          // 代理类中的所有方法,包括构造方法,静态代码块
+  private Map<String, List<ProxyGenerator.ProxyMethod>> proxyMethods = new HashMap();   //    所有的代理方法.
+  
+  
+  private ProxyGenerator(String className, Class<?>[] interfaces, int accessFlags) {
+    this.className = className;
+    this.interfaces = interfaces;
+    this.accessFlags = accessFlags;
+  }
+  
+  // 生成类二进制文件.................. 
+  private byte[] generateClassFile() {
+    this.addProxyMethod(hashCodeMethod, Object.class); // 给代理类添加 hashCode 方法
+    this.addProxyMethod(equalsMethod, Object.class);   // 给代理类添加 equals   方法
+    this.addProxyMethod(toStringMethod, Object.class); // 给代理类添加 toString 方法
+    int interfaceLength = this.interfaces.length;
+  
+    // 获取所有接口,把接口中的所有方法都生成代理方法,并添加到代理类中.
+    for(int i = 0; i < interfaceLength; ++i) {
+      Class interfaceClass = this.interfaces[i];
+      int methodLength = interfaceClass.getMethods().length;
+      for(int methodIndex = 0; methodIndex < methodLength; ++methodIndex) {
+        Method method = interfaceClass.getMethods()[methodIndex];
+        // 给代理类,添加接口中的所有方法,接口中的所有方法都需要被代理.
+        this.addProxyMethod(method, interfaceClass);
+      }
+    }
+  
+    Iterator proxyMethodsIterator = this.proxyMethods.values().iterator();
+  
+    List<ProxyGenerator.ProxyMethod> proxyMethod;
+    while(proxyMethodsIterator.hasNext()) {
+      proxyMethod = (List)proxyMethodsIterator.next();
+      checkReturnTypes(proxyMethod);
+    }
+  
+    Iterator iterator;
+    try {
+      // 给代理类添加 构造方法
+      this.methods.add(this.generateConstructor());
+  
+      // 解析所有的代理方法，
+      proxyMethodsIterator = this.proxyMethods.values().iterator();
+      while(proxyMethodsIterator.hasNext()) {
+        proxyMethod = (List)proxyMethodsIterator.next();
+        iterator = proxyMethod.iterator();
+  
+        while(iterator.hasNext()) {
+          ProxyGenerator.ProxyMethod var16 = (ProxyGenerator.ProxyMethod)iterator.next();
+          // 给代理类 添加字段；字段类型为 Method
+          this.fields.add(new ProxyGenerator.FieldInfo(var16.methodFieldName, "Ljava/lang/reflect/Method;", 10));
+          // 给代理类 添加方法
+          this.methods.add(var16.generateMethod());
+        }
+      }
+  
+      // 给代理类添加静态代码块
+      this.methods.add(this.generateStaticInitializer());
+    } catch (IOException e) {
+      throw new InternalError("unexpected I/O Exception", e);
+    }
+
+    if (this.methods.size() > 65535) {                              // 方法个数最大值校验
+      throw new IllegalArgumentException("method limit exceeded");
+    } else if (this.fields.size() > 65535) {                        // 字段个数最大值校验
+      throw new IllegalArgumentException("field limit exceeded");
+    } else {
+      this.cp.setReadOnly(); // 常量池设置为只读
+      // ====开始把类中的所有内容都写到byte[]数组中====
+      
+      // 把class文件中的内容,都使用输出流,写入到`byteArrayOutputStream`中,在最后return时,返回二进制数组.
+      ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+      DataOutputStream out = new DataOutputStream(byteArrayOutputStream);
+      try {
+        out.writeInt(-889275714);
+        out.writeShort(0);
+        out.writeShort(49); 
+        this.cp.write(out);                                           // 把常量池写入到代理类中
+        out.writeShort(this.accessFlags);                             // 代理类的访问标识   也就是 public/static/final 这些关键字.
+        out.writeShort(this.cp.getClass(dotToSlash(this.className))); // 代理类的类名
+        out.writeShort(this.cp.getClass("java/lang/reflect/Proxy"));  // 代理类继承 java.lang.reflect.Proxy 类
+
+        out.writeShort(this.interfaces.length);                       // 代理类实现的接口个数
+        for(int i = 0; i < this.interfaces.length; ++i) {             // 代理类实现的接口
+          out.writeShort(this.cp.getClass(dotToSlash(this.interfaces[i].getName())));
+        }
+
+        out.writeShort(this.fields.size());                           // 字段个数
+        iterator = this.fields.iterator();                            // 代理类中的字段
+        while(iterator.hasNext()) {
+          (ProxyGenerator.FieldInfo)iterator.next().write(out);
+        }
+
+        out.writeShort(this.methods.size());                          // 方法个数
+        iterator = this.methods.iterator();                           // 代理类中的方法
+        while(iterator.hasNext()) {
+          (ProxyGenerator.MethodInfo)iterator.next().write(out);
+        }
+
+        out.writeShort(0);                          
+        return byteArrayOutputStream.toByteArray();       返回byte[]数组.也就是class类的二进制数据数组.
+      } catch (IOException e) {
+        throw new InternalError("unexpected I/O Exception", e);
+      }
+    }
+  }
+}
+```
 
 
 
 
 
-
+## 使用代理类二进制流定义Class
 
 
 
