@@ -543,11 +543,113 @@ private static native Class<?> defineClass0(ClassLoader loader, String name, byt
 
 
 
+# 
+
+# 
 
 
 
+# 实验
 
+## 如果目标类实现了两个接口，但是在创建代理对象的时候，只指定了一个接口，会怎么样？
 
+定义两个接口：
 
+```java
+public interface LoginService {
+    void login();
+}
 
+public interface LoginService2 {
+    void login2();
+}
+```
+
+实现类：
+
+```java
+public class LoginServiceImpl implements LoginService,LoginService2 {
+
+  @Override
+  public void login() {
+    System.out.println("登录成功!");
+  }
+
+  @Override
+  public void login2() {
+    System.out.println("登录成功!222");
+  }
+}
+```
+
+代理逻辑（拦截器）：
+
+```java
+public class MyInvocationHandler implements InvocationHandler {
+    private Object target;
+    public MyInvocationHandler(Object target) {
+        this.target = target;
+    }
+    
+    @Override
+    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        System.out.println("目标方法执行前，打印这句话。");
+        return method.invoke(this.target, args);;
+    }
+}    
+```
+
+测试用例：
+
+创建代理对象的时候，指定 `LoginService.class` 一个接口，不指定 `LoginService2.class` 接口：
+
+```java
+public static void main(String[] args) throws IOException {
+    System.setProperty("sun.misc.ProxyGenerator.saveGeneratedFiles", "true"); // 输出代理类
+
+    LoginServiceImpl target = new LoginServiceImpl();
+    MyInvocationHandler myInvocationHandler = new MyInvocationHandler(target);
+    
+    LoginService proxy = (LoginService) Proxy.newProxyInstance(target.getClass().getClassLoader(), 
+                                                               new Class[]{LoginService.class}, //只指定LoginService接口
+                                                               myInvocationHandler);
+
+    proxy.login();
+}
+```
+
+执行之后，是可以正常执行。
+
+打开生成的代理类：（有删减）
+
+```java
+final class $Proxy0 extends Proxy implements LoginService {
+    private static Method m3;
+
+    public $Proxy0(InvocationHandler var1) throws  {
+        super(var1);
+    }
+
+    public final void login() throws  {
+        try {
+            super.h.invoke(this, m3, new Object[]{});
+        } catch (RuntimeException | Error var4) {
+            throw var4;
+        } catch (Throwable var5) {
+            throw new UndeclaredThrowableException(var5);
+        }
+    }
+}
+```
+
+从代理类中，我们看到，代理类只继承了`LoginService`接口，并没有继承`LoginService2`接口。
+
+那么我们也就知道了，这种情况下，并不能把`代理对象`类型转化成`LoginService2`，否则就会报错.
+
+```
+Exception in thread "main" java.lang.ClassCastException: com.sun.proxy.$Proxy0 cannot be cast to com.mytest.LoginService2
+	at com.mytest.Test.main(Test.java:24)
+```
+
+既然不能类型转成`LoginService2`，那么可想而知：我们也无法使用`代理对象`调用到`LoginService2`接口中的方法。
 
