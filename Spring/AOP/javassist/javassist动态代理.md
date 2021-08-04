@@ -1,5 +1,5 @@
 # 使用javassist作为动态代理
-- MyBatis 懒加载默认使用javassist作为动态代理
+- MyBatis 懒加载默认使用javassist动态代理
 - 详见: org.apache.ibatis.executor.loader.javassist.JavassistProxyFactory#crateProxy
 
 
@@ -19,5 +19,5 @@
 
 二、测试类：
 
-详见：[com.anxiaole.javassist.proxy.JavassistProxyTest](.\src\main\java\com\anxiaole\javassist\proxy\JavassistProxyTest.java)
+详见：[com.anxiaole.javassist.proxy.JavassistProxyTest](https://gitee.com/anxiaole/DayDayUp/blob/master/Spring/AOP/javassist/src/main/java/com/anxiaole/javassist/proxy/JavassistProxyTest.java)
 
