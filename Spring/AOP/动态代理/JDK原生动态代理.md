@@ -165,7 +165,7 @@ public static void main(String[] args) throws Exception {
 
 # Proxy#newProxyInstance
 
-> 理解这个方法确实有点困难，如果有时间、有兴趣的伙伴可以研究研究此章节。
+> 理解这个方法原理有点困难，如果有时间、有兴趣的伙伴可以研究研究。
 >
 > 否则可以直接看下一章节：[总结](#总结)
 
@@ -531,7 +531,7 @@ private static native Class<?> defineClass0(ClassLoader loader, String name, byt
 >
 > 但并不是spring中使用jdk动态代理的所有内容，只是为了阅读spring的一个入门级小demo。
 >
-> 其实还是建议：把jdk动态代理的内容先理解了，再开始看spring aop。否则很痛苦的。
+> 建议：把jdk动态代理的使用先理解了，再开始看spring aop。否则很痛苦的。
 
 测试用例详见：[com.atguigu.test.jdkDynamicProxy.MyJdkDynamicProxyTest](https://gitee.com/anxiaole/spring-framework/blob/5.0.x/spring-example/src/test/java/com/atguigu/test/jdkDynamicProxy/MyJdkDynamicProxyTest.java)
 
