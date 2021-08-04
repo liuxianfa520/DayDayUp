@@ -114,13 +114,13 @@ public static void main(String[] args) throws Exception {
  import java.lang.reflect.Proxy;
  import java.lang.reflect.UndeclaredThrowableException;
 
- public final class LoginServiceImpl$Proxy0 extends Proxy implements LoginService {
+ public final class $Proxy0 extends Proxy implements LoginService {
      
      // 使用反射从 com.service.LoginService 接口中获得login方法。
      private static Method m3 = Class.forName("com.service.LoginService")
                    .getMethod("login", Class.forName("java.lang.String"), Class.forName("java.lang.String"));
 
-     public LoginServiceImpl$Proxy(InvocationHandler var1) throws  {
+     public $Proxy0(InvocationHandler var1) throws  {
          super(var1);
      }
 
@@ -180,7 +180,7 @@ public class Proxy implements java.io.Serializable {
     * parameter types of a proxy class constructor 代理类构造方法的参数列表 
     * 
     * 从反编译的代理类中看到构造器方法参数是固定的:
-    *    public LoginServiceImpl$Proxy(InvocationHandler var1) throws  {
+    *    public $Proxy0(InvocationHandler var1) throws  {
     *        super(var1);
     *    }
     */
@@ -280,7 +280,7 @@ java.lang.reflect.Proxy.ProxyClassFactory 类是在 java.lang.reflect.Proxy 类�
         private static final String proxyClassNamePrefix = "$Proxy";
 
         // next number to use for generation of unique proxy class names   
-        // 在生成代理类时，会在代理类中添加一个自增的数字来标识类名唯一。比如本例中，代理类的类名是：LoginServiceImpl$Proxy0
+        // 在生成代理类时，会在代理类中添加一个自增的数字来标识类名唯一。比如本例中，代理类的类名是：$Proxy0
         private static final AtomicLong nextUniqueNumber = new AtomicLong();
     }        
 ```
