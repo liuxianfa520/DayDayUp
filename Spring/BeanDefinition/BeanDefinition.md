@@ -1,5 +1,7 @@
 # BeanDefinition
 
+- bean定义，主要描述spring中的bean。比如bean名称，比如bean是哪个类，比如bean是否为单例  等等。
+
 - BeanDefinition
 
   [**Table 1. The bean definition**](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-definition)
@@ -19,8 +21,9 @@
 - BeanDefinitionReader
 
   - ```java
+    // 主要方法：返回bean定义注册中心实例
     BeanDefinitionRegistry getRegistry();
-    
+    // 从指定资源，加载bean定义。返回新加载bean定义数量。
     int loadBeanDefinitions(Resource resource);
     ```
     
