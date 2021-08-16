@@ -4,71 +4,101 @@ https://github.com/ThinkingHan/Java-note/blob/master/Spring%E9%9D%A2%E8%AF%95.md
 
 # **一、基本概念面试题集（ Spring 相关概念梳理）**
 
-1.  谈谈对 Spring IoC 的理解？
+1. 谈谈对 Spring IoC 的理解？
 
-2.  谈谈对 Spring DI 的理解？
+2. 谈谈对 Spring DI 的理解？
 
-3.  BeanFactory 接口和 ApplicationContext 接口不同点是什么？
+3. BeanFactory 接口和 ApplicationContext 接口不同点是什么？
 
-4.  请介绍你熟悉的 Spring 核心类，并说明有什么作用？
+   > [`BeanFactory`](https:docs.spring.iospring-frameworkdocs5.3.5javadoc-apiorgspringframeworkbeansfactoryBeanFactory.html) 接口提供了一种能够管理任何类型对象的高级配置机制。 [`ApplicationContext`](https:docs.spring.iospring-frameworkdocs5.3.5javadoc-apiorgspringframeworkcontextApplicationContext.html)是`BeanFactory`的一个子接口,`ApplicationContext`增加了如下功能:
+   >
+   > - 更容易与 Spring 的 AOP 特性集成
+   > - 消息资源处理（用于国际化）
+   > - 事件发布
+   > - 应用层特定上下文，例如用于 Web 应用程序的`WebApplicationContext`。
+   >
+   > 简而言之，`BeanFactory` 提供了配置框架和基本功能，而`ApplicationContext` 为企业级应用程序开发而添加了特定的功能模块。
 
-5.  介绍一下 Spring 的事务的了解？
+4. 请介绍你熟悉的 Spring 核心类，并说明有什么作用？
 
-6.  介绍一下 Spring 的事务实现方式？
+   > BeanFactory  ApplicationContext  AliasRegistry
+   >
+   > BeanDefinition  BeanDefinitionRegistry  
+   >
+   > BeanPostProcessor  Aware  InitializingBean  DisposableBean
 
-7.  解释 AOP 模块
+5. 介绍一下 Spring 的事务的了解？
 
-8.  Spring 的通知类型有哪些，请简单介绍一下？
+   > - 什么是事务？
+   >
+   > - ACID——为了保证数据一致性（要么全部成功，要么全部失败）
+   >
+   > - Spring事务：编程式事务、声明式事务
+   > - 事务传播特性
 
-9.  Spring 通知类型使用场景分别有哪些？
+6. 介绍一下 Spring 的事务实现方式？
 
-10.  请介绍一下你对 Spring Beans 的理解?
+   > 声明式事务，是基于AOP实现的
+   >
+   > 编程式事务，使用什么实现？todo：
 
-11.  Spring 有哪些优点?
+7. 解释 AOP 模块
 
-12.  在Spring中使用hibernate的方法步骤
+   > [详见](./AOP/aop.md)
 
-13.  Spring 和 Struts 的区别？
+8. Spring 的通知类型有哪些，请简单介绍一下？
 
-14.  Spring 框架由那几部分组成？
+   > Before  After  AfterReturning  AfterThrowing  Around
 
-15.  谈谈你对 BeanFactory的理解，BeanFactory 实现举例
+9. Spring 通知类型使用场景分别有哪些？
 
-16.  谈谈对 Spring 中的 Web 模块的理解
+10. 请介绍一下你对 Spring Beans 的理解?
 
-17.  BeanFactory 和 Application contexts 有什么区别？
+11. Spring 有哪些优点?
 
-18.  谈谈你对 Spring 依赖注入的理解？
+12. Spring 框架由那几部分组成？
 
-19.  什么是 Bean 装配?
+    > ![image-20210816184624133](images/image-20210816184624133.png)
+    >
+    > core   beans   context  aop   aspects
+    >
+    > jdbc   tx  
+    >
+    > web   webmvc
 
-20.  什么是 Bean 的自动装配？
+13. 谈谈你对 BeanFactory的理解，BeanFactory 实现举例     [BeanFactory.md](BeanFactory\BeanFactory.md) 
 
-21.  介绍一下自动装配有几种方式？
+14. 谈谈对 Spring 中的 Web 模块的理解
 
-22.  什么是基于注解的容器配置?
+15. 谈谈你对 Spring 依赖注入的理解？
 
-23.  简述 JdbcTemplate 类的作用
+16. 什么是 Bean 装配?
 
-24.  解释 AOP
+17. 什么是 Bean 的自动装配？
 
-25.  解释 Aspect 切面
+18. 介绍一下自动装配有几种方式？
 
-26.  简述 Spring AOP 中的通知
+19. 什么是基于注解的容器配置?
 
-27.  Spring AOP 中的织入你怎样理解？
+20. 简述 JdbcTemplate 类的作用
 
-28.  请详细介绍一下 Spring MVC 的流程？
+21. 解释 AOP
 
-29.  Spring 配置文件?
+22. 解释 Aspect 切面
 
-30.  @RequestMapping 注解用在类上面有什么作用
+23. 简述 Spring AOP 中的通知
 
-31.  怎么样把某个请求映射到特定的方法上面
+24. Spring AOP 中的织入你怎样理解？
 
-32.  谈谈 Spring 对 DAO 的支持
+25. 请详细介绍一下 Spring MVC 的流程？
 
-> ![阿里Java二面问Spring哑口无言？100道Spring面试考点解析，请查收](https://upload-images.jianshu.io/upload_images/11474088-17e0c578a696032a?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+26. Spring 配置文件?
+
+27. @RequestMapping 注解用在类上面有什么作用
+
+28. 怎么样把某个请求映射到特定的方法上面
+
+29. 谈谈 Spring 对 DAO 的支持
 
 # **二、应用场景面试题集（各知识点不同使用场景选型）**
 
@@ -116,53 +146,49 @@ https://github.com/ThinkingHan/Java-note/blob/master/Spring%E9%9D%A2%E8%AF%95.md
 
 22.  Spring 框架的事务管理有哪些优点
 
-![阿里Java二面问Spring哑口无言？100道Spring面试考点解析，请查收](https://upload-images.jianshu.io/upload_images/11474088-709db97a18fd62aa?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240) 
-
 # **三、深度度知识面试题集（底层实现原理详解）**
 
-1.  IoC 控制反转设计原理？
+1. IoC 控制反转设计原理？
 
-2.  Spring 的生命周期？
+2. Spring Bean的生命周期？          [bean生命周期——初始化.md](BeanFactory\bean生命周期——初始化.md)        [bean生命周期——销毁.md](BeanFactory\bean生命周期——销毁.md) 
 
-3.  Spring 如何处理线程并发问题？
+3. Spring 如何处理线程并发问题？
 
-4.  核心容器（应用上下文）模块的理解？
+4. 核心容器（应用上下文）模块的理解？
 
-5.  为什么说 Spring 是一个容器？
+5. 为什么说 Spring 是一个容器？
 
-6.  Spring 的优点？
+6. Spring 框架中的单例 Beans 是线程安全的么？
 
-7.  Spring 框架中的单例 Beans 是线程安全的么？
+7. Spring 框架中有哪些不同类型的事件？
 
-8.  Spring 框架中有哪些不同类型的事件？
+8. IoC 的优点是什么？
 
-9.  IoC 的优点是什么？
+9. 什么是 Spring 的内部 Bean？
 
-10.  解释 Spring 框架中 Bean 的生命周期
+10. 自动装配有哪些局限性 ?
 
-11.  什么是 Spring 的内部 Bean？
+11. Spring 框架的事务管理有哪些优点？
 
-12.  自动装配有哪些局限性 ?
+12. 在 Spring AOP 中，关注点和横切关注的区别是什么？
 
-13.  Spring 框架的事务管理有哪些优点？
+13. 说说 Spring AOP 的底层实现原理？
 
-14.  在 Spring AOP 中，关注点和横切关注的区别是什么？
+14. 如何给 Spring 容器提供配置元数据?
 
-15.  说说 Spring AOP 的底层实现原理？
+15. 哪些是重要的 Bean 生命周期方法？ 你能重载它们吗？
 
-16.  如何给 Spring 容器提供配置元数据?
+    > 生命周日中的所有接口、方法都是可以重载的。详见： [bean生命周期——初始化.md](BeanFactory\bean生命周期——初始化.md#生命周期的应用) 
 
-17.  哪些是重要的 Bean 生命周期方法？ 你能重载它们吗？
+16. 讲下 Spring MVC 的执行流程
 
-18.  讲下 Spring MVC 的执行流程
+17. Spring MVC 的控制器是不是单例模式,如果是,有什么问题,怎么解决？
 
-19.  Spring MVC 的控制器是不是单例模式,如果是,有什么问题,怎么解决？
+18. Spring 中循环注入的方式？
 
-20.  Spring 中循环注入的方式？
+19. Spring MVC 比较 Struts2
 
-21.  Spring MVC 比较 Struts2
-
-![阿里Java二面问Spring哑口无言？100道Spring面试考点解析，请查收](https://upload-images.jianshu.io/upload_images/11474088-5bf885a659b297d9?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240) 
+ 
 
 # **四、拓展内容面试题集（Spring Boot 相关题集）**
 

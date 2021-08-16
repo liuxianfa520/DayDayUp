@@ -1,6 +1,12 @@
 # bean后置处理器
 
-顶级接口是 org.springframework.beans.factory.config.BeanPostProcessor
+顶级接口是 `org.springframework.beans.factory.config.BeanPostProcessor`
+
+> 后置处理器，算是一种`bean生命周期`的接口。
+>
+> 详见： [bean生命周期——初始化.md](..\BeanFactory\bean生命周期——初始化.md)      [bean生命周期——销毁.md](..\BeanFactory\bean生命周期——销毁.md) 
+>
+> Spring中很多组件，都是基于`后置处理器`来实现的。所以非常重要！！！
 
 子接口结构图如下：
 
@@ -199,4 +205,10 @@ default boolean requiresDestruction(Object bean) {
 - [容器扩展点之——使用BeanPostProcessor自定义bean](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-extension-bpp)
 
 - [使用BeanPostProcessor实现bean生命周期](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-lifecycle)
+
+
+
+
+
+# 参考
 

@@ -35,3 +35,25 @@ org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory#ini
 - DestructionAwareBeanPostProcessor#postProcessBeforeDestruction
 - DisposableBean#destroy
 - a custom destroy-method definition
+
+
+
+
+
+
+
+
+
+# 生命周期的应用
+
+**问题：上述生命周期中，开发者可以实现哪些呢？**
+
+> - 所有的Aware接口
+> - BeanPostProcessors
+> - InitializingBean#afterPropertiesSet
+> - a custom init-method definition
+> - DestructionAwareBeanPostProcessor 后置处理器：销毁前
+> - DisposableBean#destroy
+> - a custom destroy-method definition
+
+貌似是，以上生命周日的接口、方法，都是可以实现的。
