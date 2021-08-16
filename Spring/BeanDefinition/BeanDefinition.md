@@ -67,9 +67,10 @@
   -  <bean id="helloService" class="test.HelloService" />
   - 在 `BeanDefinitionReader` 中把资源加载成bean定义。
 - 在beans.xml配置文件中，spring默认的标签有哪些？
-  - bean
   - import
   - alias
+  - bean
+  - beans
   - `DefaultBeanDefinitionDocumentReader#parseBeanDefinitions`中会调用 `delegate.isDefaultNamespace(root)` 方法来判断是否为默认标签。
 - spring是如何认识dubbo的标签的？
 
