@@ -21,8 +21,15 @@
   - 早期bean：指尚未经过**bean填充**和**初始化**的对象。
   - bean填充：populateBean(beanName, mbd, instanceWrapper);
   - 初始化：initializeBean(beanName, exposedObject, mbd);
-- spring ioc容器中的三级缓存是什么？能否改成二级缓存？
-  - **singletonFactories** 存放**早期bean**用的。放的都是ObjectFactory对象工厂。
+- 【重要】Spring ioc容器中的三级缓存分别是什么？存放的分别是什么样的对象？能否改成两个缓存？
+  - 不能的！
+  - 一级缓存   单例的Spring bean        `Map<String, Object> singletonObjects`
+  - 二级缓存   早期单例对象                  `Map<String, Object> earlySingletonObjects `    
+    - *刚刚new出来的`原生的bean对象` （我称其为`rawBeanInstance`），但是已经经历过 `SmartInstantiationAwareBeanPostProcessor#getEarlyBeanReference` 这个bean生命周期了。*
+  - 三级缓存   早期单例对象的工厂      `Map<String, ObjectFactory<?>> singletonFactories`
+  - 参考 [Spring解决循环依赖的步骤【简图】.jpg](https://gitee.com/anxiaole/DayDayUp/blob/master/Spring/CircularDependencies/Spring%E8%A7%A3%E5%86%B3%E5%BE%AA%E7%8E%AF%E4%BE%9D%E8%B5%96%E7%9A%84%E6%AD%A5%E9%AA%A4%E3%80%90%E7%AE%80%E5%9B%BE%E3%80%91.jpg) ，我们看到：
+    - 如果正在创建中的单例bean A需要允许提前暴露（`earlySingletonExposure`），就把刚刚通过反射new出来的对象`rawBeanInstance`包装成`ObjectFactory`并放到三级缓存中(`singletonFactories`)
+    - 当bean B需要注入bean A时，就会调用`getBean("A")`，然后调用到：![image-20210818200434188](images/image-20210818200434188.png)
 
 
 
