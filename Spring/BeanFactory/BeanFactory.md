@@ -164,11 +164,9 @@ hello
 
 > 本篇文章主要讲解BeanFactory。AliasRegistry 别名注册器，[详见](../AliasRegistry别名注册器)
 
-## `getBean(String)`源码：
+## `getBean(beanName)`：
 
-> 我们一般在获取bean时，最常用的就是使用String类型的bean的id，来获取bean实例。
->
-> 也就是`getBean(String)` 方法——参数有且只有一个，参数是`String`类型的。
+> `获取bean` ，最常用的就是调用`getBean(String name)`方法：使用`beanName`，来获取bean实例。
 
 我们用idea打开 `DefaultListableBeanFactory`类，然后使用 idea的`File Structure`功能*（默认快捷键是Ctrl+F3）*，找到`getBean(String)`这个方法：
 
@@ -220,6 +218,7 @@ hello
 			// 获取给定bean实例的对象，bean实例本身或其创建的对象（如果是 FactoryBean）。
 			bean = getObjectForBeanInstance(sharedInstance, name, beanName, null);
 		} else {
+            // 
 			// Fail if we're already creating this bean instance:
 			// We're assumably within a circular reference.
 			if (isPrototypeCurrentlyInCreation(beanName)) {
@@ -383,6 +382,89 @@ hello
 		return (T) bean;
 	}
 ```
+
+上面代码中，如果当前需要创建的bean是单例的，则在调用`getSingleton()`方法时，传入`ObjectFactory`
+
+如果`beanName`没有在一级缓存`singletonObjects`中，则使用 `ObjectFactory` 内部类来创建bean。
+
+```java
+			if (mbd.isSingleton()) {
+				sharedInstance = getSingleton(beanName, new ObjectFactory<Object>() {
+                    public Object getObject() throws BeansException {
+						return createBean(beanName, mbd, args); // 匿名内部类：创建bean
+                    }
+                });
+				bean = getObjectForBeanInstance(sharedInstance, name, beanName, mbd);
+			}
+```
+
+
+
+## `createBean(...)`
+
+创建bean的方法，详见： [创建bean的流程.md](创建bean的流程.md) 
+
+
+
+## `getSingleton(beanName)`：
+
+此方法是：获取单例bean
+
+```java
+@Override
+public Object getSingleton(String beanName) {
+	return getSingleton(beanName, true);
+}
+
+/**
+ * Return the (raw) singleton object registered under the given name.
+ * 返回在给定名称下注册的（原始）单例对象。
+ * <p>Checks already instantiated singletons and also allows for an early
+ * reference to a currently created singleton (resolving a circular reference).
+ * 检查已经实例化的单例，并允许早期引用当前创建的单例（解决循环引用）。
+ *
+ * @param beanName            the name of the bean to look for                    要查找的 bean 的名称
+ * @param allowEarlyReference whether early references should be created or not   是否允许创建早期对象引用
+ * @return the registered singleton object, or {@code null} if none found
+ */
+@Nullable
+protected Object getSingleton(String beanName, boolean allowEarlyReference) {
+	// 先尝试从一级缓存(singletonObjects)中获取spring bean
+	// note:如果不为null，说明拿到的spring Bean已经经历了整个spring bean创建、初始化的过程.则直接return即可.
+	Object singletonObject = this.singletonObjects.get(beanName);
+	// 如果没有拿到，并且这个单例bean还正在创建中(isSingletonCurrentlyInCreation)...
+	if (singletonObject == null && isSingletonCurrentlyInCreation(beanName)) {
+		// DefaultSingletonBeanRegistry 类的 singletonObjects 属性持有所有已经实例化的singleton spring bean集合（ConcurrentHashMap）
+		synchronized (this.singletonObjects) {
+			// 尝试从二级缓存(earlySingletonObjects)中获取
+			singletonObject = this.earlySingletonObjects.get(beanName); // note:如果返回不为null,说明当前bean正在创建中.
+
+			// allowEarlyReference 这个变量很奇妙，需要注意传进来的是什么值，策略不同
+			// 如果二级缓存(earlySingletonObjects)中没拿到，并且此次getSingleton允许获取提前曝光的Reference
+			if (singletonObject == null && allowEarlyReference) {
+
+				// 从三级缓存(singletonFactories)中获取创建bean的 ObjectFactory, 这个 ObjectFactory 是带有创建代理能力的
+				ObjectFactory<?> singletonFactory = this.singletonFactories.get(beanName);
+				if (singletonFactory != null) {
+
+					// 创建实例，其实 bean的直接实例在第一次 getBean 时候已经实例化好了，
+					// 这里调用getObject是把代理应用到实例上，返回一个包裹好的bean，可能是代理对象，也可能是bean实例自己本身
+					singletonObject = singletonFactory.getObject();
+
+					// 加入二级缓存(earlySingletonObjects), 二级缓存(earlySingletonObjects)中的bean已经是被代理包裹的bean了
+					this.earlySingletonObjects.put(beanName, singletonObject);
+
+					// 删除三级缓存(singletonFactories)
+					this.singletonFactories.remove(beanName);
+				}
+			}
+		}
+	}
+	return singletonObject;
+}
+```
+
+
 
 > 建议：
 >

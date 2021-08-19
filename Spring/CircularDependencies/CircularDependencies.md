@@ -25,7 +25,7 @@
   - 不能的！
   - 一级缓存   单例的Spring bean        `Map<String, Object> singletonObjects`
   - 二级缓存   早期单例对象                  `Map<String, Object> earlySingletonObjects `    
-    - *刚刚new出来的`原生的bean对象` （我称其为`rawBeanInstance`），但是已经经历过 `SmartInstantiationAwareBeanPostProcessor#getEarlyBeanReference` 这个bean生命周期了。*
+    - 刚刚new出来的`原生的bean对象` （我称其为`rawBeanInstance`），但是已经经历过 `SmartInstantiationAwareBeanPostProcessor#getEarlyBeanReference` 这个bean生命周期了。
   - 三级缓存   早期单例对象的工厂      `Map<String, ObjectFactory<?>> singletonFactories`
   - 参考 [Spring解决循环依赖的步骤【简图】.jpg](./Spring解决循环依赖的步骤【简图】.jpg) ，我们看到：
     - 如果正在创建中的单例bean A需要允许提前暴露（`earlySingletonExposure`），就把刚刚通过反射new出来的对象`rawBeanInstance`包装成`ObjectFactory`并放到三级缓存中(`singletonFactories`)
