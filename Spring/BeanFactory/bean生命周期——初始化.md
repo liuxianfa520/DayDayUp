@@ -56,4 +56,4 @@ org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory#ini
 > - DisposableBean#destroy
 > - a custom destroy-method definition
 
-貌似是，以上生命周日的接口、方法，都是可以实现的。
+貌似是，以上生命周期的接口、方法，都是可以实现的。
