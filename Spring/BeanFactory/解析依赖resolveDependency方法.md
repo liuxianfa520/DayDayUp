@@ -9,5 +9,5 @@ public interface AutowireCapableBeanFactory extends BeanFactory {
 }    
 ```
 
-这个方法在自动注入的时候，用到了。详见：[@Autowired注解源码实现](../@Autowired注解源码实现/readme.md#AutowiredFieldElement)
+这个方法在自动注入的时候，用到了。详见：[@Autowired注解源码实现](../面试题/@Autowired注解源码实现/readme.md#AutowiredFieldElement)
 
