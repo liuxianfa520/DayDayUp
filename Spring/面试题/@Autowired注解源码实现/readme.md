@@ -148,7 +148,7 @@ public class InjectionMetadata {
 ### InjectedElement
 
 ```java
-	public abstract static class InjectedElement {
+	public abstract static class InjectedElement {    // 是个静态抽象内部类
 
 		protected final Member member;
 
