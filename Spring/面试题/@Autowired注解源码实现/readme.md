@@ -339,6 +339,8 @@ org.springframework.beans.factory.config.SmartInstantiationAwareBeanPostProcesso
 
 
 
-留下个课后作业：
+# 课后作业
 
-属性注入是  postProcessPropertyValues() 方法中写的。那问题来了：postProcessPropertyValues()  这个后置处理方法是在bean生命周期的那时间节点被调用的呢？
+- @javax.annotation.Resource 注解是如何实现的？
+- 属性注入是  postProcessPropertyValues() 方法中写的。那问题来了：postProcessPropertyValues()  这个后置处理方法是在bean生命周期的那时间节点被调用的呢？
+
