@@ -140,7 +140,23 @@ default boolean requiresDestruction(Object bean) {
 }
 ```
 
+应用：
 
+- [生命周期注解@PostConstruct和@PreDestroy源码实现](../面试题/生命周期注解@PostConstruct和@PreDestroy源码实现/readme.md)
+
+
+
+
+
+# MergedBeanDefinitionPostProcessor
+
+![image-20210823213144292](images/image-20210823213144292.png)
+
+应用：
+
+- [生命周期注解@PostConstruct和@PreDestroy源码实现](../面试题/生命周期注解@PostConstruct和@PreDestroy源码实现)         InitDestroyAnnotationBeanPostProcessor
+- [@Autowired注解源码实现](../面试题/@Autowired注解源码实现)       AutowiredAnnotationBeanPostProcessor
+- [@Resource注解源码实现](../面试题/@Resource注解源码实现)         CommonAnnotationBeanPostProcessor
 
 
 
