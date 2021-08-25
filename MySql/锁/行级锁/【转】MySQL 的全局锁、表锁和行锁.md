@@ -198,3 +198,7 @@ select * from t_test where id>=8 and id<9 for update;
 
 
 
+## 三、MySQL默认事务隔离级别如何解决幻读
+
+InnoDB 引擎的默认隔离级别虽然是「可重复读」，但是它通过next-key lock 锁（行锁和间隙锁的组合）来锁住记录之间的“间隙”和记录本身，防止其他事务在这个记录之间插入新的记录，这样就避免了幻读现象。
+
