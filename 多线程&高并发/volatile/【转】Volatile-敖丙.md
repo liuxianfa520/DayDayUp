@@ -56,6 +56,24 @@ Volatile可能是面试里面必问的一个话题吧，对他的认知很多朋
 
 正是因为这样的机制，才导致了可见性问题的存在，那我们就讨论下可见性的解决方案。
 
+
+
+
+
+## 并发编程中的三大问题
+
+- 可见性问题
+- 原子性问题
+- 指令重排序
+
+这三大问题的根本原因是：计算机为了提高单线程执行的效率，做了特定**优化**而导致在**多线程**环境中，产生的问题。
+
+- 可见性问题——原因：CPU告诉缓存
+- 原子性问题——原因：CPU执行指令是可以随意切换线程执行的。
+- 指令重排序——原因：[详见](#什么是重排序?)
+
+
+
 ## 可见性的解决方案
 
 ### 加锁
@@ -218,7 +236,7 @@ volatile域规则：对一个volatile域的写操作，happens-before于任意�
 
 ## volatile与synchronized的区别
 
-volatile只能修饰实例变量和类变量，而synchronized可以修饰方法，以及代码块。
+volatile只能修饰实例变量和静态变量，而synchronized只能修饰方法（实例方法、静态方法），以及代码块。
 
 volatile保证数据的可见性，但是不保证原子性(多线程进行写操作，不保证线程安全);而synchronized是一种排他(互斥)的机制。
 
@@ -226,7 +244,13 @@ volatile用于禁止指令重排序：可以解决单例双重检查对象初始
 
 volatile可以看做是轻量版的synchronized，volatile不保证原子性，但是如果是对一个共享变量进行多个线程的赋值，而没有其他的操作，那么就可以用volatile来代替synchronized，因为赋值本身是有原子性的，而volatile又保证了可见性，所以就可以保证线程安全了。
 
-![图片](data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg==)
+
+
+## 应用二：在AQS中的应用
+
+![image-20210829015715970](images/image-20210829015715970.png)
+
+
 
 ## 总结
 
