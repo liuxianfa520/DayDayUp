@@ -1,8 +1,8 @@
-> 原创  三太子敖丙  *2020-04-29*
+> 转载自：[面试官想到，一个Volatile，敖丙都能吹半小时](https://mp.weixin.qq.com/s?__biz=MzAwNDA2OTM1Ng==&mid=2453142004&idx=1&sn=81ccddb6c8b37114c022c4ad50368ecf&chksm=8cf2db77bb855261b761f11025728f9d56cc7828d9f174752875d4a188e196b4e8494006f7f8&scene=178&cur_album_id=1343706145583857665#rd)
 >
-> 微信公众号：JavaAudition
+> 原创 三太子敖丙 *2020-04-29*
 >
-> 收录于话题 [\#多线程905](https://mp.weixin.qq.com/mp/appmsgalbum?__biz=MzAwNDA2OTM1Ng==&action=getalbum&album_id=1343706145583857665&scene=173&subscene=&sessionid=svr_d0c79eb41af&enterid=1630077564&from_msgid=2453142004&from_itemidx=1&count=3&nolastread=1#wechat_redirect) [\#程序员](https://mp.weixin.qq.com/mp/publictag?action=get&tag_id=13117706729104080897&start=0&scene=173&subscene=&sessionid=svr_d0c79eb41af&enterid=1630081933&from_msgid=2453142004&from_itemidx=1&count=3&nolastread=1#wechat_redirect)7638
+> 收录于话题 [\#多线程910](https://mp.weixin.qq.com/mp/appmsgalbum?__biz=MzAwNDA2OTM1Ng==&action=getalbum&album_id=1343706145583857665&scene=173&subscene=&sessionid=svr_bb437fdff64&enterid=1630171760&from_msgid=2453142004&from_itemidx=1&count=3&nolastread=1#wechat_redirect) \#程序员7663
 
 
 
@@ -10,11 +10,7 @@ Volatile可能是面试里面必问的一个话题吧，对他的认知很多朋
 
 先来跟着丙丙来看一段demo的代码：
 
-Volatile可能是面试里面必问的一个话题吧，对他的认知很多朋友也仅限于会用阶段，今天我们换个角度去看看。
-
-先来跟着丙丙来看一段demo的代码：
-
-![图片](https://mmbiz.qpic.cn/mmbiz_jpg/uChmeeX1FpzhiaXUhn9W2XjuqeziaG1ibdvgtlXcS2aHf8I7LeM23TPexQztAQZnQ6rrZOUTNoqIgvladRt5X74Xw/640?wx_fmt=jpeg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
+![图片](images/fasdfasfasd)
 
 你会发现，永远都不会输出**有点东西**这一段代码，按道理线程改了flag变量，主线程也能访问到的呀？
 
@@ -36,7 +32,7 @@ Volatile可能是面试里面必问的一个话题吧，对他的认知很多朋
 
 在多处理器系统中，每个处理器都有自己的高速缓存，而它们又共享同一主内存（MainMemory）。
 
-![图片](https://mmbiz.qpic.cn/mmbiz_jpg/uChmeeX1FpzhiaXUhn9W2XjuqeziaG1ibdvVI870whHRM2h2vfaCl1RRIXLpia50cmaSrQZ96z2Z2fMDOUn3gRwDXA/640?wx_fmt=jpeg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
+![图片](images/fasdfasdffasdfasdfasdf)
 
 然后我们可以聊一下JMM了。
 
@@ -56,7 +52,7 @@ Volatile可能是面试里面必问的一个话题吧，对他的认知很多朋
 
 ### 本地内存和主内存的关系：
 
-![图片](https://mmbiz.qpic.cn/mmbiz_jpg/uChmeeX1FpzhiaXUhn9W2XjuqeziaG1ibdvOgPyiaPib3U7oR6ZS77CqlAVp7BkTxS30UhDN1X6YJRfCGQadBP6xd9Q/640?wx_fmt=jpeg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
+![图片](images/fasdfasdfsafsdfds)
 
 正是因为这样的机制，才导致了可见性问题的存在，那我们就讨论下可见性的解决方案。
 
@@ -64,7 +60,7 @@ Volatile可能是面试里面必问的一个话题吧，对他的认知很多朋
 
 ### 加锁
 
-![图片](https://mmbiz.qpic.cn/mmbiz_jpg/uChmeeX1FpzhiaXUhn9W2XjuqeziaG1ibdvEpR6SEg6ibWX4WOZXoCYUpcfc4Bkx00McJ3uVo6PAyM7fXDQ48X22kg/640?wx_fmt=jpeg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
+![图片](images/fasdfadsf)
 
 ### 为啥加锁可以解决可见性问题呢？
 
@@ -74,11 +70,11 @@ Volatile可能是面试里面必问的一个话题吧，对他的认知很多朋
 
 ### Volatile修饰共享变量
 
-![图片](https://mmbiz.qpic.cn/mmbiz_jpg/uChmeeX1FpzhiaXUhn9W2XjuqeziaG1ibdvMTx9aIxjalUBpwO5KqJwgCMcVPk0l9YTPZp11kDUMgtcs8urCgFn1Q/640?wx_fmt=jpeg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
+![图片](images/asdfasdfasd)
 
 开头的代码优化完之后应该是这样的：
 
-![图片](https://mmbiz.qpic.cn/mmbiz_jpg/uChmeeX1FpzhiaXUhn9W2XjuqeziaG1ibdvk2p0NZ32Ttt7CHCsfENxOe69kgPVG4oYdPyniatQrZ9hSLV7wxmrfoQ/640?wx_fmt=jpeg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
+![图片](images/fasdfadsfsad)
 
 ### Volatile做了啥？
 
@@ -126,7 +122,7 @@ volatile保证不同线程对共享变量操作的可见性，也就是说一个
 
 ### 重排序的类型有哪些呢？源码到最终执行会经过哪些重排序呢？
 
-![图片](https://mmbiz.qpic.cn/mmbiz_jpg/uChmeeX1FpzhiaXUhn9W2XjuqeziaG1ibdvKQwRWOQB1UIxNHmNrz9icBQfqtqRqrU1M30IO8FWqFWTYOhcEQXgIwA/640?wx_fmt=jpeg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
+![图片](images/fsadfadsfsaf)
 
 一个好的内存模型实际上会放松对处理器和编译器规则的束缚，也就是说软件技术和硬件技术都为同一个目标，而进行奋斗：在不改变程序执行结果的前提下，尽可能提高执行效率。
 
@@ -156,17 +152,17 @@ java编译器会在生成指令系列时在适当的位置会插入`内存屏障
 
 为了实现volatile的内存语义，JMM会限制特定类型的编译器和处理器重排序，JMM会针对编译器制定volatile重排序规则表：
 
-![图片](https://mmbiz.qpic.cn/mmbiz_jpg/uChmeeX1FpzhiaXUhn9W2XjuqeziaG1ibdvh07EXHvYzpX7DTvOPwqjeRIIrUr3WoPtXHCBSicEL92uk4xZSiaanwuA/640?wx_fmt=jpeg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
+![图片](images/fasdfasdfadsfasd)
 
 需要注意的是：volatile写是在前面和后面**分别插入内存屏障**，而volatile读操作是在**后面插入两个内存屏障**。
 
 ### 写
 
-![图片](https://mmbiz.qpic.cn/mmbiz_jpg/uChmeeX1FpzhiaXUhn9W2XjuqeziaG1ibdvFIPUibjmzCN8H6waUfRsXIIB5HrzF2qKS7lOWrsCzluG1x5L8zg80pw/640?wx_fmt=jpeg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
+![图片](images/fasdfasdfasd)
 
 ### 读
 
-![图片](https://mmbiz.qpic.cn/mmbiz_jpg/uChmeeX1FpzhiaXUhn9W2XjuqeziaG1ibdvaOPHe2KysUlTCphhnkoaacAho6ZFv3F4vaetoGu4dUQcvPn4wicvGwA/640?wx_fmt=jpeg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
+![图片](images/hdfghdgfhdfgh)
 
 上面的我提过重排序原则，为了提高处理速度，JVM会对代码进行编译优化，也就是指令重排序优化，并发编程下指令重排序会带来一些安全隐患：如指令重排序导致的多个线程操作之间的不可见性。
 
@@ -196,7 +192,7 @@ volatile域规则：对一个volatile域的写操作，happens-before于任意�
 
 ## 应用
 
-![图片](https://mmbiz.qpic.cn/mmbiz_jpg/uChmeeX1FpzhiaXUhn9W2XjuqeziaG1ibdvs2S8eLDBnWul1cmiapWuTPcibd7Xakzm8yMSVt05TquIKtgxItIOX7Mw/640?wx_fmt=jpeg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
+![图片](images/hdfghdgfh)
 
 单例有8种写法，我说一下里面比较特殊的一种，涉及Volatile的。
 
@@ -230,7 +226,7 @@ volatile用于禁止指令重排序：可以解决单例双重检查对象初始
 
 volatile可以看做是轻量版的synchronized，volatile不保证原子性，但是如果是对一个共享变量进行多个线程的赋值，而没有其他的操作，那么就可以用volatile来代替synchronized，因为赋值本身是有原子性的，而volatile又保证了可见性，所以就可以保证线程安全了。
 
-![图片](https://mmbiz.qpic.cn/mmbiz_gif/uChmeeX1FpzhiaXUhn9W2XjuqeziaG1ibdv5snvTssWUFWb5pGTBgKpiaTqKaItdtlFzf6ICKlarI77fBJc1PDibI6w/640?wx_fmt=gif&tp=webp&wxfrom=5&wx_lazy=1)
+![图片](data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg==)
 
 ## 总结
 
