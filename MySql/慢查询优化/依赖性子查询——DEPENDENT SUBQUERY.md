@@ -219,12 +219,7 @@ ALTER TABLE `wbs_prd_reservation` ADD INDEX (`updateTime`);
 - 第一个sql查询部门数据
 
   ```sql
-  select
-     dept.id,
-     dept.code,
-     dept.parentCode,
-     dept.name,
-     dept.departmentTypeCode
+  select *  -- 查询*是为了脱敏
   from department dept
   WHERE dept.entId = #{entId,jdbcType=NUMERIC}
      and dept.deleted = 0 
@@ -246,12 +241,7 @@ ALTER TABLE `wbs_prd_reservation` ADD INDEX (`updateTime`);
   FROM emp_dept a
   JOIN employee e ON a.empId = e.id
   JOIN department d ON d.id = a.deptId
-  WHERE
-      e.dismissionDate IS NULL
-      AND e.independent = 0
-      AND e.superAdmin = 0
-      AND e.external = 0
-      and d.deleted = 0
+  WHERE and d.deleted = 0
       <if test="name != null and name !=''">
           and d.name like concat('%',#{name},'%')
       </if>
