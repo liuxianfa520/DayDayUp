@@ -9,9 +9,9 @@
 RocketMQ有很多的角色：
 
 - NameServer
-- broker
-- producer
-- consumer
+- Broker
+- Producer
+- Consumer
 
 这些角色之间会有很多的网络请求，底层是使用的netty作为网络框架传输的数据。
 
