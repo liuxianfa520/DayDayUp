@@ -51,3 +51,83 @@ NameServer中的请求处理器只有一个：org.apache.rocketmq.namesrv.proces
 >
 
 
+
+
+
+# Broker中的请求处理器
+
+| 请求处理器 | 作用 |
+| ---- | ---- |
+|  SendMessageProcessor    | 发送消息 |
+|  PullMessageProcessor    | 拉取消息请求 |
+|  ReplyMessageProcessor    |      |
+|  QueryMessageProcessor    | 查询消息 |
+|  ClientManageProcessor    | 客户端管理 |
+|  ConsumerManageProcessor    | 消费者管理 |
+|  EndTransactionProcessor    |      |
+|  AdminBrokerProcessor    | 用于处理mqadmin命令的请求 |
+
+
+
+以上最重要的请求处理器是：`SendMessageProcessor` —— producer发送mq消息给broker，broker需要把消息保存下来，就是使用这个请求处理器来处理的。
+
+我们首先来看一下请求处理器是在哪地方注册进去的。
+
+# 注册请求处理器
+
+org.apache.rocketmq.broker.BrokerController#registerProcessor 这个方法是broker根据不同的`请求code` 注册对应的请求处理器的地方。
+
+下图看到，首先注册的就是 `SendMessageProcessor` 这个发送消息请求处理器，这个处理器会处理 以下这些请求code：
+
+```
+RequestCode.SEND_MESSAGE
+RequestCode.SEND_MESSAGE_V2
+RequestCode.SEND_BATCH_MESSAGE
+RequestCode.CONSUMER_SEND_MSG_BACK
+```
+
+![image-20211112103638844](images/image-20211112103638844.png)
+
+*（注释：上图只是截了一部分图，总共broker需要注册8个请求处理器，具体逻辑都类似，就没有截全）*
+
+
+
+而什么时候会调用这个 `registerProcessor()` 方法来注册这些请求处理器呢？
+
+![image-20211112104040113](images/image-20211112104040113.png)
+
+根据上图的调用栈发现：
+
+- 在broker启动的时候，会调用`BrokerStartup.main` 方法，在这个方法中，会去创建`BrokerController`
+- 当`brokerController`在初始化时—— `initialize()` 发放中，会调用注册处理器的方法。
+
+也就是：
+
+![image-20211112104825810](images/image-20211112104825810.png)
+
+# SendMessageProcessor
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
