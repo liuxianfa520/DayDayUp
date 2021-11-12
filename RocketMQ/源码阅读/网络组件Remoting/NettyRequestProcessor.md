@@ -105,7 +105,29 @@ RequestCode.CONSUMER_SEND_MSG_BACK
 
 ![image-20211112104825810](images/image-20211112104825810.png)
 
+
+
 # SendMessageProcessor
+
+![image-20211113005838866](images/image-20211113005838866.png)
+
+从类图中，我们可以只到，发送消息的请求处理器支持异步处理，因为实现了 `AsyncNettyRequestProcessor` 抽象方法。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
