@@ -109,6 +109,12 @@ RequestCode.CONSUMER_SEND_MSG_BACK
 
 # SendMessageProcessor
 
+> 画外音：
+>
+> 源码阅读过程录制的视频：https://www.bilibili.com/video/BV1mr4y1r76r/
+>
+> 欢迎关注。不定期更新源码阅读视频。
+
 ![image-20211113005838866](images/image-20211113005838866.png)
 
 从类图中，我们可以只到，发送消息的请求处理器支持异步处理，因为实现了 `AsyncNettyRequestProcessor` 抽象方法。
