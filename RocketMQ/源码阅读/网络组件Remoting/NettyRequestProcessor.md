@@ -349,6 +349,168 @@ result = mappedFile.appendMessage(msg, this.appendMessageCallback, putMessageCon
 
 
 
+# client端的请求处理器
+
+> 画外音：
+>
+> 上面讲的都是server端的请求处理器，无论是NameServer端，broker端，都是server端。
+>
+> 但是在client端——producer和consumer端，也是有请求处理器的。也就是broker也会给client端发送请求。
+>
+> 这也是后来翻看代码中才发现的。每天都有新收获啊。
+
+## broker都会给client发送哪些请求？
+
+详见 `org.apache.rocketmq.broker.client.net.Broker2Client` 类中的方法。
+
+构造方法：
+
+```java
+public class Broker2Client {
+    private final BrokerController brokerController;
+    public Broker2Client(BrokerController brokerController) {
+        this.brokerController = brokerController;
+    }
+}
+```
+
+> 画外音：
+>
+> 个人是这么理解这个类的：
+>
+> 这个类把远程remoting模块封装了一下：如果说**远程remoting**是`底层组件`的角度，那么 `Broker2Client` 就是站在`RocketMQ具体业务`的角度，声明了一些实用的方法。
+>
+> 也可以理解为是个工具类。
+
+![image-20211116104655284](images/image-20211116104655284.png)
+
+
+
+## 注册请求处理器接口
+
+```java
+public interface RemotingClient extends RemotingService {
+    /**
+     * 注册处理器及线程池
+     *
+     * @param requestCode 请求code org.apache.rocketmq.common.protocol.RequestCode
+     * @param processor   处理器:这个请求使用哪个处理器来处理
+     * @param executor    处理这个请求的时候,在哪个线程池中执行
+     */
+    void registerProcessor(int requestCode,
+                           NettyRequestProcessor processor,
+                           ExecutorService executor);
+}    
+```
+
+在`RemotingClient`这个客户端远程组件接口上，都有注册请求处理器的方法。
+
+*不过和 `RemotingServer`的区别是：`RemotingClient`没有`registerDefaultProcessor()` 方法。*
+
+## 注册请求处理器实现
+
+```java
+    @Override
+    public void registerProcessor(int requestCode, 
+                                  NettyRequestProcessor processor, 
+                                  ExecutorService executor) {
+        
+        ExecutorService executorThis = executor;
+        if (null == executor) {
+            executorThis = this.publicExecutor;
+        }
+
+        this.processorTable.put(requestCode, new Pair<>(processor, executorThis));
+    }
+```
+
+方法实现的代码和 `NettyRemotingServer#registerProcessor` 是一模一样的。都是把参数放到一个map中。
+
+
+
+## 注册请求处理器
+
+![image-20211116095612792](images/image-20211116095612792.png)
+
+在client端启动的时候，会注册请求处理器，如上图看到，client使用唯一的一个请求处理器来处理broker给client发来的请求。
+
+![image-20211116100143608](images/image-20211116100143608.png)
+
+
+
+## client端请求处理器
+
+`org.apache.rocketmq.client.impl.ClientRemotingProcessor`
+
+构造函数：
+
+```java
+public class ClientRemotingProcessor 
+    extends AsyncNettyRequestProcessor implements NettyRequestProcessor {
+    
+    private final MQClientInstance mqClientFactory;
+
+    public ClientRemotingProcessor(final MQClientInstance mqClientFactory) {
+        this.mqClientFactory = mqClientFactory;
+    }
+}    
+```
+
+实现接口中的两个方法：
+
+```java
+@Override
+public RemotingCommand processRequest(ChannelHandlerContext ctx,RemotingCommand request){
+    switch (request.getCode()) {
+        case RequestCode.CHECK_TRANSACTION_STATE:
+            return this.checkTransactionState(ctx, request);
+        case RequestCode.NOTIFY_CONSUMER_IDS_CHANGED:
+            return this.notifyConsumerIdsChanged(ctx, request);
+        case RequestCode.RESET_CONSUMER_CLIENT_OFFSET:
+            return this.resetOffset(ctx, request);
+        case RequestCode.GET_CONSUMER_STATUS_FROM_CLIENT:
+            return this.getConsumeStatus(ctx, request);
+        case RequestCode.GET_CONSUMER_RUNNING_INFO:
+            return this.getConsumerRunningInfo(ctx, request);
+        case RequestCode.CONSUME_MESSAGE_DIRECTLY:
+            return this.consumeMessageDirectly(ctx, request);
+        case RequestCode.PUSH_REPLY_MESSAGE_TO_CLIENT:
+            return this.receiveReplyMessage(ctx, request);
+        default:
+            break;
+    }
+    return null;
+}
+
+@Override
+public boolean rejectRequest() {
+    return false;
+}
+```
+
+在 `processRequest()` 方法中，套路还是一样的，根据请求code来调用不同的方法。
+
+
+
+## broker给client发送的请求类别
+
+|      |      |
+| ---- | ---- |
+|  RequestCode.CHECK_TRANSACTION_STATE   | 检查事务状态 |
+|  RequestCode.NOTIFY_CONSUMER_IDS_CHANGED   | 通知consumer消费者，id变化。<br />consumer收到请求后会立即rebalance |
+|  RequestCode.RESET_CONSUMER_CLIENT_OFFSET   | 重置consumer消费者的消费偏移量 |
+|  RequestCode.GET_CONSUMER_STATUS_FROM_CLIENT   | 从client端获取consumer消费者的状态 |
+|  RequestCode.GET_CONSUMER_RUNNING_INFO   | 获取消费者运行信息 |
+|  RequestCode.CONSUME_MESSAGE_DIRECTLY   | broker给consumer发送请求，直接要求当前的consumer消费mq消息。 |
+|  RequestCode.PUSH_REPLY_MESSAGE_TO_CLIENT   | todo |
+
+以上就是broker给client发送的所有的请求，这里每种请求的具体实现流程就不赘述了。
+
+有兴趣的话，可以自己clone源码，或者直接在线看看：[org.apache.rocketmq.client.impl.ClientRemotingProcessor#processRequest](https://gitee.com/anxiaole/rocketmq/blob/master/client/src/main/java/org/apache/rocketmq/client/impl/ClientRemotingProcessor.java)
+
+
+
+
 
 
 # 总结
@@ -366,50 +528,5 @@ result = mappedFile.appendMessage(msg, this.appendMessageCallback, putMessageCon
 
 
 有兴趣的话可以去了解一下ZooKeeper的请求处理器，并对比一下。
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
