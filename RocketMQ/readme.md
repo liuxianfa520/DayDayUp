@@ -56,6 +56,8 @@ Consumer启动流程.md
 
 ### 客户端管理器ClientManager
 
+[客户端管理器.md](./源码阅读/客户端管理器/客户端管理器.md)
+
 
 
 ### 存储组件StoreService
