@@ -781,11 +781,17 @@ topic的路由表已经获取到了，无论是从本地缓存中获取的，还
 
 ![image-20211105163438145](images/image-20211105163438145.png)
 
-> todo：疑问
+> 画外音：
 >
-> 总是觉得这个图不太准确。
+> 对于这个结构图我最开始是有疑问的：为什么TopicA在每个机器上都有Queue0这个队里呢？不应该是`分片`的吗？
 >
-> topicA下的Queue0应只有一份，应该不会在其他机器上有分片吧？？？
+> 其实有这个误解是因为之前了解过一些Elasticsearch的原理：**[为了分散负载而对分片进行重新分配](https://www.elastic.co/guide/cn/elasticsearch/guide/current/_scale_horizontally.html)**
+>
+> ![img](images/elas_0204.png)
+>
+> 但是RocketMQ的原理和Elasticsearch这种`分片`处理方式不一样：
+>
+> **在broker中，同一个topic，可以在不同的broker中创建，并且其队列数量可以不一样。**也就正如上图看到的这种结构。
 
 
 
