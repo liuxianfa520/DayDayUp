@@ -984,15 +984,136 @@ org.apache.rocketmq.client.impl.MQClientAPIImpl#sendMessage
 
 ## invokeSync同步发送请求
 
+> 详细流程图：
+>
+> https://docs.qq.com/flowchart/DQU14SFZDemFTcXNC
+
 ![image-20211118185411583](images/image-20211118185411583.png)
 
-## invokeSyncImpl 同步调用具体实现
+## invokeSyncImpl 同步调用实现
+
+先获取请求id，然后实例化一个 ，并放入 `responseTable`中：
+
+```java
+// requestId：这个opaque变了就代表请求id。
+int opaque = request.getOpaque();
+ResponseFuture responseFuture = new ResponseFuture(channel, opaque, timeoutMillis, null, null);
+this.responseTable.put(opaque, responseFuture);
+```
+
+通过与broker之间的channel，获取远程socket。
+
+```java
+final SocketAddress addr = channel.remoteAddress();
+```
+
+然后通过网络socket，把请求数据写出去，相当于把请求数据发送给broker：
+
+```java
+// 发送请求,并设置监听.
+channel.writeAndFlush(request).addListener(new ChannelFutureListener() {
+    @Override
+    public void operationComplete(ChannelFuture f) throws Exception {
+        // 请求发送完毕,如果成功了,就设置请求发送ok.否则就设置请求发送不ok
+        if (f.isSuccess()) {
+            responseFuture.setSendRequestOK(true);
+        } else {
+            responseFuture.setSendRequestOK(false);
+            responseTable.remove(opaque); // 移除此请求
+            responseFuture.setCause(f.cause()); // 设置不ok的原因
+            responseFuture.putResponse(null); // 设置返回的响应体为null
+            log.warn("send a request command to channel <" + addr + "> failed.");
+        }
+    }
+});
+```
+
+上面，发送完毕后，会添加一个监听器：监听`操作完毕事件`。
+
+request请求数据已经发送给了broker，在broker端需要接收并处理消息，然后给client端返回response。与此同时的client端，就使用`waitResponse()`方法，等着响应结果：
+
+```java
+// [等待响应response]
+// note:这里就是异步转同步的一般实现方案.就是直接在发送完请求之后,调用获取结果的接口.
+//  这样的话,就会阻塞到这里,知道请求返回.其实也就是 responseFuture.putResponse() 方法被调用时,才会解除阻塞.
+RemotingCommand responseCommand = responseFuture.waitResponse(timeoutMillis);
+// 如果响应数据为空,
+if (null == responseCommand) {
+    // 如果请求发送成功——说明是远程响应超时
+    if (responseFuture.isSendRequestOK()) {
+        throw new RemotingTimeoutException(RemotingHelper.parseSocketAddressAddr(addr), timeoutMillis, responseFuture.getCause());
+    } else {
+        // 请求没有发送成功——抛出异常:请求发送异常
+        throw new RemotingSendRequestException(RemotingHelper.parseSocketAddressAddr(addr), responseFuture.getCause());
+    }
+}
+
+return responseCommand;
+```
 
 
 
+## invokeAsync异步发送请求
+
+```java
+// 以下为简化之后的伪代码：
+public void invokeAsync(String addr, RemotingCommand request, 
+                        long timeoutMillis, InvokeCallback invokeCallback) {
+    
+    final Channel channel = this.getAndCreateChannel(addr);
+    if (channel != null && channel.isActive()) {
+            doBeforeRpcHooks(addr, request);
+            this.invokeAsyncImpl(channel, request, timeoutMillis - costTime, invokeCallback);
+    }
+}
+```
 
 
 
+## invokeAsyncImpl异步调用实现
+
+```java
+// 以下为简化之后的伪代码：
+public void invokeAsyncImpl(final Channel channel, final RemotingCommand request,
+                            final long timeoutMillis, final InvokeCallback invokeCallback) {
+    // 当前请求的请求id
+    int opaque = request.getOpaque();
+    // 响应Future.
+    ResponseFuture responseFuture = new ResponseFuture(channel, opaque, timeoutMillis, invokeCallback);
+    // 根据请求id保存到map中.
+    this.responseTable.put(opaque, responseFuture);
+    
+    // 使用netty,通过tpc发送请求.并添加tpc发送状态的监听器
+    channel.writeAndFlush(request).addListener((ChannelFutureListener) f -> {
+        // 请求tcp消息发送成功:
+        if (f.isSuccess()) {
+            responseFuture.setSendRequestOK(true);// 标记发送请求成功
+        } else {
+            requestFail(opaque); // 在发送request阶段失败.
+        }
+    });
+}
+```
+
+当request发送失败的处理逻辑：
+
+```java
+private void requestFail(final int opaque) {
+    ResponseFuture responseFuture = responseTable.remove(opaque);
+    if (responseFuture != null) {
+        // 设置发送请求不ok.
+        responseFuture.setSendRequestOK(false);
+        // 设置响应消息体为null
+        responseFuture.putResponse(null);
+        try {
+            executeInvokeCallback(responseFuture); // 因为是异步发送请求，所以失败的时候，直接调用回调函数。
+        } finally {
+            // 释放资源.具体就是:释放信号量.  (这个信号量感觉就是个限流器的作用)
+            responseFuture.release();
+        }
+    }
+}
+```
 
 
 
