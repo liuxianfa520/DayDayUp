@@ -645,7 +645,7 @@ public class NettyDecoder extends LengthFieldBasedFrameDecoder {
 
 
 
-## request数据包如何发送？
+# request数据包如何发送？
 
 解答这个问题之前，再来看一下RocketMQ中的各个角色：
 
@@ -749,13 +749,11 @@ org.apache.rocketmq.client.impl.producer.DefaultMQProducerImpl#tryToFindTopicPub
 
 org.apache.rocketmq.client.impl.MQClientAPIImpl#getTopicRouteInfoFromNameServer
 
-这个方法是使用`remotingClient`发送请求的逻辑。修改本地缓存的逻辑这里没有粘贴出来。
+这个方法是使用`remotingClient`给NameServer发送请求的逻辑，并返回获取到`TopicRouteData`：
 
 ![image-20211105161633903](images/image-20211105161633903.png)
 
-上面使用`remotingClient`连接NameServer，查询到topic的路由信息。
-
-本地缓存是保存到了 `MQClientInstance#topicRouteTable` 这个map中：
+从NameServer获取到TopicRouteData之后，需要修改client客户端本地缓存的路由表 `MQClientInstance#topicRouteTable` ：
 
 ```java
 /**
@@ -767,7 +765,37 @@ org.apache.rocketmq.client.impl.MQClientAPIImpl#getTopicRouteInfoFromNameServer
 private final ConcurrentMap<String/* Topic */, TopicRouteData> topicRouteTable = new ConcurrentHashMap();
 ```
 
-具体的处理逻辑自己有兴趣可以去看一看。
+在修改本地缓存的路由表之前，还需要比较一下是否有变化：
+
+```java
+// 从本地路由表中获取topic数据,
+TopicRouteData old = this.topicRouteTable.get(topic);
+// 对比是否有变化
+boolean changed = topicRouteDataIsChange(old, topicRouteData);
+if (!changed) {
+    // 如果没有变化,则判断是否需要修改 producerTable 和 consumerTable .
+    changed = this.isNeedUpdateTopicRouteInfo(topic);
+} else {
+    log.info("the topic[{}] route info changed, old[{}] ,new[{}]", topic, old, topicRouteData);
+}
+```
+
+如果有变化的话`change=true`，此时才会修改本地缓存：
+
+![image-20211118162632580](images/image-20211118162632580.png)
+
+从NameServer获取并更新本地的`TopicRouteInfo`之后，会再次获取一次  `topicPublishInfo`：
+
+```java
+        // 先从本地缓存中获取topic发布信息
+        TopicPublishInfo topicPublishInfo = this.topicPublishInfoTable.get(topic);
+        // 如果本地路由表中没有,就给NameServer发送请求,从NameServer中获取并更新本地路由表，然后再次获取一次。
+        if (null == topicPublishInfo || !topicPublishInfo.ok()) {
+            // note:从NameServer中获取路由表.并保存到本地路由表中.
+            this.mQClientFactory.updateTopicRouteInfoFromNameServer(topic);
+            topicPublishInfo = this.topicPublishInfoTable.get(topic);
+        }
+```
 
 
 
@@ -777,7 +805,9 @@ org.apache.rocketmq.client.impl.producer.DefaultMQProducerImpl#selectOneMessageQ
 
 topic的路由表已经获取到了，无论是从本地缓存中获取的，还是从NameServer中获取的。
 
-**由于topic对应多个queue——默认是一个topic需要创建4个queue。所以需要选择出，这条mq消息到底要发送到其中哪一个queue中的。**
+**由于一个topic对应多个queue——默认是一个topic会创建4个queue。所以在producer在发送消息时，需要选择出这条mq消息到底要发送到其中哪一个queue中的。**
+
+关系图：
 
 ![image-20211105163438145](images/image-20211105163438145.png)
 
@@ -791,18 +821,172 @@ topic的路由表已经获取到了，无论是从本地缓存中获取的，还
 >
 > 但是RocketMQ的原理和Elasticsearch这种`分片`处理方式不一样：
 >
-> **在broker中，同一个topic，可以在不同的broker中创建，并且其队列数量可以不一样。**也就正如上图看到的这种结构。
+> **在broker中，相同的topic名，可以在不同的broker中创建，并且其队列数量可以不一样。**也就正如关系图中看到的这种结构。
 
 
 
+而DefaultMQProducerImpl#selectOneMessageQueue 这个方法就是从topic中找出一个queue，然后让producer把消息发送到这个queue对应的broker里。【这相当于producer侧的负载均衡】
 
+```java
+public MessageQueue selectOneMessageQueue(final TopicPublishInfo tpInfo, final String lastBrokerName) {
+    return this.mqFaultStrategy.selectOneMessageQueue(tpInfo, lastBrokerName);
+}
+```
+
+`mqFaultStrategy` 英文直接翻译表示：mq故障策略。在RocketMQ这个框架中，其实表示的是：
+
+> MQFaultStrategy : Producer的负载均衡
+>
+> Producer端在发送消息的时候，会先根据Topic找到指定的TopicPublishInfo，在获取了TopicPublishInfo路由信息后，RocketMQ的客户端在默认方式下 {@link #selectOneMessageQueue}方法会从TopicPublishInfo中的messageQueueList中选择一个队列（MessageQueue）进行发送消息。
+> 这里有一个 {@link #sendLatencyFaultEnable}开关变量，如果开启，在随机递增取模的基础上，再过滤掉not available的Broker。
+> 所谓的"latencyFaultTolerance"，是指对之前失败的，按一定的时间做退避。例如，如果上次请求的latency超过550Lms，就退避3000Lms；超过1000L，就退避60000L；
+> 如果关闭，采用随机递增取模的方式选择一个队列（MessageQueue）来发送消息，latencyFaultTolerance机制是实现消息发送高可用的核心关键所在。
+
+```java
+    public MessageQueue selectOneMessageQueue(final TopicPublishInfo tpInfo, final String lastBrokerName) {
+        // producer发送mq消息时,负载均衡策略是否启用
+        if (!this.sendLatencyFaultEnable) {
+            // sendLatencyFaultEnable = false,未启用情况,直接让 TopicPublishInfo 选择一个queue
+            return tpInfo.selectOneMessageQueue(lastBrokerName);
+        }
+
+        try {
+            int index = tpInfo.getSendWhichQueue().incrementAndGet();
+            for (int i = 0; i < tpInfo.getMessageQueueList().size(); i++) {
+                int pos = Math.abs(index++) % tpInfo.getMessageQueueList().size();
+                if (pos < 0)
+                    pos = 0;
+                MessageQueue mq = tpInfo.getMessageQueueList().get(pos);
+                if (latencyFaultTolerance.isAvailable(mq.getBrokerName()))
+                    return mq;
+            }
+
+            final String notBestBroker = latencyFaultTolerance.pickOneAtLeast();
+            int writeQueueNums = tpInfo.getQueueIdByBroker(notBestBroker);
+            if (writeQueueNums > 0) {
+                final MessageQueue mq = tpInfo.selectOneMessageQueue();
+                if (notBestBroker != null) {
+                    mq.setBrokerName(notBestBroker);
+                    mq.setQueueId(tpInfo.getSendWhichQueue().incrementAndGet() % writeQueueNums);
+                }
+                return mq;
+            } else {
+                latencyFaultTolerance.remove(notBestBroker);
+            }
+        } catch (Exception e) {
+            log.error("Error occurred when selecting message queue", e);
+        }
+        // 最终保底策略还是让 TopicPublishInfo 选择一个queue
+        return tpInfo.selectOneMessageQueue();
+    }
+```
 
 
 
 ### sendKernelImpl
 
+> 上面已经确定mq消息具体要发送到哪个queue了，也就知道了这个queue所在的broker机器ip了。
+>
+> 此时就可以给这个broker发送request了。
+
 org.apache.rocketmq.client.impl.producer.DefaultMQProducerImpl#sendKernelImpl
 
+- 先根据brokerName获取brokerAddress，也就是broker的ip
+
+  ```java
+  String brokerAddr = this.mQClientFactory.findBrokerAddressInPublish(mq.getBrokerName());
+  ```
+
+- 消息体超过一定大小之后,尝试压缩.
+
+  - 批量消息目前不支持压缩
+
+  - 默认压缩大于 4k 的消息体。
+
+  - ```java
+    boolean msgBodyCompressed = false;
+    // 消息体超过一定大小之后,尝试压缩.
+    if (this.tryToCompressMessage(msg)) {
+        sysFlag |= MessageSysFlag.COMPRESSED_FLAG;
+        msgBodyCompressed = true;
+    }
+    ```
+
+- 如果有发送消息的钩子`SendMessageHook`,则去调用`sendMessageBefore()` 方法
+
+- 构建请求 ，`SendMessageRequestHeader`
+
+  ```java
+  SendMessageRequestHeader requestHeader = new SendMessageRequestHeader();
+  requestHeader.setProducerGroup(this.defaultMQProducer.getProducerGroup());
+  requestHeader.setTopic(msg.getTopic());
+  requestHeader.setDefaultTopic(this.defaultMQProducer.getCreateTopicKey());
+  // 默认每个主题要创建的队列数。默认为4
+  requestHeader.setDefaultTopicQueueNums(this.defaultMQProducer.getDefaultTopicQueueNums());
+  // 队列id
+  requestHeader.setQueueId(mq.getQueueId());
+  requestHeader.setSysFlag(sysFlag);
+  // 消息出生时间
+  requestHeader.setBornTimestamp(System.currentTimeMillis());
+  requestHeader.setFlag(msg.getFlag());
+  requestHeader.setProperties(MessageDecoder.messageProperties2String(msg.getProperties()));
+  requestHeader.setReconsumeTimes(0);
+  requestHeader.setUnitMode(this.isUnitMode());
+  // 是否为批量消息
+  requestHeader.setBatch(msg instanceof MessageBatch);
+  ```
+
+- 根据通信类型 `CommunicationMode` 去发送消息 
+
+  ```java
+  // 简化很多判断逻辑的伪代码。
+  switch (communicationMode) {
+      case ASYNC: // 异步发送消息
+          sendResult = this.mQClientFactory.getMQClientAPIImpl().sendMessage(brokerAddr, mq.getBrokerName(), tmpMessage, requestHeader, timeout - costTimeAsync, communicationMode, sendCallback, topicPublishInfo, this.mQClientFactory, this.defaultMQProducer.getRetryTimesWhenSendAsyncFailed(), context, this);
+          break;
+      case ONEWAY:
+      case SYNC: // 同步发送消息
+          sendResult = this.mQClientFactory.getMQClientAPIImpl().sendMessage(brokerAddr, mq.getBrokerName(), msg, requestHeader, timeout - costTimeSync, communicationMode, context, this);
+          break;
+      default:
+          assert false;
+          break;
+  }
+  ```
+
+- 如果有发送消息的钩子`SendMessageHook`,则去调用 `sendMessageAfter()`方法
+
+
+
+### sendMessage
+
+org.apache.rocketmq.client.impl.MQClientAPIImpl#sendMessage
+
+此方法是**真正的构建`RemotingCommand`请求，然后根据通信方式（同步或异步）去发送消息**
+
+- 构建`RemotingCommand` 请求：![image-20211118184656801](images/image-20211118184656801.png)
+
+
+
+- 根据通讯方式,发送消息：![image-20211118184735401](images/image-20211118184735401.png)
+
+
+
+### sendMessageSync同步发送消息
+
+![image-20211118184915803](images/image-20211118184915803.png)
+
+
+
+# RemotingClient
+
+![image-20211118185309303](images/image-20211118185309303.png)
+
+## invokeSync同步发送请求
+
+![image-20211118185411583](images/image-20211118185411583.png)
+
+## invokeSyncImpl 同步调用具体实现
 
 
 
@@ -814,30 +998,7 @@ org.apache.rocketmq.client.impl.producer.DefaultMQProducerImpl#sendKernelImpl
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+# 问题
 
 ## server端接收到`request`数据包，是如何处理的？
 
