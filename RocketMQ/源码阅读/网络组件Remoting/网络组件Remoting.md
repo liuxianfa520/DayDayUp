@@ -44,9 +44,11 @@ RocketMQ有很多的角色：
 
 # 远程命令 RemotingCommand
 
-在RocketMQ中，无论是request还是response，都是使用`org.apache.rocketmq.remoting.protocol.RemotingCommand`类来表示的。
+无论是客户端发送的request还是server端返回的response，其实都是`数据包`，类似于http协议中，`数据包`包含`请求头`、`请求体`、`响应头`、`响应体`。
 
-只不过使用如下方法，可以知道当前这个`远程命令`实例的类型是`request`还是`response`：
+在RocketMQ中，`request`和`response`都是使用`org.apache.rocketmq.remoting.protocol.RemotingCommand`类来表示的。
+
+只不过使用`getType()`方法，可以知道当前这个`远程命令`实例的类型是`request`还是`response`：
 
 ```java
     @JSONField(serialize = false)
@@ -485,34 +487,42 @@ org.apache.rocketmq.remoting.netty.NettyRemotingClient#start
 
 netty中的使用，这里就不讲了，如果对netty不太了解，那需要先去学习netty框架的使用。
 
-主要逻辑就是设置的：`ChannelHandler`
+**一般使用netty主要逻辑就是实现`ChannelHandler`接口，并在启动的时候设置`ChannelHandler`。**
 
-比如client设置了：
+比如client启动时设置了：
 
-```
-                    // 设置channel处理器
-                    pipeline.addLast(
-                        defaultEventExecutorGroup,
-                        new NettyEncoder(), // 编码器——RemotingCommand转字节流byte[]
-                        new NettyDecoder(), // 解码器——字节流byte[]转RemotingCommand
-                        new IdleStateHandler(0, 0, nettyClientConfig.getClientChannelMaxIdleTimeSeconds()),
-                        new NettyConnectManageHandler(), // 监听netty连接状态,并维护连接信息 —— NettyRemotingClient#channelTables
-                        new NettyClientHandler()); // 处理收到的消息
+```java
+// 设置channel处理器
+pipeline.addLast(
+    defaultEventExecutorGroup,
+    new NettyEncoder(),                  // 编码器——作用：把RemotingCommand转字节流byte[]
+    new NettyDecoder(),                  // 解码器——作用：把字节流byte[]转RemotingCommand
+    new IdleStateHandler(0, 0, nettyClientConfig.getClientChannelMaxIdleTimeSeconds()),
+    new NettyConnectManageHandler(),     // 监听netty连接状态,并维护连接信息 —— NettyRemotingClient#channelTables
+    new NettyClientHandler());           // 处理收到的消息
 ```
 
-server设置了：
+server启动时设置了：
 
+```java
+ch.pipeline()
+    .addLast(defaultEventExecutorGroup, HANDSHAKE_HANDLER_NAME, handshakeHandler)
+    .addLast(defaultEventExecutorGroup,
+        new NettyEncoder(),                  // 编码器——作用：把RemotingCommand转字节流byte[]
+        new NettyDecoder(),                  // 解码器——作用：把字节流byte[]转RemotingCommand
+        new IdleStateHandler(0, 0, nettyServerConfig.getServerChannelMaxIdleTimeSeconds()),
+        new NettyConnectManageHandler(),     // 这个处理器除了打打日志,当监听到channel事件,其他没干啥事.（不重要）
+        new NettyServerHandler()             // 接收到消息之后,经过上面一系列的消息解码,最终的处理逻辑.
+    );
 ```
-                        ch.pipeline()
-                            .addLast(defaultEventExecutorGroup, HANDSHAKE_HANDLER_NAME, handshakeHandler)
-                            .addLast(defaultEventExecutorGroup,
-                                encoder,                  // 编码器——RemotingCommand转字节流byte[]
-                                new NettyDecoder(),       // 解码器——字节流byte[]转RemotingCommand
-                                new IdleStateHandler(0, 0, nettyServerConfig.getServerChannelMaxIdleTimeSeconds()),
-                                connectionManageHandler,  // 这个处理器除了打打日志,发个事件,其他没干啥事.
-                                serverHandler             // 接收到消息之后,经过上面一系列的消息解码,最终的处理逻辑.
-                            );
-```
+
+> 画外音
+>
+> 本小节就主要讲解client端和server端使用到的`ChannelHandler`，
+>
+> 比如：NettyEncoder、NettyDecoder、NettyClientHandler、NettyServerHandler
+>
+> IdleStateHandler、NettyConnectManageHandler （后面这两个不是很重要，了解即可）
 
 上面都设置了 `NettyEncoder` `NettyDecoder` 编码和解码器，
 
@@ -524,9 +534,9 @@ server设置了：
 
 ![image-20211104164833068](images/image-20211104164833068.png)
 
+# ChannelHandler
 
-
-# NettyEncoder
+## NettyEncoder
 
 ```java
 /**
@@ -559,7 +569,9 @@ public class NettyEncoder extends MessageToByteEncoder<RemotingCommand> {
 
 
 
-# NettyDecoder
+
+
+## NettyDecoder
 
 ```java
 /**
@@ -641,7 +653,66 @@ public class NettyDecoder extends LengthFieldBasedFrameDecoder {
 
 
 
+## NettyClientHandler
 
+```java
+class NettyClientHandler extends SimpleChannelInboundHandler<RemotingCommand> {
+
+    @Override
+    protected void channelRead0(ChannelHandlerContext ctx, RemotingCommand msg) throws Exception {
+        // 当netty接收到网络I/O数据后,会调用此方法.
+
+        // 处理收到的消息(可能是request或response)
+        processMessageReceived(ctx, msg);
+    }
+}
+```
+
+
+
+## NettyServerHandler
+
+这是在`NettyRemotingServer`类中的一个内部类。
+
+![image-20211119180809536](images/image-20211119180809536.png)
+
+从类图中看到，本质上还是 `ChannelHandler` 。
+
+主要是实现了`channelRead0()` 方法，当netty收到消息之后，经过`NettyDecoder`把byte[]字节流转成 `RemotingCommand`之后，会调用`channelRead0()`方法。
+
+```java
+class NettyServerHandler extends SimpleChannelInboundHandler<RemotingCommand> {
+
+    @Override
+    protected void channelRead0(ChannelHandlerContext ctx, RemotingCommand msg) throws Exception {
+        processMessageReceived(ctx, msg);
+    }
+}
+```
+
+这里收到消息之后，调用 `processMessageReceived(ctx, msg);` 方法去处理这个消息。具体处理的逻辑详见：
+
+
+
+## IdleStateHandler
+
+
+
+## NettyConnectManageHandler
+
+
+
+## 小结
+
+
+
+
+
+
+
+
+
+---
 
 
 
