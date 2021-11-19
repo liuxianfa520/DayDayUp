@@ -403,3 +403,72 @@ if (responseFuture.getInvokeCallback() != null) {
 } 
 ```
 
+
+
+```java
+    private void executeInvokeCallback(final ResponseFuture responseFuture) {
+        boolean runInThisThread = false; // 是否在当前线程执行callback
+        // callback方法的执行线程池
+        ExecutorService executor = this.getCallbackExecutor();
+        if (executor != null) {
+            try {
+                // 如果存在线程池,则使用对应的线程池去执行callback
+                executor.submit(() -> {
+                    try {
+                        // 执行callback
+                        responseFuture.executeInvokeCallback();
+                    } catch (Throwable e) {
+                        log.warn("execute callback in executor exception, and callback throw", e);
+                    } finally {
+                        // 释放信号量.   限流器释放一个资源
+                        responseFuture.release();
+                    }
+                });
+            } catch (Exception e) {
+                // 如果向异步线程池提交任务时异常了,则还在当前线程执行callback.
+                // (异常的原因可能是执行器太忙了——maybe executor busy)
+                runInThisThread = true;
+                log.warn("execute callback in executor exception, maybe executor busy", e);
+            }
+        } else {
+            // 未指定callback在特定线程池中执行,则:callback在当前线程执行
+            runInThisThread = true;
+        }
+
+        if (runInThisThread) {
+            try {
+                // 执行callback
+                responseFuture.executeInvokeCallback();
+            } catch (Throwable e) {
+                log.warn("executeInvokeCallback Exception", e);
+            } finally {
+                // 释放资源.   释放线程器.
+                responseFuture.release();
+            }
+        }
+    }
+
+```
+
+异步调用回调方法时，会判断是否需要在线程池中执行：
+
+- 如果 设置了异步执行线程池，则在线程池中执行。
+- 如果提交异步任务时异常了（可能是因为执行器太忙导致的），也会在当前线程中执行。
+- 通过上面的代码和描述：在本线程执行的情况有两种：
+  - `ExecutorService executor = this.getCallbackExecutor();`  执行器为空
+  - 向执行器中提交任务时，失败了。（失败原因可能是触发了拒绝策略。）
+  - *注意：如果任务在线程池中异步执行时，除了异常，在本线程中是不会再次执行的。*
+- 但是无论是在异步线程池中执行，还是在本线程中执行，最后都是会调用 `responseFuture.executeInvokeCallback();` 来完成异步回调函数的执行的：
+
+```java
+// org.apache.rocketmq.remoting.netty.ResponseFuture#executeInvokeCallback
+public void executeInvokeCallback() {
+    if (invokeCallback != null) {
+        // 用cas判断是否执行过：如果cas设置成功,则说明异步回调函数没有被执行过,则去执行callback.
+        if (this.executeCallbackOnlyOnce.compareAndSet(false, true)) {
+            invokeCallback.operationComplete(this);
+        }
+    }
+}
+```
+
