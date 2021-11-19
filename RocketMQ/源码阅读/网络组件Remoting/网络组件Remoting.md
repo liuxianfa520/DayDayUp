@@ -653,21 +653,6 @@ public class NettyDecoder extends LengthFieldBasedFrameDecoder {
 
 
 
-## NettyClientHandler
-
-```java
-class NettyClientHandler extends SimpleChannelInboundHandler<RemotingCommand> {
-
-    @Override
-    protected void channelRead0(ChannelHandlerContext ctx, RemotingCommand msg) throws Exception {
-        // 当netty接收到网络I/O数据后,会调用此方法.
-
-        // 处理收到的消息(可能是request或response)
-        processMessageReceived(ctx, msg);
-    }
-}
-```
-
 
 
 ## NettyServerHandler
@@ -690,7 +675,25 @@ class NettyServerHandler extends SimpleChannelInboundHandler<RemotingCommand> {
 }
 ```
 
-这里收到消息之后，调用 `processMessageReceived(ctx, msg);` 方法去处理这个消息。具体处理的逻辑详见：
+这里收到消息之后，调用 `processMessageReceived(ctx, msg);` 方法去处理这个消息。具体处理的逻辑详见： [收到netty远程消息之后处理流程.md](收到netty远程消息之后处理流程.md) 
+
+## NettyClientHandler
+
+```java
+class NettyClientHandler extends SimpleChannelInboundHandler<RemotingCommand> {
+
+    @Override
+    protected void channelRead0(ChannelHandlerContext ctx, RemotingCommand msg) throws Exception {
+        processMessageReceived(ctx, msg);
+    }
+}
+```
+
+![image-20211119180809536](images/image-20211119180809536.png)
+
+从代码和类结构图上看，除了类名和`NettyServerHandler`不一样，并没有其他什么区别了。
+
+
 
 
 
