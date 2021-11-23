@@ -22,7 +22,7 @@ import cn.hutool.core.date.DateUtil;
  */
 public class InterNetFeeCalcTest {
     private Date start = new DateTime("2021-11-01 12:00");
-    private Date end = new DateTime("2021-11-02 12:00");
+    private Date end = new DateTime("2021-11-03 00:59");
 
     private String baoyeStart = "23:00";
     private String baoyeEnd = "06:00";
