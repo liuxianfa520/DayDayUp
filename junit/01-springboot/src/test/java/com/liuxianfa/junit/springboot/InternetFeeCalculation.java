@@ -32,7 +32,7 @@ public class InternetFeeCalculation {
 
     private static String beginTime = "2021-11-20T15:00:00";
 
-    private static String endTime = "2021-11-20T16:03:00";
+    private static String endTime = "2021-11-21T16:03:00";
 
     private static String baoYeBegin = "23:00";
     private static String baoYeEnd = "06:00";
@@ -78,8 +78,8 @@ public class InternetFeeCalculation {
 
             }
 
-            System.out.println(JSON.toJSONString(list, true));
         }
+        System.out.println(JSON.toJSONString(list, true));
     }
 
     private static boolean isIn(LocalDateTime time, LocalDateTime begin, LocalDateTime end) {
