@@ -27,18 +27,17 @@ public class KaiJiProcessor implements InternetFeeCalcProcessor {
 
     @Override
     public boolean canProcessor(Date start, Date end) {
-        if (!hasBeenCalculated) {
-            hasBeenCalculated = true;
-            return hasBeenCalculated;
-        } else {
-            return false;
-        }
+        return !hasBeenCalculated;
     }
 
     @Override
     public int process(Date start, Date end, Chain chain, ProcessContext context) {
-        context.addFee(new Date(), new Date(), price, price, SwType.kaijifei);
-        // 开机费自身 加上 其他处理器的处理逻辑
-        return price + chain.doProcess(start, end, context);
+        if (!hasBeenCalculated) {
+            hasBeenCalculated = true;
+            context.addFee(new Date(), new Date(), price, price, SwType.kaijifei);
+            // 开机费自身 加上 其他处理器的处理逻辑
+            return price + chain.doProcess(start, end, context);
+        }
+        return 0;
     }
 }

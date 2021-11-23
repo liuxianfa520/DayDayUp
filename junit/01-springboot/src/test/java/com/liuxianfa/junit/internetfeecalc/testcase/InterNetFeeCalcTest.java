@@ -40,11 +40,9 @@ public class InterNetFeeCalcTest {
         BaoYeProcessor baoYeProcessor = new BaoYeProcessor(baoyeStart, baoyeEnd, baoyePrice, unitPrice);
         KaiJiProcessor kaiJiProcessor = new KaiJiProcessor(kaijiPrice);
 
+        Chain chain = new Chain(kaiJiProcessor, baoYeProcessor, unitPriceProcessor);
         ProcessContext processContext = new ProcessContext();
-        Chain chain = new Chain();
-        chain.addProcessor(kaiJiProcessor, baoYeProcessor, unitPriceProcessor);
-
-        int fee = chain.doProcess(start, end, processContext);
+        int fee = kaiJiProcessor.process(start, end, chain, processContext);
         System.out.printf("网费=%s%n", fee);
         System.out.println(JSON.toJSONString(processContext.getFeeList()));
     }

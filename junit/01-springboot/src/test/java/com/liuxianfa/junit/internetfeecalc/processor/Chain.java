@@ -18,6 +18,13 @@ public class Chain {
     @Getter
     private List<InternetFeeCalcProcessor> list = new ArrayList<>();
 
+    public Chain(InternetFeeCalcProcessor... processors) {
+        if (processors != null && processors.length > 0) {
+            Collections.addAll(list, processors);
+        }
+        putUnitPriceProcessorLast();
+    }
+
     public Chain addProcessor(InternetFeeCalcProcessor processor) {
         list.add(processor);
         putUnitPriceProcessorLast();
