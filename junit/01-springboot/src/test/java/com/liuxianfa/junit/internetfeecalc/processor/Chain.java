@@ -58,14 +58,12 @@ public class Chain {
     }
 
     public int doProcess(Date s, Date e, ProcessContext context) {
-        int cost = 0;
         for (InternetFeeCalcProcessor processor : list) {
             if (processor.canProcessor(s, e)) {
-                int process = processor.process(s, e, this, context);
-                cost += process;
+                return processor.process(s, e, this, context);
             }
         }
-        return cost;
+        return 0;
     }
 
 }

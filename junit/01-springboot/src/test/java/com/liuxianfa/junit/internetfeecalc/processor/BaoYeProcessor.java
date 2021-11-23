@@ -94,13 +94,13 @@ public class BaoYeProcessor implements InternetFeeCalcProcessor {
         Date endTmp = endInBaoYeDuration ? end : baoYeEndTime;
 
         // 判断单价上网网费是否小于包夜价格
-        int cost = betweenHour(start, endTmp) * unitPrice;
+        int cost = betweenHour(baoYeStartTime, endTmp) * unitPrice;
         if (cost < price) {
             // 使用单价上网计算规则
-            total += context.addFee(start, endTmp, unitPrice, cost, SwType.baoYeTime_but_unit_price).getCost();
+            total += context.addFee(baoYeStartTime, endTmp, unitPrice, cost, SwType.baoYeTime_but_unit_price).getCost();
         } else {
             // 使用包夜价格计算
-            total += context.addFee(start, endTmp, price, price, SwType.baoye).getCost();
+            total += context.addFee(baoYeStartTime, endTmp, price, price, SwType.baoye).getCost();
         }
 
         if (!endInBaoYeDuration) {
@@ -190,7 +190,8 @@ public class BaoYeProcessor implements InternetFeeCalcProcessor {
      * 判断一个时间,是否在一个时间段中.
      */
     private boolean isIn(LocalTime time, LocalTime begin, LocalTime end) {
-        return (time.isAfter(begin) || time.equals(begin)) && (time.isBefore(end) || time.equals(end));
+        // fixbug:之前使用这种判断,存在问题: return (time.isAfter(begin) || time.equals(begin)) && (time.isBefore(end) || time.equals(end));
+        return (time.isAfter(begin)) && (time.isBefore(end));
     }
 
     private boolean isBefore(Date date, Date date2) {
