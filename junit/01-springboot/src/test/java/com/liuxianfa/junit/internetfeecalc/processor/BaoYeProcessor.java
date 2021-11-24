@@ -1,7 +1,6 @@
 package com.liuxianfa.junit.internetfeecalc.processor;
 
 import com.liuxianfa.junit.internetfeecalc.SwType;
-import com.liuxianfa.junit.internetfeecalc.testcase.InterNetFeeCalcTest;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -164,13 +163,10 @@ public class BaoYeProcessor implements InternetFeeCalcProcessor {
     }
 
     /**
-     * 判断两个时间段是否重叠
-     * 详见:https://blog.csdn.net/qq_21478261/article/details/109383357
+     * 判断两个时间段是否重叠 详见:https://www.cnblogs.com/AndyJee/p/4537251.html
      */
     private boolean isOverlap(Date start1, Date end1, Date start2, Date end2) {
-        long begin = Math.max(start1.getTime(), start2.getTime());
-        long end = Math.min(end1.getTime(), end2.getTime());
-        return end - begin > 0;
+        return end1.getTime() > start2.getTime() && start1.getTime() < end2.getTime();
     }
 
     private boolean isBefore(Date date, Date date2) {
