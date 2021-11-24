@@ -52,37 +52,6 @@ public class InterNetFeeCalcTest {
     }
 
     /**
-     * {@link BaoYeProcessor#canProcessor(Date, Date)}
-     */
-    @Test
-    public void 判断一个时间段是否和另一个时间段重叠() {
-        // 先判断start~end之间是否等于或超过1天,如果是:返回true
-        long days = DateUtil.betweenDay(start, end, false);
-        if (days >= 1) {
-            System.out.println("超过1天,重叠了");
-            return;
-        }
-        // 判断包含
-        LocalTime startLocalTime = DateUtil.toLocalDateTime(this.start).toLocalTime();
-        LocalTime endLocalTime = DateUtil.toLocalDateTime(this.end).toLocalTime();
-
-        LocalTime baoYeStart = baoYeProcessor.getBaoYeStart();
-        LocalTime baoYeEnd = baoYeProcessor.getBaoYeEnd();
-
-        if (baoYeProcessor.baoYeIsSameDay()) {
-            if (isOverlap(startLocalTime, endLocalTime, baoYeStart, baoYeEnd)) {
-                System.out.println("重叠了");
-            }
-        } else {
-            LocalTime endOfDay = LocalTime.parse("23:59:59");
-            LocalTime beginOfDay = LocalTime.parse("00:00:00");
-            if (isOverlap(startLocalTime, endLocalTime, baoYeStart, endOfDay) || isOverlap(startLocalTime, endLocalTime, beginOfDay, baoYeEnd)) {
-                System.out.println("重叠了");
-            }
-        }
-    }
-
-    /**
      * 判断是否重叠的
      *
      * @param s

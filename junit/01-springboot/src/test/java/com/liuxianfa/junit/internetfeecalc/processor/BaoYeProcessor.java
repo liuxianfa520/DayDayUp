@@ -158,40 +158,19 @@ public class BaoYeProcessor implements InternetFeeCalcProcessor {
      *
      * @param start 上网开始时间
      * @param end   上网结束时间
-     * @see InterNetFeeCalcTest#判断一个时间段是否和另一个时间段重叠()
      */
     private boolean isOverlapWithBaoYe(Date start, Date end) {
-        // 先判断start~end之间是否超过或等于1天,如果是:返回true
-        long days = DateUtil.betweenDay(start, end, false);
-        if (days >= 1) {
-            return true;
-        }
-
-        // 判断包含
-        LocalTime startLocalTime = DateUtil.toLocalDateTime(start).toLocalTime();
-        LocalTime endLocalTime = DateUtil.toLocalDateTime(end).toLocalTime();
-        if (baoYeIsSameDay()) {
-            return isOverlap(startLocalTime, endLocalTime, baoYeStart, baoYeEnd);
-        }
-        return isOverlap(startLocalTime, endLocalTime, baoYeStart, endOfDay) || isOverlap(startLocalTime, endLocalTime, beginOfDay, baoYeEnd);
+        return isOverlap(start, end, getBaoYeStartDateTime(start), getBaoYeEndDateTime(start));
     }
 
     /**
      * 判断两个时间段是否重叠
+     * 详见:https://blog.csdn.net/qq_21478261/article/details/109383357
      */
-    private boolean isOverlap(LocalTime start1, LocalTime end1, LocalTime start2, LocalTime end2) {
-        return isIn(start2, start1, end1)
-                || isIn(end2, start1, end1)
-                || isIn(start1, start2, end2)
-                || isIn(end1, start2, end2);
-    }
-
-    /**
-     * 判断一个时间,是否在一个时间段中.
-     */
-    private boolean isIn(LocalTime time, LocalTime begin, LocalTime end) {
-        // fixbug:之前使用这种判断,存在问题: return (time.isAfter(begin) || time.equals(begin)) && (time.isBefore(end) || time.equals(end));
-        return (time.isAfter(begin)) && (time.isBefore(end));
+    private boolean isOverlap(Date start1, Date end1, Date start2, Date end2) {
+        long begin = Math.max(start1.getTime(), start2.getTime());
+        long end = Math.min(end1.getTime(), end2.getTime());
+        return end - begin > 0;
     }
 
     private boolean isBefore(Date date, Date date2) {
