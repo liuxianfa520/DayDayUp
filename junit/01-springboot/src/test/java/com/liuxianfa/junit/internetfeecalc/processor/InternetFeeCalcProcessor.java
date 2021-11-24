@@ -31,4 +31,11 @@ public interface InternetFeeCalcProcessor {
                 .divide(new BigDecimal(DateUnit.HOUR.getMillis()), 0, RoundingMode.UP)
                 .intValue();
     }
+
+    /**
+     * 判断两个时间段是否重叠 详见:https://www.cnblogs.com/AndyJee/p/4537251.html
+     */
+    default boolean isOverlap(Date start1, Date end1, Date start2, Date end2) {
+        return end1.getTime() > start2.getTime() && start1.getTime() < end2.getTime();
+    }
 }

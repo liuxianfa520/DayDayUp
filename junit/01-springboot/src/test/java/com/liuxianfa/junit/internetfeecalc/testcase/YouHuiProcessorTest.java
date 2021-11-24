@@ -5,7 +5,8 @@ import com.liuxianfa.junit.internetfeecalc.processor.YouHuiProcessor;
 import org.junit.Test;
 
 import java.util.ArrayList;
-import java.util.Date;
+
+import cn.hutool.core.date.DateTime;
 
 /**
  * @author LiuXianfa
@@ -25,7 +26,15 @@ public class YouHuiProcessorTest {
 
     @Test
     public void getNextYouHuiStartDate() {
-        System.out.println(youHuiProcessor.getNextYouHuiStartDate(new Date()));
-        System.out.println(youHuiProcessor.getNextYouHuiEndDate(new Date()));
+        DateTime from = new DateTime("2021-11-26 05:00:00");
+        System.out.println(youHuiProcessor.getNextYouHuiStartDate(from));
+        System.out.println(youHuiProcessor.getNextYouHuiEndDate(from));
+    }
+
+    @Test
+    public void canProcessor() {
+        DateTime start = new DateTime("2021-11-25 05:00:00");
+        DateTime __end = new DateTime("2021-11-25 08:59:00");
+        System.out.println(youHuiProcessor.canProcessor(start, __end));
     }
 }

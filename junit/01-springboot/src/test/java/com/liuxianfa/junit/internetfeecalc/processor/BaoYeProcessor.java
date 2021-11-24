@@ -162,18 +162,7 @@ public class BaoYeProcessor implements InternetFeeCalcProcessor {
         return isOverlap(start, end, getBaoYeStartDateTime(start), getBaoYeEndDateTime(start));
     }
 
-    /**
-     * 判断两个时间段是否重叠 详见:https://www.cnblogs.com/AndyJee/p/4537251.html
-     */
-    private boolean isOverlap(Date start1, Date end1, Date start2, Date end2) {
-        return end1.getTime() > start2.getTime() && start1.getTime() < end2.getTime();
-    }
-
     private boolean isBefore(Date date, Date date2) {
-        return date.before(date2) || date.equals(date2);
-    }
-
-    private boolean isAfter(Date date, Date date2) {
-        return date.after(date2) || date.equals(date2);
+        return date.before(date2);
     }
 }

@@ -36,9 +36,38 @@ public class YouHuiProcessor implements InternetFeeCalcProcessor {
 
     @Override
     public boolean canProcessor(Date start, Date end) {
+        return isOverlapWithYouHui(start, end);
+    }
 
-
-        return false;
+    /**
+     * 上网时间段中是否有优惠时段
+     *
+     * @param start 上机时间
+     * @param end   下机时间
+     * @return true:上网时间段中有优惠时段,false:上网时间段中没有优惠时段
+     */
+    private boolean isOverlapWithYouHui(Date start, Date end) {
+        Date s = start;
+        while (true) {
+            Date nextYouHuiStartDate = getNextYouHuiStartDate(s);
+            // 没有下次优惠开始、结束时间
+            if (nextYouHuiStartDate == null) {
+                return false;
+            }
+            Date nextYouHuiEndDate = getNextYouHuiEndDate(s);
+            if (nextYouHuiEndDate == null) {
+                return false;
+            }
+            // 下次优惠开始前,就已经下机了.
+            if (end.before(nextYouHuiStartDate)) {
+                return false;
+            }
+            boolean overlap = isOverlap(start, end, nextYouHuiStartDate, nextYouHuiEndDate);
+            s = nextYouHuiStartDate;
+            if (overlap) {
+                return true;
+            }
+        }
     }
 
     /**
