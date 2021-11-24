@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.liuxianfa.junit.internetfeecalc.processor.BaoYeProcessor;
 import com.liuxianfa.junit.internetfeecalc.processor.Chain;
 import com.liuxianfa.junit.internetfeecalc.processor.KaiJiProcessor;
+import com.liuxianfa.junit.internetfeecalc.processor.LowestCostProcessor;
 import com.liuxianfa.junit.internetfeecalc.processor.ProcessContext;
 import com.liuxianfa.junit.internetfeecalc.processor.UnitPriceProcessor;
 
@@ -39,8 +40,10 @@ public class InterNetFeeCalcTest {
         UnitPriceProcessor unitPriceProcessor = new UnitPriceProcessor(unitPrice);
         BaoYeProcessor baoYeProcessor = new BaoYeProcessor(baoyeStart, baoyeEnd, baoyePrice, unitPrice);
         KaiJiProcessor kaiJiProcessor = new KaiJiProcessor(kaijiPrice);
+        LowestCostProcessor lowestCostProcessor = new LowestCostProcessor(5000, true);
 
-        Chain chain = new Chain(kaiJiProcessor, baoYeProcessor, unitPriceProcessor);
+        // 注意:由于实现的原因,处理器顺序是固定的.
+        Chain chain = new Chain(kaiJiProcessor, lowestCostProcessor, baoYeProcessor, unitPriceProcessor);
         ProcessContext processContext = new ProcessContext();
         int fee = kaiJiProcessor.process(start, end, chain, processContext);
         System.out.printf("网费=%s%n", fee);

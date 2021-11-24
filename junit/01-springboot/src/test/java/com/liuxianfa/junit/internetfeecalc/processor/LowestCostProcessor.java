@@ -8,20 +8,29 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * @author LiuXianfa
  * @email xianfaliu2@creditease.cn
  * @date 2021/11/24 11:05
  */
-@Data
 public class LowestCostProcessor implements InternetFeeCalcProcessor {
 
     // todo:尚未考虑包间需要乘以机器数量的情况.
-    int price;
+    @Getter
+    @Setter
+    private int price;
 
-    boolean enable;
+    @Getter
+    @Setter
+    private boolean enable;
+
+    /**
+     * 是否已经计算过 (最低消费计算一次就行了)
+     */
+    private boolean hasBeenCalculated;
 
     public LowestCostProcessor(int price, boolean enable) {
         this.price = price;
@@ -30,15 +39,16 @@ public class LowestCostProcessor implements InternetFeeCalcProcessor {
 
     @Override
     public boolean canProcessor(Date start, Date end) {
-        return enable;
+        return enable && !hasBeenCalculated;
     }
 
     @Override
     public int process(Date start, Date end, Chain chain, ProcessContext context) {
-        if (!enable) {
+        if (!enable || hasBeenCalculated) {
             return 0;
         }
 
+        hasBeenCalculated = true;
         // 调用执行器链,先去执行完所有的处理器
         chain.doProcess(start, end, context);
 
