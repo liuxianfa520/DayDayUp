@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import lombok.Getter;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -15,10 +15,23 @@ import lombok.extern.slf4j.Slf4j;
  * @email xianfaliu2@creditease.cn
  * @date 2021/11/23 10:55
  */
+@Data
 @Slf4j
 public class ProcessContext {
 
-    @Getter
+    /**
+     * 上机时间
+     */
+    private Date start;
+
+    /**
+     * 下机时间
+     */
+    private Date end;
+
+    /**
+     * 网费明细
+     */
     private List<SwFee> feeList = new ArrayList<>();
 
     public SwFee addFee(Date start, Date end, int unitPrice, int price, SwType type) {

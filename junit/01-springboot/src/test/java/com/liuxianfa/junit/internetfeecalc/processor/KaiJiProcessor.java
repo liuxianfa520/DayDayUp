@@ -34,6 +34,8 @@ public class KaiJiProcessor implements InternetFeeCalcProcessor {
     public int process(Date start, Date end, Chain chain, ProcessContext context) {
         if (!hasBeenCalculated) {
             hasBeenCalculated = true;
+            context.setStart(start);
+            context.setEnd(end);
             context.addFee(new Date(), null, price, price, SwType.kaijifei);
             // 开机费自身 加上 其他处理器的处理逻辑
             return price + chain.doProcess(start, end, context);

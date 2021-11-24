@@ -8,7 +8,7 @@ package com.liuxianfa.junit.internetfeecalc;
 public enum SwType {
 
     kaijifei,
-    zuidixiaofei,
+    lowest_cost,
     normal,
     normal_youhui,
     baoye,
