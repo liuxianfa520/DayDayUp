@@ -118,7 +118,7 @@ public class BaoYeProcessor implements InternetFeeCalcProcessor {
                                     .withHour(baoYeEnd.getHour())
                                     .withMinute(baoYeEnd.getMinute())
                                     .withSecond(baoYeEnd.getSecond());
-        if (baoYeIsSameDay()) {
+        if (baoYeIsSameDay() || startIsEarlyMorning(from)) {
             // 日期:from    时间:baoYeEnd
             return DateUtil.date(tmp);
         }
@@ -127,13 +127,30 @@ public class BaoYeProcessor implements InternetFeeCalcProcessor {
     }
 
     /**
+     * 判断上机时间是不是凌晨
+     * 说明:如果上机是凌晨,则包夜结束时间,就不需要加1天了.
+     *
+     * @param from 上机时间
+     */
+    private boolean startIsEarlyMorning(Date from) {
+        return DateUtil.toLocalDateTime(from).toLocalTime().isBefore(getBaoYeEnd());
+    }
+
+    /**
      * 指定日期from,获取日期对应的包夜开始时间
+     * fixme:如果start=2021-10-01 00:01:00 ,则计算出来的包夜时间为 2021-10-01 23:00:00,
      */
     private Date getBaoYeStartDateTime(Date from) {
-        return DateUtil.date(DateUtil.toLocalDateTime(from)
-                                     .withHour(baoYeStart.getHour())
-                                     .withMinute(baoYeStart.getMinute())
-                                     .withSecond(baoYeStart.getSecond()));
+        LocalDateTime temporalAccessor = DateUtil.toLocalDateTime(from)
+                                                 .withHour(baoYeStart.getHour())
+                                                 .withMinute(baoYeStart.getMinute())
+                                                 .withSecond(baoYeStart.getSecond());
+
+        // 如果上机时间是凌晨,则包夜开始、结束时间需要减1天
+        if (DateUtil.toLocalDateTime(from).toLocalTime().isBefore(getBaoYeEnd())) {
+            return DateUtil.date(temporalAccessor.plusDays(-1));
+        }
+        return DateUtil.date(temporalAccessor);
     }
 
     /**

@@ -48,13 +48,13 @@ public class InterNetFeeCalcTest {
 
     @Test
     public void testMain() {
-        UnitPriceProcessor unitPriceProcessor = new UnitPriceProcessor(unitPrice);
+//        UnitPriceProcessor unitPriceProcessor = new UnitPriceProcessor(unitPrice);
         BaoYeProcessor baoYeProcessor = new BaoYeProcessor(baoyeStart, baoyeEnd, baoyePrice, unitPrice);
         KaiJiProcessor kaiJiProcessor = new KaiJiProcessor(kaijiPrice);
-        LowestCostProcessor lowestCostProcessor = new LowestCostProcessor(5000, false);
+//        LowestCostProcessor lowestCostProcessor = new LowestCostProcessor(5000, false);
 
         // 注意:由于实现的原因,处理器顺序是固定的.
-        Chain chain = new Chain(kaiJiProcessor, lowestCostProcessor, baoYeProcessor, youHuiProcessor, unitPriceProcessor);
+        Chain chain = new Chain(kaiJiProcessor, baoYeProcessor);
         ProcessContext processContext = new ProcessContext();
         int fee = kaiJiProcessor.process(start, end, chain, processContext);
         System.out.printf("网费=%s%n", fee);
