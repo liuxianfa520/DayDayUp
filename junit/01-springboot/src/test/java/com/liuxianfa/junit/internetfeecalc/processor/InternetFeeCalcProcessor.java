@@ -38,4 +38,8 @@ public interface InternetFeeCalcProcessor {
     default boolean isOverlap(Date start1, Date end1, Date start2, Date end2) {
         return end1.getTime() > start2.getTime() && start1.getTime() < end2.getTime();
     }
+
+    default boolean isBefore(Date date, Date date2) {
+        return date.before(date2);
+    }
 }

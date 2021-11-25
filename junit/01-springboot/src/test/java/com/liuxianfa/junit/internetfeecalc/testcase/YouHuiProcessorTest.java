@@ -7,6 +7,7 @@ import org.junit.Test;
 import java.util.ArrayList;
 
 import cn.hutool.core.date.DateTime;
+import cn.hutool.json.JSONUtil;
 
 /**
  * @author LiuXianfa
@@ -27,8 +28,10 @@ public class YouHuiProcessorTest {
     @Test
     public void getNextYouHuiStartDate() {
         DateTime from = new DateTime("2021-11-26 05:00:00");
-        System.out.println(youHuiProcessor.getNextYouHuiStartDate(from));
-        System.out.println(youHuiProcessor.getNextYouHuiEndDate(from));
+        YouHuiProcessor.NextYouHuiTime nextYouHuiTime = youHuiProcessor.getNextYouHuiTime(from);
+        System.out.println(nextYouHuiTime.getStart());
+        System.out.println(nextYouHuiTime.getEnd());
+        System.out.println(JSONUtil.toJsonStr(nextYouHuiTime.getYouHuiConfig()));
     }
 
     @Test

@@ -162,7 +162,4 @@ public class BaoYeProcessor implements InternetFeeCalcProcessor {
         return isOverlap(start, end, getBaoYeStartDateTime(start), getBaoYeEndDateTime(start));
     }
 
-    private boolean isBefore(Date date, Date date2) {
-        return date.before(date2);
-    }
 }

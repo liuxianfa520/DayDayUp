@@ -1,17 +1,16 @@
 package com.liuxianfa.junit.internetfeecalc.processor;
 
-import org.springframework.scheduling.support.CronExpression;
-
-import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.date.DateTime;
-import cn.hutool.core.date.LocalDateTimeUtil;
+import cn.hutool.cron.pattern.CronPattern;
+import cn.hutool.cron.pattern.CronPatternUtil;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 /**
  * @author LiuXianfa
@@ -22,16 +21,13 @@ public class YouHuiProcessor implements InternetFeeCalcProcessor {
 
     List<YouHuiConfig> youHuiConfigList;
 
+    private ThreadLocal<NextYouHuiTime> nextYouHuiTimeThreadLocal = new ThreadLocal<>();
+
     public YouHuiProcessor(List<YouHuiConfig> youHuiConfigList) {
         this.youHuiConfigList = youHuiConfigList;
         if (this.youHuiConfigList == null) {
             this.youHuiConfigList = Collections.emptyList();
         }
-    }
-
-    public static void main(String[] args) {
-        final LocalDateTime dateTime = CronExpression.parse("0 0/12 * * * ?").next(LocalDateTime.now());
-        System.out.println(dateTime);
     }
 
     @Override
@@ -49,64 +45,54 @@ public class YouHuiProcessor implements InternetFeeCalcProcessor {
     private boolean isOverlapWithYouHui(Date start, Date end) {
         Date s = start;
         while (true) {
-            Date nextYouHuiStartDate = getNextYouHuiStartDate(s);
-            // 没有下次优惠开始、结束时间
-            if (nextYouHuiStartDate == null) {
+            NextYouHuiTime nextYouHuiTime = getNextYouHuiTime(s);
+            // 没有下次优惠时段,则结束
+            if (nextYouHuiTime == null) {
                 return false;
             }
-            Date nextYouHuiEndDate = getNextYouHuiEndDate(s);
-            if (nextYouHuiEndDate == null) {
-                return false;
-            }
+            Date nextYouHuiStartDate = nextYouHuiTime.getStart();
+            Date nextYouHuiEndDate = nextYouHuiTime.getEnd();
+
             // 下次优惠开始前,就已经下机了.
             if (end.before(nextYouHuiStartDate)) {
                 return false;
             }
-            boolean overlap = isOverlap(start, end, nextYouHuiStartDate, nextYouHuiEndDate);
-            s = nextYouHuiStartDate;
-            if (overlap) {
+            // 如果上机时间段内有和优惠时段重叠,则返回true
+            if (isOverlap(start, end, nextYouHuiStartDate, nextYouHuiEndDate)) {
+                nextYouHuiTimeThreadLocal.set(nextYouHuiTime);
                 return true;
             }
+            s = nextYouHuiStartDate;
         }
     }
 
     /**
-     * 获取下一次优惠开始时间
+     * 获取下一次优惠时间段
      */
-    public Date getNextYouHuiStartDate(Date from) {
+    public NextYouHuiTime getNextYouHuiTime(Date from) {
         if (CollUtil.isEmpty(youHuiConfigList)) {
             return null;
         }
-        LocalDateTime _from = LocalDateTimeUtil.of(from);
-
-        LocalDateTime nextYouHuiStartDate = null;
+        NextYouHuiTime nextYouHuiTime = null;
         for (YouHuiConfig youHuiConfig : youHuiConfigList) {
-            LocalDateTime next = CronExpression.parse(youHuiConfig.getStartCron()).next(_from);
-            if (nextYouHuiStartDate == null || next.isBefore(nextYouHuiStartDate)) {
-                nextYouHuiStartDate = next;
+            Date next = cronNext(from, youHuiConfig.getStartCron());
+            if (nextYouHuiTime == null || next.before(nextYouHuiTime.getStart())) {
+                if (nextYouHuiTime == null) {
+                    nextYouHuiTime = new NextYouHuiTime();
+                }
+                nextYouHuiTime.setStart(next).setYouHuiConfig(youHuiConfig);
             }
         }
-        return new DateTime(nextYouHuiStartDate);
+        if (nextYouHuiTime != null) {
+            nextYouHuiTime.setEnd(cronNext(nextYouHuiTime.getStart(), nextYouHuiTime.getYouHuiConfig().getEndCron()));
+        }
+        return nextYouHuiTime;
     }
 
-    /**
-     * 获取下一次优惠结束时间
-     */
-    public Date getNextYouHuiEndDate(Date from) {
-        if (CollUtil.isEmpty(youHuiConfigList)) {
-            return null;
-        }
-
-        LocalDateTime _from = LocalDateTimeUtil.of(getNextYouHuiStartDate(from));
-
-        LocalDateTime nextYouHuiEndDate = null;
-        for (YouHuiConfig youHuiConfig : youHuiConfigList) {
-            LocalDateTime next = CronExpression.parse(youHuiConfig.getEndCron()).next(_from);
-            if (nextYouHuiEndDate == null || next.isBefore(nextYouHuiEndDate)) {
-                nextYouHuiEndDate = next;
-            }
-        }
-        return new DateTime(nextYouHuiEndDate);
+    private Date cronNext(Date from, String cron) {
+//        return new DateTime(CronExpression.parse(cron).next(LocalDateTimeUtil.of(from)));
+        // fixme:感觉这种在年底时,会出现bug?
+        return CronPatternUtil.nextDateAfter(new CronPattern(cron), from, true);
     }
 
     @Override
@@ -133,5 +119,15 @@ public class YouHuiProcessor implements InternetFeeCalcProcessor {
         int price;
     }
 
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Accessors(chain = true)
+    public static class NextYouHuiTime {
+        Date start;
+        Date end;
+
+        YouHuiConfig youHuiConfig;
+    }
 
 }
