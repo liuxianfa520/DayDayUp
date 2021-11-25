@@ -3,13 +3,15 @@ package com.liuxianfa.junit.internetfeecalc.processor;
 import com.liuxianfa.junit.internetfeecalc.SwFee;
 import com.liuxianfa.junit.internetfeecalc.SwType;
 
+import org.springframework.scheduling.support.CronExpression;
+
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.cron.pattern.CronPattern;
-import cn.hutool.cron.pattern.CronPatternUtil;
+import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.LocalDateTimeUtil;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -92,10 +94,8 @@ public class YouHuiProcessor implements InternetFeeCalcProcessor {
         return nextYouHuiTime;
     }
 
-    private Date cronNext(Date from, String cron) {
-//        return new DateTime(CronExpression.parse(cron).next(LocalDateTimeUtil.of(from)));
-        // fixme:感觉这种在年底时,会出现bug?
-        return CronPatternUtil.nextDateAfter(new CronPattern(cron), from, true);
+    private static Date cronNext(Date from, String cron) {
+        return new DateTime(CronExpression.parse(cron).next(LocalDateTimeUtil.of(from)));
     }
 
     @Override
