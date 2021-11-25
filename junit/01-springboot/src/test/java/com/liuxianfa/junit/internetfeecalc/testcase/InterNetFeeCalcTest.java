@@ -24,22 +24,35 @@ import cn.hutool.core.date.DateUtil;
  * @date 2021/11/23 14:45
  */
 public class InterNetFeeCalcTest {
-    private Date start = new DateTime("2021-11-01 00:01");
-    private Date end = new DateTime("2021-11-01 08:59");
+    Date start = new DateTime("2021-11-01 00:01");
+    Date end = new DateTime("2021-11-01 08:59");
 
-    private String baoyeStart = "23:00";
-    private String baoyeEnd = "06:00";
+    // 开机费
+    int kaijiPrice = 5;
+    KaiJiProcessor kaiJiProcessor = new KaiJiProcessor(kaijiPrice);
 
 
-    private int unitPrice = 10;
-    private int baoyePrice = 30;
-    private int kaijiPrice = 5;
+    // 单价
+    int unitPrice = 10;
+    UnitPriceProcessor unitPriceProcessor = new UnitPriceProcessor(unitPrice);
 
-    private BaoYeProcessor baoYeProcessor = new BaoYeProcessor(baoyeStart, baoyeEnd, baoyePrice, unitPrice);
 
-    private static YouHuiProcessor youHuiProcessor;
+    // 包夜
+    int baoyePrice = 30;
+    String baoyeStart = "23:00";
+    String baoyeEnd = "06:00";
+    BaoYeProcessor baoYeProcessor = new BaoYeProcessor(baoyeStart, baoyeEnd, baoyePrice, unitPrice);
 
-    static {
+    // 最低消费配置
+    int lowestCostPrice = 500;
+    boolean lowestCostEnable = true;
+    LowestCostProcessor lowestCostProcessor = new LowestCostProcessor(lowestCostPrice, lowestCostEnable);
+
+
+    // 优惠时段
+    YouHuiProcessor youHuiProcessor;
+
+    {
         ArrayList<YouHuiProcessor.YouHuiConfig> youHuiConfigs = new ArrayList<>();
         youHuiConfigs.add(new YouHuiProcessor.YouHuiConfig("周末上午优惠(周六日,每天8点~12点)", "0 0 8 ? * SAT-SUN", "0 0 12 ? * SAT-SUN", 8));
         youHuiConfigs.add(new YouHuiProcessor.YouHuiConfig("工作日优惠(周一~周四,每天8点~20点)", "0 0 8 ? * MON-THU", "0 0 20 ? * MON-THU", 8));
@@ -48,13 +61,8 @@ public class InterNetFeeCalcTest {
 
     @Test
     public void testMain() {
-//        UnitPriceProcessor unitPriceProcessor = new UnitPriceProcessor(unitPrice);
-        BaoYeProcessor baoYeProcessor = new BaoYeProcessor(baoyeStart, baoyeEnd, baoyePrice, unitPrice);
-        KaiJiProcessor kaiJiProcessor = new KaiJiProcessor(kaijiPrice);
-//        LowestCostProcessor lowestCostProcessor = new LowestCostProcessor(5000, false);
-
         // 注意:由于实现的原因,处理器顺序是固定的.
-        Chain chain = new Chain(kaiJiProcessor, baoYeProcessor);
+        Chain chain = new Chain(kaiJiProcessor, lowestCostProcessor, baoYeProcessor, youHuiProcessor, unitPriceProcessor);
         ProcessContext processContext = new ProcessContext();
         int fee = kaiJiProcessor.process(start, end, chain, processContext);
         System.out.printf("网费=%s%n", fee);

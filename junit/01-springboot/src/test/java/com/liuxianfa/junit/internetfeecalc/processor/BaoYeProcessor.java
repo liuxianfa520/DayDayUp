@@ -92,14 +92,16 @@ public class BaoYeProcessor implements InternetFeeCalcProcessor {
 
         Date endTmp = endInBaoYeDuration ? end : baoYeEndTime;
 
+        // 在baoYeStart之后才上机(23:00开始包夜,但是 23:30才上机的情况)
+        Date startTmp = start.after(baoYeStartTime) ? start : baoYeStartTime;
         // 判断单价上网网费是否小于包夜价格
-        int cost = betweenHour(baoYeStartTime, endTmp) * unitPrice;
+        int cost = betweenHour(startTmp, endTmp) * unitPrice;
         if (cost < price) {
             // 使用单价上网计算规则
-            total += context.addFee(baoYeStartTime, endTmp, unitPrice, cost, SwType.baoYeTime_but_unit_price).getCost();
+            total += context.addFee(startTmp, endTmp, unitPrice, cost, SwType.baoYeTime_but_unit_price).getCost();
         } else {
             // 使用包夜价格计算
-            total += context.addFee(baoYeStartTime, endTmp, price, price, SwType.baoye).getCost();
+            total += context.addFee(startTmp, endTmp, price, price, SwType.baoye).getCost();
         }
 
         if (!endInBaoYeDuration) {
