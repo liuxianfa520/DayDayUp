@@ -24,8 +24,8 @@ import cn.hutool.core.date.DateUtil;
  * @date 2021/11/23 14:45
  */
 public class InterNetFeeCalcTest {
-    Date start = new DateTime("2021-11-01 00:01");
-    Date end = new DateTime("2021-11-01 08:59");
+    Date start = new DateTime("2021-11-01 7:58");
+    Date end = new DateTime("2021-11-01 9:02");
 
     // 开机费
     int kaijiPrice = 5;
@@ -45,7 +45,7 @@ public class InterNetFeeCalcTest {
 
     // 最低消费配置
     int lowestCostPrice = 500;
-    boolean lowestCostEnable = true;
+    boolean lowestCostEnable = false;
     LowestCostProcessor lowestCostProcessor = new LowestCostProcessor(lowestCostPrice, lowestCostEnable);
 
 
@@ -54,8 +54,9 @@ public class InterNetFeeCalcTest {
 
     {
         ArrayList<YouHuiProcessor.YouHuiConfig> youHuiConfigs = new ArrayList<>();
-        youHuiConfigs.add(new YouHuiProcessor.YouHuiConfig("周末上午优惠(周六日,每天8点~12点)", "0 0 8 ? * SAT-SUN", "0 0 12 ? * SAT-SUN", 8));
-        youHuiConfigs.add(new YouHuiProcessor.YouHuiConfig("工作日优惠(周一~周四,每天8点~20点)", "0 0 8 ? * MON-THU", "0 0 20 ? * MON-THU", 8));
+        youHuiConfigs.add(new YouHuiProcessor.YouHuiConfig("周末上午优惠(周六日,每天8点~12点)", "0 0 8 ? * SAT-SUN", "0 0 9 ? * SAT-SUN", 8, unitPrice));
+        youHuiConfigs.add(new YouHuiProcessor.YouHuiConfig("工作日优惠(周一~周四,每天8点~9点)", "0 0 8 ? * MON-THU", "0 0 9 ? * MON-THU", 8, unitPrice));
+//        youHuiConfigs.add(new YouHuiProcessor.YouHuiConfig("工作日优惠(周一~周四,每天8点~12点)", "0 0 8 ? * MON-THU", "0 0 12 ? * MON-THU", 8, unitPrice));
         youHuiProcessor = new YouHuiProcessor(youHuiConfigs);
     }
 
