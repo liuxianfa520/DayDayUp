@@ -3,10 +3,8 @@ package com.liuxianfa.junit.internetfeecalc.processor;
 import com.liuxianfa.junit.internetfeecalc.SwFee;
 import com.liuxianfa.junit.internetfeecalc.SwType;
 
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -59,10 +57,7 @@ public class LowestCostProcessor implements InternetFeeCalcProcessor {
 
         // 网费小于最低消费
         if (total < price) {
-            List<SwFee> feeList = context.getFeeList().stream()
-                                         .filter(swFee -> Objects.equals(SwType.kaijifei, swFee.getType()))
-                                         .collect(Collectors.toList());
-            context.setFeeList(feeList);
+            context.setFeeList(new ArrayList<>());
             return context.addFee(context.getStart(), context.getEnd(), price, price, SwType.lowest_cost).getCost();
         }
         return total;
