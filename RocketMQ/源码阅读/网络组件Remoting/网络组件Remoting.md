@@ -1,3 +1,7 @@
+[TOC]
+
+
+
 # 官方文档
 
 [设计-通信机制](https://gitee.com/anxiaole/rocketmq/blob/master/docs/cn/design.md#2-%E9%80%9A%E4%BF%A1%E6%9C%BA%E5%88%B6)
@@ -1050,9 +1054,13 @@ org.apache.rocketmq.client.impl.MQClientAPIImpl#sendMessage
 
 ![image-20211118184915803](images/image-20211118184915803.png)
 
+> 这里网络侧面发送数据是用 `RemotingClient` ，接下来就来详细讲解一下：
+>
+> - 同步发送请求
+>
+> - 异步发送请求
 
-
-# RemotingClient
+# RemotingClient 远程客户端
 
 ![image-20211118185309303](images/image-20211118185309303.png)
 
@@ -1197,7 +1205,39 @@ private void requestFail(final int opaque) {
 
 ## server端接收到`request`数据包，是如何处理的？
 
+详见：[收到netty远程消息之后处理流程.md](收到netty远程消息之后处理流程.md)
+
+
+
 ## server端处理完`request`之后，如何给client返回一个响应`response`？
 
+伪代码：
+
+```java
+// 设置请求id
+response.setOpaque(opaque);
+// 标记当前发送的数据包是response类型的
+response.markResponseType();
+// 使用netty网络通道,把response消息发送给对方.
+ctx.writeAndFlush(response);
+```
+
+详见：[收到netty远程消息之后处理流程.md](收到netty远程消息之后处理流程.md#- 返回处理结果)
+
+
+
 ## client端收到表示`response`的数据包，又会如何处理？
+
+> 如下图，client端才会收到response类型的数据包。
+>
+> ![image-20211125215535364](images/image-20211125215535364.png)
+>
+> 当client端收到response之后，需要根据`通信方式`做不同的处理：
+>
+> - 如果request是同步发送的，则需要解除阻塞。
+> - 如果request是异步发送的，则需要调用回调方法。
+
+详见： [收到netty远程消息之后处理流程.md](收到netty远程消息之后处理流程.md#处理响应命令) 
+
+
 

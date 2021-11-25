@@ -1,3 +1,7 @@
+> 在 [网络组件Remoting.md](网络组件Remoting.md) 中说，作为client角色的producer和consumer会给作为server端的broker发送消息，
+>
+> 那么当broker收到消息的时候，会如何处理呢？
+
 # 服务端netty处理器
 
 ```java
@@ -9,9 +13,9 @@ class NettyServerHandler extends SimpleChannelInboundHandler<RemotingCommand> {
 }
 ```
 
-这是 `NettyRemotingServer` 类中的内部类。继承自 `SimpleChannelInboundHandler` ，实现了 `channelRead0()` 方法：
+继承自 `SimpleChannelInboundHandler` ，实现了 `channelRead0()` 方法：
 
-当netty收到消息之后，经过 `NettyDecoder`解码成`RemotingCommand`后，会调用 `channelRead0()` 方法。
+**当netty收到消息之后，经过 `NettyDecoder`解码成`RemotingCommand`后，会调用 `channelRead0()` 方法。**
 
 
 
@@ -28,9 +32,9 @@ class NettyClientHandler extends SimpleChannelInboundHandler<RemotingCommand> {
 }
 ```
 
-这是 `NettyRemotingClient` 类中的内部类。继承自 `SimpleChannelInboundHandler` ，实现了 `channelRead0()` 方法：
+继承自 `SimpleChannelInboundHandler` ，实现了 `channelRead0()` 方法：
 
-当netty收到消息之后，经过 `NettyDecoder`解码成`RemotingCommand`后，会调用 `channelRead0()` 方法。
+**当netty收到消息之后，经过 `NettyDecoder`解码成`RemotingCommand`后，会调用 `channelRead0()` 方法。**
 
 
 
@@ -292,6 +296,15 @@ public void asyncProcessRequest(ChannelHandlerContext ctx, RemotingCommand reque
 
 ## 处理响应命令
 
+> 如下图，client端才会收到response类型的数据包。![image-20211125215535364](images/image-20211125215535364.png)
+>
+> 当client端收到response之后，需要根据`通信方式`做不同的处理：
+>
+> - 如果request是同步发送的，则需要解除阻塞。
+>- 如果request是异步发送的，则需要调用回调方法。
+> 
+> 具体详见下面方法.
+
 ```java
 public void processResponseCommand(ChannelHandlerContext ctx, RemotingCommand cmd) {
     // 请求id requestId  详见 : RemotingCommand.getOpaque
@@ -347,6 +360,8 @@ public enum CommunicationMode {
     ONEWAY,
 }
 ```
+
+
 
 ### - 同步阻塞请求
 
@@ -418,7 +433,6 @@ if (responseFuture.getInvokeCallback() != null) {
                         // 执行callback
                         responseFuture.executeInvokeCallback();
                     } catch (Throwable e) {
-                        log.warn("execute callback in executor exception, and callback throw", e);
                     } finally {
                         // 释放信号量.   限流器释放一个资源
                         responseFuture.release();
@@ -428,7 +442,6 @@ if (responseFuture.getInvokeCallback() != null) {
                 // 如果向异步线程池提交任务时异常了,则还在当前线程执行callback.
                 // (异常的原因可能是执行器太忙了——maybe executor busy)
                 runInThisThread = true;
-                log.warn("execute callback in executor exception, maybe executor busy", e);
             }
         } else {
             // 未指定callback在特定线程池中执行,则:callback在当前线程执行
@@ -440,7 +453,6 @@ if (responseFuture.getInvokeCallback() != null) {
                 // 执行callback
                 responseFuture.executeInvokeCallback();
             } catch (Throwable e) {
-                log.warn("executeInvokeCallback Exception", e);
             } finally {
                 // 释放资源.   释放线程器.
                 responseFuture.release();
