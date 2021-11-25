@@ -38,6 +38,16 @@ public class ProcessContext {
         return addFee(start, end, unitPrice, price, type, null);
     }
 
+    public SwFee addFee(SwFee fee) {
+        if (fee == null) {
+            throw new RuntimeException("参数fee不能为空!");
+        }
+        boolean add = feeList.add(fee);
+        log.info("添加明细:开始={},结束={},单价={},总价={},类型={},描述={}", fee.getStart(),
+                 fee.getEnd(), fee.getUnitPrice(), fee.getCost(), fee.getType(), fee.getDesc());
+        return fee;
+    }
+
     public SwFee addFee(Date start, Date end, int unitPrice, int price, SwType type, String desc) {
         SwFee swFee = new SwFee()
                 .setStart(start)

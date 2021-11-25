@@ -1,5 +1,6 @@
 package com.liuxianfa.junit.internetfeecalc.processor;
 
+import com.liuxianfa.junit.internetfeecalc.SwFee;
 import com.liuxianfa.junit.internetfeecalc.SwType;
 
 import java.util.Collections;
@@ -100,13 +101,19 @@ public class YouHuiProcessor implements InternetFeeCalcProcessor {
     @Override
     public int process(Date start, Date end, Chain chain, ProcessContext context) {
         int total = 0;
+
+        // 临时上下文,作用看第四步骤.
+        ProcessContext youHuiTmpContext = new ProcessContext();
+        youHuiTmpContext.setStart(start);
+        youHuiTmpContext.setEnd(end);
+
         // 一、先处理  start ~ youHuiStart  上网的费用.
         NextYouHuiTime nextYouHuiTime = nextYouHuiTimeThreadLocal.get();
         int youHuiPrice = nextYouHuiTime.getYouHuiConfig().getYouHuiPrice();
         int unitPrice = nextYouHuiTime.getYouHuiConfig().getUnitPrice();
         Date youHuiStartTime = nextYouHuiTime.getStart();
         if (isBefore(start, youHuiStartTime)) {
-            total += context.addFee(start, youHuiStartTime, unitPrice, betweenHour(start, youHuiStartTime) * unitPrice, SwType.normal).getCost();
+            total += youHuiTmpContext.addFee(start, youHuiStartTime, unitPrice, betweenHour(start, youHuiStartTime) * unitPrice, SwType.normal).getCost();
         }
 
 
@@ -119,14 +126,24 @@ public class YouHuiProcessor implements InternetFeeCalcProcessor {
         // 判断 start 是否在 youHuiStart 之后
         Date startTmp = start.after(youHuiStartTime) ? start : youHuiStartTime;
         String desc = String.format("启用的优惠名称为:[%s]", nextYouHuiTime.getYouHuiConfig().getName());
-        total += context.addFee(startTmp, endTmp, youHuiPrice, betweenHour(startTmp, endTmp) * youHuiPrice, SwType.youhui, desc).getCost();
+        total += youHuiTmpContext.addFee(startTmp, endTmp, youHuiPrice, betweenHour(startTmp, endTmp) * youHuiPrice, SwType.youhui, desc).getCost();
 
 
         // 三、如果youHuiEnd之后还没下机,则计算 youHuiEnd ~ end 时间段网费
         if (!endInYouHuiDuration) {
-            total += chain.doProcess(youHuiEndTime, end, context);
+            total += chain.doProcess(youHuiEndTime, end, youHuiTmpContext);
         }
-        return total;
+
+        // 四、如果使用优惠策略计算之后,还没有直接使用单价计算便宜,则使用单价计费.
+        int costByUnitPrice = new UnitPriceProcessor(unitPrice).process(start, end, null, new ProcessContext());
+        if (costByUnitPrice < total) {
+            return context.addFee(start, end, unitPrice, costByUnitPrice, SwType.normal, "单价直接计算比优惠价格便宜.直接使用单价计算.").getCost();
+        } else {
+            for (SwFee swFee : youHuiTmpContext.getFeeList()) {
+                context.addFee(swFee);
+            }
+            return total;
+        }
     }
 
     @Data

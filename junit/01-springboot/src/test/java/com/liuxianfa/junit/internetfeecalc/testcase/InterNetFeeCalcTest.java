@@ -67,7 +67,7 @@ public class InterNetFeeCalcTest {
         ProcessContext processContext = new ProcessContext();
         int fee = kaiJiProcessor.process(start, end, chain, processContext);
         System.out.printf("网费=%s%n", fee);
-        System.out.println(JSON.toJSONString(processContext.getFeeList()));
+        System.out.println(JSON.toJSONString(processContext.getFeeList(), true));
     }
 
     private static boolean isIn(LocalTime time, LocalTime begin, LocalTime end) {

@@ -58,7 +58,8 @@ public class LowestCostProcessor implements InternetFeeCalcProcessor {
         // 网费小于最低消费
         if (total < price) {
             context.setFeeList(new ArrayList<>());
-            return context.addFee(context.getStart(), context.getEnd(), price, price, SwType.lowest_cost).getCost();
+            String desc = "网费总和为[%s]元,没有达到最低消费[%s]元.";
+            return context.addFee(context.getStart(), context.getEnd(), price, price, SwType.lowest_cost, desc).getCost();
         }
         return total;
     }
