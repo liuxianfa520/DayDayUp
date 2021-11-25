@@ -1,5 +1,7 @@
 package com.liuxianfa.junit.internetfeecalc.processor;
 
+import com.liuxianfa.junit.internetfeecalc.SwType;
+
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -97,7 +99,31 @@ public class YouHuiProcessor implements InternetFeeCalcProcessor {
 
     @Override
     public int process(Date start, Date end, Chain chain, ProcessContext context) {
-        return 0;
+        int total = 0;
+        // 一、先处理  start ~ youHuiStart  上网的费用.
+        NextYouHuiTime nextYouHuiTime = nextYouHuiTimeThreadLocal.get();
+        int unitPrice = nextYouHuiTime.getYouHuiConfig().getPrice();
+        Date youHuiStartTime = nextYouHuiTime.getStart();
+        if (isBefore(start, youHuiStartTime)) {
+            total += context.addFee(start, youHuiStartTime, unitPrice, betweenHour(start, youHuiStartTime) * unitPrice, SwType.normal).getCost();
+        }
+
+
+        // 二、优惠时段计费
+        // 优惠结束时间
+        Date youHuiEndTime = nextYouHuiTime.getEnd();
+        // 是否在优惠时段内下机的
+        boolean endInYouHuiDuration = isBefore(end, youHuiEndTime);
+        Date endTmp = endInYouHuiDuration ? end : youHuiEndTime;
+        String desc = String.format("启用的优惠名称为:[%s]", nextYouHuiTime.getYouHuiConfig().getName());
+        total += context.addFee(youHuiStartTime, endTmp, unitPrice, betweenHour(youHuiStartTime, endTmp) * unitPrice, SwType.youhui, desc).getCost();
+
+
+        // 三、如果youHuiEnd之后还没下机,则计算 youHuiEnd ~ end 时间段网费
+        if (!endInYouHuiDuration) {
+            total += chain.doProcess(youHuiEndTime, end, context);
+        }
+        return total;
     }
 
     @Data

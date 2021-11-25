@@ -10,7 +10,7 @@ public enum SwType {
     kaijifei,
     lowest_cost,
     normal,
-    normal_youhui,
+    youhui,
     baoye,
     /**
      * 包夜时段,但是网费并没有超过包夜总价.

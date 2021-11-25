@@ -35,14 +35,19 @@ public class ProcessContext {
     private List<SwFee> feeList = new ArrayList<>();
 
     public SwFee addFee(Date start, Date end, int unitPrice, int price, SwType type) {
+        return addFee(start, end, unitPrice, price, type, null);
+    }
+
+    public SwFee addFee(Date start, Date end, int unitPrice, int price, SwType type, String desc) {
         SwFee swFee = new SwFee()
                 .setStart(start)
                 .setEnd(end)
                 .setUnitPrice(unitPrice)
                 .setCost(price)
-                .setType(type);
+                .setType(type)
+                .setDesc(desc);
         feeList.add(swFee);
-        log.info("添加明细:开始={},结束={},单价={},总价={},类型={}", start, end, unitPrice, price, type);
+        log.info("添加明细:开始={},结束={},单价={},总价={},类型={},描述={}", start, end, unitPrice, price, type, desc);
         return swFee;
     }
 }

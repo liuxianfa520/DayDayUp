@@ -23,4 +23,6 @@ public class SwFee {
     int cost;
 
     SwType type;
+
+    String desc;
 }
