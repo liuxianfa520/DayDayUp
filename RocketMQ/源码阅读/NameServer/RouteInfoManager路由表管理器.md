@@ -16,19 +16,47 @@ NameServer最重要的作用之一就是：**维护broker服务地址及及时�
 
 ## 1、broker每30s向NameServer发送心跳包
 
-请求类型：RequestCode#REGISTER_BROKER
+**请求类型**
 
 ```java
 public static final int REGISTER_BROKER = 103;
 ```
 
-**broker启动的时候，向所有NameServer注册broker：**
+**定时任务**
+
+![image-20211128222943242](images/image-20211128222943242.png)
+
+> 向NameServer发送心跳包，默认情况是30秒：
+>
+> ```java
+> /**
+>  * 向NameServer注册broker相关配置的周期
+>  * 允许值介于 10000 和 60000 毫秒之间。
+>  */
+> private int registerNameServerPeriod = 1000 * 30;
+> ```
+>
+> 也是可以自定义的，不过需要在 10s ~ 60s  之间。
+
+**注册broker的具体逻辑**
 
 ![BrokerOuterAPI#registerBrokerAll](images/image-20211117192602165.png)
 
 **向指定的NameServer注册broker：**
 
 ![BrokerOuterAPI#registerBroker](images/image-20211117192653730.png)
+
+
+
+> 这里还有一个问题：
+>
+> 就是向NameServer发送的请求的byte[] body中的数据都是什么呢？
+
+![image-20211128230242304](images/image-20211128230242304.png)
+
+![image-20211128230322170](images/image-20211128230322170.png)
+
+然后经过这个warpper的序列化，会把 `topicConfigTable` 和 `dataVersion` 序列化成`byte[] body` 字节数组。
 
 
 
@@ -88,63 +116,171 @@ public static final int REGISTER_BROKER = 103;
 
 ## 4、broker持久化路由信息
 
+![image-20211128220646694](images/image-20211128220646694.png)
+
+所以我们看一下broker的路由信息是如何持久化的。
+
+**broker端存储topic信息表**
+
+topic信息肯定是先在broker上创建的，然后由broker注册到NameServer上之后，producer和consumer才能从NameServer上获取到路由表。
+
+那么在broker端肯定有个存储topic配置的地方，这就是 `TopicConfigManager` 。
+
+![image-20211128221005246](images/image-20211128221005246.png)
+
+**持久化**
+
+当broker中的topic信息变化的时候，也就是 `topicConfigTable` 变化的时候：
+
+- 首先把最新的topic保存到 `topicConfigTable` 
+- 然后更新版本号 `dataVersion`
+- 持久化到磁盘
+- 最后,把broker信息注册到所有的NameServer上。
+
+![image-20211128221628909](images/image-20211128221628909.png)
+
 
 
 ## 5、根据topic查询路由信息
 
+一般producer在发送mq消息的时候，会根据指定的topic名称，从NameServer上查询这个topic所在的broker的ip，然后和broker之间创建长连接，把消息发送给broker。
+
+所以下面看一下如何从NameServer查询topic路由信息的。
+
+
+
+**请求code**
+
+```java
+/**
+ * 根据topic名称获取路由表
+ */
+public static final int GET_ROUTEINFO_BY_TOPIC = 105;
+```
+
+![image-20211128231032735](images/image-20211128231032735.png)
+
+在client端，就是创建request，然后使用sync同步的方式发送并等待response。
+
+**NameServer处理request**
+
+> 上面说了，这个请求是client端发送给NameServer的，所以NameServer会有个请求处理器。
+>
+> NameServer只有一个请求处理器，org.apache.rocketmq.namesrv.processor.DefaultRequestProcessor
+
+![image-20211128231353232](images/image-20211128231353232.png)
+
+
+
+![image-20211128231439672](images/image-20211128231439672.png)
 
 
 
 
 
+# 路由表管理器RouteInfoManager
+
+还是先来看一下上面的流程图。
+
+![image-20211125221127915](images/image-20211125221127915.png)
+
+从上图，我们知道，只要broker配置了NameServer的ip端口，那么broker就会每30s主动上报心跳包，这个心跳包中包含了此broker节点的ip、brokerName、brokerId、还有topic信息等。
+
+那么在NameServer端，就需要有个角色来管理这些配置，那就是 `RouteInfoManager`。
+
+> 其实经过上面的1~5步骤，已经对RouteInfoManager有所了解了。这个小节只是列出对应的重要属性、重要方法等。
+
+## **类结构**
+
+```java
+package org.apache.rocketmq.namesrv.routeinfo;
+
+
+public class RouteInfoManager {
+}
+```
+
+可以看到并没有继承和实现什么。类结构非常简单。
 
 
 
+## **重要属性**
+
+```java
+/**
+ * broker和NameServer之间连接超时时间. 默认是2分钟.
+ */
+private final static long BROKER_CHANNEL_EXPIRED_TIME = 1000 * 60 * 2;
+```
+
+### 路由表
+
+```java
+/**
+ * <pre>
+ * 路由表
+ * key:topic名称
+ * value:{@link QueueData} 列表 ——
+ *
+ * 可以理解为:
+ *   topicName 对应-> brokerNameList
+ *   也就是,根据 topicName ,可以获取到这个topic都在哪些broker节点上.
+ *
+ *
+ * Producer将消息写入到某Broker中的某Queue中，其经历了如下过程：
+ *  - Producer发送消息之前，会先向NameServer发出获取Topic路由信息的请求
+ *  - NameServer返回该[Topic的路由表]及[Broker列表]
+ *  - Producer根据代码中指定的Queue选择策略，从Queue列表中选出一个队列，用于后续存储消息
+ *  - Produer对消息做一些特殊处理，例如，消息本身超过4M，则会报错
+ *  - Producer向选择出的Queue所在的Broker发出RPC请求，将消息发送到选择出的Queue
+ *  - 网络通信使用netty
+ * </pre>
+ */
+private final HashMap<String/* topic */, List<QueueData>> topicQueueTable = 
+    new HashMap<String, List<QueueData>>(1024);
+```
+
+### broker列表
+
+```java
+/**
+ * <pre>
+ * broker列表
+ * key为broker名称
+ * value为BrokerData
+ *
+ * 并不是一个Broker对应一个BrokerData实例:
+ * 一套brokerName名称相同的Master-Slave小集群对应一个 BrokerData。
+ *
+ * BrokerData中包含brokerName及一个map。
+ * 该map的key为brokerId，value为该 broker对应的地址。brokerId为0表示该broker为Master，非0表示Slave
+ * </pre>
+ */
+private final HashMap<String/* brokerName */, BrokerData> brokerAddrTable = 
+    = new HashMap<String, BrokerData>(128);
+```
+
+### 其他一些集合
+
+```java
+/**
+ * 记录cluster集群中有多少个master的broker. <br/>
+ *
+ * 说明:master和slave的broker的brokerName相同.
+ */
+private final HashMap<String/* clusterName */, Set<String/* brokerName */>> clusterAddrTable =
+    new HashMap<String, Set<String>>(32);
+private final HashMap<String/* brokerAddr */, BrokerLiveInfo> brokerLiveTable = 
+    new HashMap<String, BrokerLiveInfo>(256);
+private final HashMap<String/* brokerAddr */, List<String>/* Filter Server */> filterServerTable = 
+    new HashMap<String, List<String>>(256);
+```
 
 
 
+## **重要方法**
 
-# NameServer如何管理路由表
-
-## RouteInfoManager
-
-
-
-
-
-
-
-# broker启动时注册
-
-
-
-
-
-
-
-# 路由表的获取
-
-producer和consumer都会连接NameServer，去获取路由表。
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+![image-20211128232927963](images/image-20211128232927963.png)
 
 
 
