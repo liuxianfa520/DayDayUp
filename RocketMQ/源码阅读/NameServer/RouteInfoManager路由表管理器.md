@@ -290,3 +290,109 @@ private final HashMap<String/* brokerAddr */, List<String>/* Filter Server */> f
 
 
 
+# broker探活服务
+
+> 在RocketMQ早先版本，是使用ZooKeeper作为注册中心的（把集群中broker的元数据保存到注册中心，同时监控broker的注册状态），但是ZooKeeper太重了，所以就设计了一种轻量级的注册中心——NameServer。
+>
+> 本文前面的章节说了一种**使用心跳思想来保证broker存活**的手段：
+>
+> - broker使用心跳机制——每30秒给NameServer发送request，NameServer使用定时任务扫描超过120秒未发送心跳的broker。如果超时就移除broker。
+>
+> 但是还有一种场景：
+>
+> broker和NameServer之间使用netty长连接，如果在netty网络层面，监控到网络通道断开，那么就无需等待120s的定时扫描任务了。
+>
+> 所以有了：`BrokerHousekeepingService`
+
+## BrokerHousekeepingService
+
+**类结构**
+
+```java
+public class BrokerHousekeepingService implements ChannelEventListener {
+    private final NamesrvController namesrvController;
+    public BrokerHousekeepingService(NamesrvController namesrvController) {
+        this.namesrvController = namesrvController;
+    }
+}
+```
+
+**接口**
+
+![image-20211130174504502](images/image-20211130174504502.png)
+
+说明一下，这个监听器是RocketMQ自己定义的监听器，并不是netty的监听器。
+
+但是我们只需要知道，当channel发生对应的事件之后，对应的方法就会被调用。
+
+
+
+![image-20211130175011620](images/image-20211130175011620.png)
+
+## 问题：
+
+上面其实留了一个小疑问：org.apache.rocketmq.remoting.ChannelEventListener 是RocketMQ自定义的监听器，那么从源码的角度，是如何回调方法的呢？
+
+![image-20211130175426790](images/image-20211130175426790.png)
+
+
+
+org.apache.rocketmq.remoting.netty.NettyRemotingAbstract.NettyEventExecutor
+
+![image-20211130180121738](images/image-20211130180121738.png)
+
+
+
+
+
+实例化线程
+
+![image-20211130180450602](images/image-20211130180450602.png)
+
+
+
+启动线程
+
+![image-20211130180637161](images/image-20211130180637161.png)
+
+何时关闭这个线程呢？
+
+![image-20211130180754379](images/image-20211130180754379.png)
+
+
+
+发送netty事件
+
+> 在介绍这个线程的run方法时说了，会从`eventQueue` 队列中，拿取元素，
+>
+> 那么这个队列的元素是在什么时候放进去的呢？
+
+NettyConnectManageHandler   类实现了  io.netty.channel.ChannelDuplexHandler  （看一下这个类的包，是io.netty的）
+
+NettyConnectManageHandler   才是真正接收netty事件的，但是这个处理器把netty层面的事件，转成了 org.apache.rocketmq.remoting.netty.NettyEvent 这个RocketMQ自定义的事件。
+
+![image-20211130181033591](images/image-20211130181033591.png)
+
+那CLOSE关闭’事件‘来说，是在`channelInactive()`方法中调用的，这个方法表示 `channel不活跃`。
+这里这个方法是很重要的，因为这个是io.netty的方法：
+
+![image-20211130181137425](images/image-20211130181137425.png)
+
+实现了这个方法，就和netty关联起来了。
+
+**毕竟 `channel` 这个概念是在网络层才会有，而RocketMQ的网络传输层使用的是netty框架，我觉得是为了让channel的监听器简单化：**
+
+**让开发这无需关注netty的细节，剥离netty的复杂度，所以RocketMQ又自己定义了一个【netty channel监听器】的接口—— org.apache.rocketmq.remoting.ChannelEventListener**
+
+**开发者如果想要自己监听网络channel层面的’事件‘，就直接实现 org.apache.rocketmq.remoting.ChannelEventListener 接口就行了。**
+
+
+
+
+
+
+
+
+
+
+
