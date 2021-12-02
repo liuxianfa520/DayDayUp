@@ -102,13 +102,13 @@ public static final int REGISTER_BROKER = 103;
 
 
 
-
+###### scanNotActiveBroker
 
 ![image-20211126183809135](images/image-20211126183809135.png)
 
-上面，关闭channel，并从 `brokerLiveTable` 移除之后，
+扫描不存活的broker实现逻辑：判断broker最后活跃时间是否超时，如果超时了，就关闭channel，并从 `brokerLiveTable` 移除，
 
-会调用 `public void onChannelDestroy(String remoteAddr, Channel channel)` 方法，
+然后会调用 `public void onChannelDestroy(String remoteAddr, Channel channel)` 方法，
 
 这个方法是比较长的，就是维护各个Table中的信息，该删掉的都删掉。*细节就不粘贴出来了，有兴趣自己去看看。*
 
