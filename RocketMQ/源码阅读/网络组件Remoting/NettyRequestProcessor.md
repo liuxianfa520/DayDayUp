@@ -41,7 +41,7 @@ public interface NettyRequestProcessor {
 
 NameServer中的请求处理器只有一个：org.apache.rocketmq.namesrv.processor.DefaultRequestProcessor
 
-更多，详见文档：[NameServer中的请求处理器](..\NameServer\请求处理器DefaultRequestProcessor.md)
+更多，详见文档：[NameServer中的请求处理器](../NameServer/请求处理器DefaultRequestProcessor.md)
 
 > 画外音：
 >
