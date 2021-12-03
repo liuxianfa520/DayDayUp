@@ -167,7 +167,7 @@ public static void main(String[] args) throws Exception {
 
 > 理解这个方法原理有点困难，如果有时间、有兴趣的伙伴可以研究研究。
 >
-> 否则可以直接看下一章节：[总结](#总结)
+> 否则可以直接看下一章节：[总结](#%E6%80%BB%E7%BB%93)
 
 结合下面 `newProxyInstance`静态方法，我们看到主要有两个步骤：
 

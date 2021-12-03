@@ -37,7 +37,7 @@
 
 > *CommonAnnotationBeanPostProcessor 源码后面讲，先来说说其父类 InitDestroyAnnotationBeanPostProcessor。*
 >
-> *[CommonAnnotationBeanPostProcessor 详解](#CommonAnnotationBeanPostProcessor详解)*
+> *[CommonAnnotationBeanPostProcessor 详解](#CommonAnnotationBeanPostProcessor%E8%AF%A6%E8%A7%A3)*
 
 # InitDestroyAnnotationBeanPostProcessor
 
