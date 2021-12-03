@@ -27,7 +27,7 @@ server：master 的broker
 
 **延迟偏移量 delayOffset 的作用：**
 
-[点击跳转](#延迟偏移量delayOffset的作用)
+[点击跳转](#%E5%BB%B6%E8%BF%9F%E5%81%8F%E7%A7%BB%E9%87%8Fdelayoffset%E7%9A%84%E4%BD%9C%E7%94%A8)
 
 
 
