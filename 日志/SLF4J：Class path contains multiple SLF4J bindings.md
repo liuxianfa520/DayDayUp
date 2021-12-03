@@ -48,7 +48,7 @@ SLF4J: Actual binding is of type [ch.qos.logback.classic.util.ContextSelectorSta
 
 > 画外音：
 >
-> 上面   [【java】slf4j中的适配器与桥接是怎样工作的？](https://www.bilibili.com/video/BV1FJ411R78C)    视频中06:43讲解的`log4j-over-slf4j`使用了`桥接模式`，我个人理解是使用的是`适配器模式`。[适配器模式](https://gitee.com/anxiaole/DayDayUp/tree/master/设计模式#2-结构模式)
+> 上面   [【java】slf4j中的适配器与桥接是怎样工作的？](https://www.bilibili.com/video/BV1FJ411R78C)    视频中06:43讲解的`log4j-over-slf4j`使用了`桥接模式`，我个人理解是使用的是`适配器模式`。[适配器模式](https://gitee.com/anxiaole/DayDayUp/tree/master/设计模式#2-%E7%BB%93%E6%9E%84%E6%A8%A1%E5%BC%8F)
 >
 > 简单说说个人这样理解的思路：
 >

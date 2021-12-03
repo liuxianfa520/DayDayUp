@@ -1222,7 +1222,7 @@ response.markResponseType();
 ctx.writeAndFlush(response);
 ```
 
-详见：[收到netty远程消息之后处理流程.md](收到netty远程消息之后处理流程.md#- 返回处理结果)
+详见：[收到netty远程消息之后处理流程.md](收到netty远程消息之后处理流程.md)
 
 
 

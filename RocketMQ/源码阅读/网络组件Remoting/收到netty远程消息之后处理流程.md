@@ -86,7 +86,7 @@ public RemotingCommandType getType() {
 }
 ```
 
-在  [网络组件Remoting.md](网络组件Remoting.md#远程命令 RemotingCommand)  章节中，描述RocketMQ使用 `RemotingCommand` 一个类表示`request`和`response`。
+在  [网络组件Remoting.md](网络组件Remoting.md#%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%20RemotingCommand)  章节中，描述RocketMQ使用 `RemotingCommand` 一个类表示`request`和`response`。
 
 
 

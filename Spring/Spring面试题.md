@@ -178,7 +178,7 @@ https://github.com/ThinkingHan/Java-note/blob/master/Spring%E9%9D%A2%E8%AF%95.md
 
 15. 哪些是重要的 Bean 生命周期方法？ 你能重载它们吗？
 
-    > 生命周日中的所有接口、方法都是可以重载的。详见： [bean生命周期——初始化.md](BeanFactory\bean生命周期——初始化.md#生命周期的应用) 
+    > 生命周日中的所有接口、方法都是可以重载的。详见： [bean生命周期——初始化.md](BeanFactory\bean生命周期——初始化.md#%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F%E7%9A%84%E5%BA%94%E7%94%A8) 
 
 16. 讲下 Spring MVC 的执行流程
 

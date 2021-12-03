@@ -267,7 +267,7 @@ MyISAM是将数据和索引分开存储的，InnoDB存储引擎的数据和索�
 
     > 如果关联字段数据类型不一样，在数据关联判断关联条件是否相等时，就需要进行隐式类型转换。
     >
-    > 如果数据类型都是varchar，但是字符集不一样，也会进行隐式数据转换。[详见](./慢查询优化——Using join buffer (Block Nested Loop).md#解决方案)
+    > 如果数据类型都是varchar，但是字符集不一样，也会进行隐式数据转换。[详见](./慢查询优化——Using join buffer (Block Nested Loop).md#%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88)
 
 #### 好的建议
 
