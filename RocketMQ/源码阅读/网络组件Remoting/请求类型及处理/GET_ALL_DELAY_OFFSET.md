@@ -98,7 +98,7 @@ server端，也就是master的broker，收到消息之后，是如何处理的�
 
 这个类主要负责RocketMQ延迟队列的调度，其中有个timer定时任务，对每个等级level的延迟，都有对应的任务——`DeliverDelayedMessageTimerTask`。
 
-详见：[配置管理 ConfigManager/ScheduleMessageService.md](../../配置管理 ConfigManager/ScheduleMessageService.md)
+详见：[配置管理ConfigManager——ScheduleMessageService.md](../../配置管理ConfigManager/ScheduleMessageService.md)
 
 
 
