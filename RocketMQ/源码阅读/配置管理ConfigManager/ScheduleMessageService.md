@@ -43,9 +43,9 @@ private final ConcurrentMap<Integer /* level */, Long/* offset */> offsetTable =
 private final ConcurrentMap<Integer /* level */, Long/* delay timeMillis */> delayLevelTable = new ConcurrentHashMap<>(32);
 ```
 
-偏移量表 offsetTable 是需要持久化到磁盘的。并且slave还需要从master获取offsetTable，并持久化到slave的磁盘中。是比较重要的。
+偏移量表 offsetTable 是需要持久化到磁盘的。并且slave还需要从master获取offsetTable，并持久化到slave的磁盘中。是比较重要的。[更多>](#offsetTable)
 
-delayLevelTable 详见：[load()](#load())
+delayLevelTable 延迟等级表，key存的是延迟等级，value存储的是延迟的时间毫秒数，比如消息需要延迟1分钟，则存储的是 60*1000 。详见：[load()](#load())
 
 
 
@@ -209,6 +209,53 @@ https://docs.qq.com/flowchart/DQW9PYmxhZlpVUFNL
  */
 private final ConcurrentMap<Integer /* level */, Long/* offset */> offsetTable = new ConcurrentHashMap<>(32);
 ```
+
+## map的key
+
+这个map的key表示延迟等级 delayLevel。delayLevel和queueId是有关系的：
+
+- queueId = delayLevel - 1
+- delayLevel = queueId + 1
+
+```java
+public static int delayLevel2QueueId(final int delayLevel) {
+    return delayLevel - 1;
+}
+public static int queueId2DelayLevel(final int queueId) {
+    return queueId + 1;
+}
+```
+
+并且RocketMQ系统中存放延迟消息的队列：
+
+```java
+// org.apache.rocketmq.common.topic.TopicValidator#RMQ_SYS_SCHEDULE_TOPIC
+public static final String RMQ_SYS_SCHEDULE_TOPIC = "SCHEDULE_TOPIC_XXXX";
+```
+
+这个队列的默认queue数量是：
+
+```java
+// org.apache.rocketmq.broker.topic.TopicConfigManager#SCHEDULE_TOPIC_QUEUE_NUM
+private static final int SCHEDULE_TOPIC_QUEUE_NUM = 18;
+```
+
+broker初始化的时候，默认自动创建延迟topic：
+
+```java
+private final ConcurrentMap<String, TopicConfig> topicConfigTable = new ConcurrentHashMap<>(1024);
+
+public TopicConfigManager(BrokerController brokerController) { // 省略其他默认自动创建的topic及代码逻辑。
+    String topic = TopicValidator.RMQ_SYS_SCHEDULE_TOPIC; // SCHEDULE_TOPIC_XXXX
+    TopicConfig topicConfig = new TopicConfig(topic);
+    TopicValidator.addSystemTopic(topic);
+    topicConfig.setReadQueueNums(SCHEDULE_TOPIC_QUEUE_NUM);
+    topicConfig.setWriteQueueNums(SCHEDULE_TOPIC_QUEUE_NUM);
+    this.topicConfigTable.put(topicConfig.getTopicName(), topicConfig);
+}    
+```
+
+## map的value
 
 这个map的value是 Long offset，那么这个offset到底有什么用呢？
 
