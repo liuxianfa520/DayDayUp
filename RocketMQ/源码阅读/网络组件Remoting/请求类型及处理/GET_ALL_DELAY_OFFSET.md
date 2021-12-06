@@ -35,11 +35,11 @@ server：master 的broker
 
 # client
 
-> 根据这个描述，分布来看：
->
 > 如果broker是slave，则slave给master发送 消息获取延迟偏移量delayOffset (字符串类型)
 >
 > 然后把 delayOffset 保存到 `{rootDia}/config/delayOffset.json` 文件中。
+>
+> 根据上面的描述，分步骤来看：
 
 **发送请求**
 
@@ -59,7 +59,9 @@ org.apache.rocketmq.broker.out.BrokerOuterAPI#getAllDelayOffset
 
 
 
-上面还说了【只有slave才会给master发送消息】，那么问题来了，是在哪里判断的broker的角色是slave的呢？
+**只有slave才会给master发送消息**：
+
+那么问题来了，是在哪里判断的broker的角色是slave的呢？
 ![image-20211203155746203](images/image-20211203155746203.png)
 
 
@@ -80,7 +82,7 @@ server端，也就是master的broker，收到消息之后，是如何处理的�
 
 上图中**master broker接收到请求之后，其实是把master节点上的 `ScheduleMessageService` encode转成String之后，返回给slave。**
 
-那么，`ScheduleMessageService` 是什么呢？具体作用是？ 详见下一小节。
+那么，`ScheduleMessageService` 是什么呢？具体作用是？ 详见 [ScheduleMessageService](#ScheduleMessageService)
 
 
 
@@ -92,11 +94,13 @@ server端，也就是master的broker，收到消息之后，是如何处理的�
 
 
 
-`{rootDia}/config/delayOffset.json` 文件是给 `ScheduleMessageService` 来做持久化使用的。
+`{rootDia}/config/delayOffset.json` 文件是给 `ScheduleMessageService` 来做持久化使用的。详见：[ScheduleMessageService](#ScheduleMessageService)
 
-## ScheduleMessageService
 
-这个类主要负责RocketMQ延迟队列的调度，其中有个timer定时任务，对每个等级level的延迟，都有对应的任务——`DeliverDelayedMessageTimerTask`。
+
+# ScheduleMessageService
+
+这个类主要负责RocketMQ延迟队列的调度，其中有个timer定时任务，对每个等级level的延迟，都注册对应的任务——`DeliverDelayedMessageTimerTask`。
 
 详见：[配置管理ConfigManager——ScheduleMessageService.md](../../配置管理ConfigManager/ScheduleMessageService.md)
 

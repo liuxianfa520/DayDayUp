@@ -1,8 +1,14 @@
 # 简述
 
-在RocketMQ中有延迟队列，延迟队列的消费，就是由`ScheduleMessageService`来负责的。
+在RocketMQ中有延迟队列，延迟队列的调度，就是由`ScheduleMessageService`来负责的。
 
-这个延迟消息服务ScheduleMessageService中有个定时任务，对有不同等级level的延迟队列，都注册一个延迟task——`DeliverDelayedMessageTimerTask`。
+我们在RocketMQ中使用延迟队列的时候，这个`延迟多久`并不是随意设置的，RocketMQ设置了几个默认的延迟等级，只能从这几个延迟等级中选择：
+
+```java
+private String messageDelayLevel = "1s 5s 10s 30s 1m 2m 3m 4m 5m 6m 7m 8m 9m 10m 20m 30m 1h 2h";
+```
+
+`延迟消息服务ScheduleMessageService`中有个定时任务timer，对不同的`延迟等级`，都注册一个延迟task——`DeliverDelayedMessageTimerTask`。
 
 另外，如果broker是slave，则slave会给master发送 `GET_ALL_DELAY_OFFSET` 请求，去获取master的延迟队列处理进度，然后持久化到slave机器的磁盘文件中。这个详见：[请求类型及处理/GET_ALL_DELAY_OFFSET.md](../网络组件Remoting/请求类型及处理/GET_ALL_DELAY_OFFSET.md)
 
@@ -18,6 +24,32 @@ package org.apache.rocketmq.store.schedule;
 public class ScheduleMessageService extends ConfigManager {
 }
 ```
+
+
+
+# 重要属性
+
+在这个类中，有两个map，是比较重要的：
+
+```java
+/**
+ * 偏移量表
+ */
+private final ConcurrentMap<Integer /* level */, Long/* offset */> offsetTable = new ConcurrentHashMap<>(32);
+
+/**
+ * 延迟等级表
+ */
+private final ConcurrentMap<Integer /* level */, Long/* delay timeMillis */> delayLevelTable = new ConcurrentHashMap<>(32);
+```
+
+偏移量表 offsetTable 是需要持久化到磁盘的。并且slave还需要从master获取offsetTable，并持久化到slave的磁盘中。是比较重要的。
+
+delayLevelTable 详见：[load()](#load())
+
+
+
+# 重写的方法
 
 在 [readme.md](readme.md) 中也说了，`ConfigManager` 是个抽象类，其中有4个抽象方法需要被子类实现：
 
@@ -92,7 +124,7 @@ public boolean load() {
 
 **boolean parseDelayLevel()** 方法，解析延迟等级，那么什么是`延迟等级`呢？
 
-其实：我们在RocketMQ中使用延迟队列的时候，这个`延迟多久`并不是随意设置的，而是RocketMQ设置了几个延迟等级，`延迟多久`只能从这几个延迟等级中选一个：
+其实：我们在RocketMQ中使用延迟队列的时候，这个`延迟多久`并不是随意设置的，RocketMQ设置了几个默认的延迟等级，只能从这几个延迟等级中选择：
 
 ```java
 private String messageDelayLevel = "1s 5s 10s 30s 1m 2m 3m 4m 5m 6m 7m 8m 9m 10m 20m 30m 1h 2h";
@@ -105,24 +137,6 @@ private String messageDelayLevel = "1s 5s 10s 30s 1m 2m 3m 4m 5m 6m 7m 8m 9m 10m
 
 
 # 定时任务Timer
-
-在这个类中，有两个map，是比较重要的：
-
-```java
-/**
- * 延迟等级表
- */
-private final ConcurrentMap<Integer /* level */, Long/* delay timeMillis */> delayLevelTable = new ConcurrentHashMap<>(32);
-
-/**
- * 偏移量表
- */
-private final ConcurrentMap<Integer /* level */, Long/* offset */> offsetTable = new ConcurrentHashMap<>(32);
-```
-
-
-
-定时任务：
 
 ```java
 /**
