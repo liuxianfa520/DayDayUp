@@ -187,6 +187,11 @@ private Timer timer;
 
 
 
+# 延迟消息流程图
+
+https://docs.qq.com/flowchart/DQW9PYmxhZlpVUFNL
+
+抽象流程图：https://docs.qq.com/flowchart/DQUxIR0JURE9Idlpo
 
 
 
@@ -194,4 +199,23 @@ private Timer timer;
 
 
 
+# offsetTable
 
+上面说了，在 org.apache.rocketmq.store.schedule.ScheduleMessageService 中的重要属性：
+
+```java
+/**
+ * 偏移量表
+ */
+private final ConcurrentMap<Integer /* level */, Long/* offset */> offsetTable = new ConcurrentHashMap<>(32);
+```
+
+这个map的value是 Long offset，那么这个offset到底有什么用呢？
+
+**offset其实表示的是consumeQueue文件的逻辑偏移量！**再直白点说——就是consumeQueue文件内容的下标：
+
+![image-20211206193725750](images/image-20211206193725750.png)
+
+![image-20211206205501398](images/image-20211206205501398.png)
+
+详见：[consumeQueue文件详解](https://gitee.com/anxiaole/rocketmq/blob/master/docs/cn/design.md#consumequeue)
