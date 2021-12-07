@@ -40,9 +40,24 @@
 
 ![image-20211202173917460](images/image-20211202173917460.png)
 
+```java
+/**
+ * slave和master同步所有数据
+ */
+public void syncAll() {
+    this.syncTopicConfig();                  // 同步topic配置
+    this.syncConsumerOffset();               // 同步消费偏移量
+    this.syncDelayOffset();                  // 同步延迟队列偏移量
+    this.syncSubscriptionGroupConfig();      // 同步订阅组配置
+}
+```
 
+slave broker需要从master broker拉取这四种数据：
 
-
+- this.syncTopicConfig();                  // 同步topic配置
+- this.syncConsumerOffset();               // 同步消费偏移量
+- [this.syncDelayOffset();                  // 同步延迟队列偏移量](../网络组件Remoting/请求类型及处理/GET_ALL_DELAY_OFFSET.md)
+- this.syncSubscriptionGroupConfig();      // 同步订阅组配置
 
 
 
