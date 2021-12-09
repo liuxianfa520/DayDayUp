@@ -16,12 +16,15 @@ server：master 的broker
 
 
 
-**此请求在以下场景会发送：**
+**定时任务**
 
-- broker启动时，并且broker是 slave
-- 当broker的角色由master变成slave时
+![image-20211209191233438](images/image-20211209191233438.png)
 
-![image-20211202185024295](images/image-20211202185024295.png)
+**此定时任务在以下场景会注册：**
+
+[client何时发送请求](#client%E4%BD%95%E6%97%B6%E5%8F%91%E9%80%81%E8%AF%B7%E6%B1%82)
+
+
 
 
 
@@ -67,6 +70,41 @@ org.apache.rocketmq.broker.out.BrokerOuterAPI#getAllDelayOffset
 
 
 也就是在 ：![image-20211203155812942](images/image-20211203155812942.png)
+
+
+
+
+
+
+
+# client何时发送请求
+
+> 上面我们知道了这个请求是slave发送给master的，也知道了slave收到响应之后处理逻辑。
+>
+> 但是slave在什么时候/什么场景才会给master发送这个请求呢？
+
+是在定时任务中，每隔10秒slave和master之间同步一次数据：
+
+![image-20211209191233438](images/image-20211209191233438.png)
+
+**这个定时任务是在broker是slave的情况下，才会注册、才会执行。**
+
+**下面两种情况，会注册定时任务：**
+
+- broker启动时，并且broker是 slave
+- 当broker的角色由master变成slave时
+
+![image-20211202185024295](images/image-20211202185024295.png)
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -1,10 +1,24 @@
 # 简述
 
-slave broker从master broker拉取topic配置信息，保存到slave broker中，并持久化。
+slave broker使用定时任务，每隔10秒发送请求从master broker拉取topic配置信息，保存到slave broker中，并持久化。
 
 client：slave broker
 
 server：master broker
+
+
+
+**定时任务**
+
+![image-20211209185724321](images/image-20211209185724321.png)
+
+
+
+
+
+**此定时任务在以下场景会注册：**
+
+[client何时发送请求](#client%E4%BD%95%E6%97%B6%E5%8F%91%E9%80%81%E8%AF%B7%E6%B1%82)
 
 
 
@@ -54,6 +68,35 @@ slave broker使用同步阻塞的方式，发送请求，当slave broker收到ma
 
 
 
+
+
+# client何时发送请求
+
+> 上面我们知道了这个请求是slave发送给master的，也知道了slave收到响应之后处理逻辑。
+>
+> 但是slave在什么时候/什么场景才会给master发送这个请求呢？
+
+是在定时任务中，每隔10秒slave和master之间同步一次数据：
+
+![image-20211209185724321](images/image-20211209185724321.png)
+
+**这个定时任务是在broker是slave的情况下，才会注册、才会执行。**
+
+**下面两种情况，会注册定时任务：**
+
+- broker启动时，并且broker是 slave
+- 当broker的角色由master变成slave时
+
+![image-20211202185024295](images/image-20211202185024295.png)
+
+
+
+
+
+
+
+
+
 # server
 
 server端是master broker，使用请求处理器来处理：
@@ -71,5 +114,4 @@ server端是master broker，使用请求处理器来处理：
 # TopicConfigManager 
 
 详见：[ConfigManager——TopicConfigManager.md](../../配置管理ConfigManager/TopicConfigManager.md)
-
 

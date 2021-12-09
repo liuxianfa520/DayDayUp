@@ -1,5 +1,31 @@
 # 简述
 
+broker用`TopicConfigManager`来管理当前broker机器上的topic。
+
+
+
+**持久化**
+
+- broker上的topic配置信息，需要持久化到磁盘。
+- 每次topic变化的时候，都需要持久化并记录数据版本号。
+
+
+
+**注册到NameServer**
+
+- 当broker上的topic配置变化的时候后，给所有的NameServer发送消息
+- 请求包含broker自身信息及topic配置信息
+- [详见RouteInfoManager路由表管理器.md](../NameServer/RouteInfoManager路由表管理器.md) 
+
+
+
+**master和slave之间topic配置同步**
+
+- slave会给master发送请求，拉取topic配置，然后保存到slave机器上
+
+- slave也会注册到NameServer。
+- [详见 GET_ALL_TOPIC_CONFIG.md](../网络组件Remoting/请求类型及处理/GET_ALL_TOPIC_CONFIG.md)
+
 
 
 
@@ -319,9 +345,25 @@ public boolean isOrderTopic(final String topic) {
 
 ![image-20211207204926748](images/image-20211207204926748.png)
 
+在RocketMQ的控制台上，也能看到重试topic只有1个queue：
+
+![image-20211207211220158](images/image-20211207211220158.png)
 
 
 
+
+
+
+
+## 持久化相关方法
+
+
+
+
+
+
+
+## 持久化方法的使用
 
 
 
