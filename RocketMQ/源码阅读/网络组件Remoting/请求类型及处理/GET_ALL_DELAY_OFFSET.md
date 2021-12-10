@@ -10,7 +10,7 @@ server：master 的broker
 
 **描述：**
 
-如果broker是slave，则slave给master发送 消息获取延迟偏移量delayOffset (字符串类型)
+如果broker是slave，则slave给master发送 `GET_ALL_DELAY_OFFSET`消息获取延迟偏移量delayOffset (字符串类型)
 
 然后把 delayOffset 保存到 `{rootDia}/config/delayOffset.json` 文件中。
 
