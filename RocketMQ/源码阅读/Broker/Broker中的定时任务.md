@@ -54,10 +54,10 @@ public void syncAll() {
 
 slave broker需要从master broker拉取这四种数据：
 
-- this.syncTopicConfig();                  // 同步topic配置
-- this.syncConsumerOffset();               // 同步消费偏移量
+- [this.syncTopicConfig();                  // 同步topic配置](../配置管理ConfigManager/TopicConfigManager.md)
+- [this.syncConsumerOffset();               // 同步消费偏移量](../配置管理ConfigManager/ConsumerOffsetManager.md)
 - [this.syncDelayOffset();                  // 同步延迟队列偏移量](../网络组件Remoting/请求类型及处理/GET_ALL_DELAY_OFFSET.md)
-- this.syncSubscriptionGroupConfig();      // 同步订阅组配置
+- [this.syncSubscriptionGroupConfig();      // 同步订阅组配置](../配置管理ConfigManager/SubscriptionGroupManager.md#slave%E5%92%8Cmaster%E6%95%B0%E6%8D%AE%E5%90%8C%E6%AD%A5)
 
 
 

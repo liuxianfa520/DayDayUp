@@ -22,9 +22,9 @@ broker用`TopicConfigManager`来管理当前broker机器上的topic。
 **master和slave之间topic配置同步**
 
 - slave会给master发送请求，拉取topic配置，然后保存到slave机器上
-
 - slave也会注册到NameServer。
 - [详见 GET_ALL_TOPIC_CONFIG.md](../网络组件Remoting/请求类型及处理/GET_ALL_TOPIC_CONFIG.md)
+- [broker定时任务](../Broker/Broker中的定时任务.md#%E5%A6%82%E6%9E%9Cbroker%E6%98%AFslave%EF%BC%8C%E5%88%99%E6%AF%8F%E9%9A%9410%E7%A7%92%E4%BB%8Emaster%E5%90%8C%E6%AD%A5%E6%95%B0%E6%8D%AE)
 
 
 
