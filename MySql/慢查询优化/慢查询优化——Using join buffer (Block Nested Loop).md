@@ -165,6 +165,24 @@ ADD INDEX `idx_userId` (`userId`);
 
 
 
+# [todo] 其他优化sql案例
+
+1、wind库同步基金信息
+
+先看一下慢查询日志使用`pt-query-digest`工具分析之后的结果：
+
+![image-20211217124734905](images/image-20211217124734905.png)
+
+Explain:
+
+![image-20211217124222599](images/image-20211217124222599.png)
+
+两个表的数据量：
+
+- CF_AnnInf 表有数据量：1194987
+
+- CF_AnnColumn 表有数据量：21
+
 
 
 
