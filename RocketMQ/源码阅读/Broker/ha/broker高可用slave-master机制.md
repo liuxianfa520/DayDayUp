@@ -42,6 +42,14 @@ public class MessageStoreConfig {
 
 
 
-# 疑问
+# 复制HA
 
 ## 1、slave的commitLog数据,是从哪里同步的?
+
+- [producer生产mq消息给broker时，master会以同步阻塞方式把mq消息复制到slave](https://docs.qq.com/flowchart/DQVNZQUNacU9rd0V2)
+
+
+
+## 2、如果master是异步复制slave，是如何处理的呢？
+
+- todo：
