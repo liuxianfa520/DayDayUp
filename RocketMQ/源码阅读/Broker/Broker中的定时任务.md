@@ -32,7 +32,7 @@
 
 ![image-20211202173634387](images/image-20211202173634387.png)
 
-具体逻辑 详见：[RouteInfoManager路由表管理器.md](../NameServer\RouteInfoManager路由表管理器.md)  
+具体逻辑 详见：[RouteInfoManager路由表管理器.md](../NameServer/RouteInfoManager路由表管理器.md)  
 
 
 

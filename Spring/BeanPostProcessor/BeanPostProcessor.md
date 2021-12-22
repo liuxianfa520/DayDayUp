@@ -4,7 +4,7 @@
 
 > 后置处理器，算是一种`bean生命周期`的接口。
 >
-> 详见： [bean生命周期——初始化.md](..\BeanFactory\bean生命周期——初始化.md)      [bean生命周期——销毁.md](..\BeanFactory\bean生命周期——销毁.md) 
+> 详见： [bean生命周期——初始化.md](../BeanFactory/bean生命周期——初始化.md)      [bean生命周期——销毁.md](../BeanFactory/bean生命周期——销毁.md) 
 >
 > Spring中很多组件，都是基于`后置处理器`来实现的。所以非常重要！！！
 
@@ -201,7 +201,7 @@ default boolean requiresDestruction(Object bean) {
 
 - 理解：所有的bean后置处理器都实现了相同的接口，每个子类存在不同的实现逻辑：可以根据参数在子类的方法中判断如何进行处理：
   - 有的对bean做了修改
-    - aop   详见 [aop.md](..\AOP\aop.md)
+    - aop   详见 [aop.md](../AOP/aop.md)
       - AbstractAutoProxyCreator#getEarlyBeanReference 在早期引用的时，对目标bean创建代理对象。（只有存在循环依赖时，才会使用此方式创建代理对象）
       - AbstractAutoProxyCreator#postProcessAfterInitialization 在bean初始化完毕后，对目标bean创建代理对象。
   - 有的对bean中方法进行调用

@@ -66,7 +66,7 @@ https://github.com/ThinkingHan/Java-note/blob/master/Spring%E9%9D%A2%E8%AF%95.md
     >
     > web   webmvc
 
-13. 谈谈你对 BeanFactory的理解，BeanFactory 实现举例     [BeanFactory.md](BeanFactory\BeanFactory.md) 
+13. 谈谈你对 BeanFactory的理解，BeanFactory 实现举例     [BeanFactory.md](BeanFactory/BeanFactory.md) 
 
 14. 谈谈对 Spring 中的 Web 模块的理解
 
@@ -150,7 +150,7 @@ https://github.com/ThinkingHan/Java-note/blob/master/Spring%E9%9D%A2%E8%AF%95.md
 
 1. IoC 控制反转设计原理？
 
-2. Spring Bean的生命周期？          [bean生命周期——初始化.md](BeanFactory\bean生命周期——初始化.md)        [bean生命周期——销毁.md](BeanFactory\bean生命周期——销毁.md) 
+2. Spring Bean的生命周期？          [bean生命周期——初始化.md](BeanFactory/bean生命周期——初始化.md)        [bean生命周期——销毁.md](BeanFactory/bean生命周期——销毁.md) 
 
 3. Spring 如何处理线程并发问题？
 
@@ -178,7 +178,7 @@ https://github.com/ThinkingHan/Java-note/blob/master/Spring%E9%9D%A2%E8%AF%95.md
 
 15. 哪些是重要的 Bean 生命周期方法？ 你能重载它们吗？
 
-    > 生命周日中的所有接口、方法都是可以重载的。详见： [bean生命周期——初始化.md](BeanFactory\bean生命周期——初始化.md#%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F%E7%9A%84%E5%BA%94%E7%94%A8) 
+    > 生命周日中的所有接口、方法都是可以重载的。详见： [bean生命周期——初始化.md](BeanFactory/bean生命周期——初始化.md#%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F%E7%9A%84%E5%BA%94%E7%94%A8) 
 
 16. 讲下 Spring MVC 的执行流程
 

@@ -41,7 +41,7 @@
 
 # 参考
 
- [bean生命周期——初始化.md](..\BeanFactory\bean生命周期——初始化.md) 
+ [bean生命周期——初始化.md](../BeanFactory/bean生命周期——初始化.md) 
 
- [bean生命周期——销毁.md](..\BeanFactory\bean生命周期——销毁.md) 
+ [bean生命周期——销毁.md](../BeanFactory/bean生命周期——销毁.md) 
 

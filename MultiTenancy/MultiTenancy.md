@@ -1,6 +1,6 @@
 # [多租户Multi-Tenancy](http://niyanchun.com/multitenant-database-design-in-saas.html)
 
-![img](https://img2018.cnblogs.com/blog/1303876/201906/1303876-20190621114239354-1621489760.png)
+![img](images/1303876-20190621114239354-1621489760.png)
 
 多租户（Multi-Tenancy）是SaaS中一个基础功能，本文介绍多租户下的数据库设计。
 
@@ -55,8 +55,8 @@
   - 目前提供的有两种实现：
   - 一种是在项目启动时，把链接上配置中心ZooKeeper，把所有租户的数据源都初始化好：
   - 一种是懒加载模式的：com.anxiaole.multitenancy.lazyLoad.LazyLoadRoutingDataSource
-- 详见  [MultiTenancyApplication.java](src\main\java\com\anxiaole\multitenancy\MultiTenancyApplication.java) 验证步骤：
-  - 1、数据库中执行 \DayDayUp\MultiTenancy\src\main\resources\sql\db.sql
+- 详见  [MultiTenancyApplication.java](src/main/java/com/anxiaole/multitenancy/MultiTenancyApplication.java) 验证步骤：
+  - 1、数据库中执行 /DayDayUp/MultiTenancy/src/main/resources/sql/db.sql
   - 2、本地启动 ZooKeeper  使用默认端口号:2181
   - 3、修改数据库连接账号、密码.
   - 4、启动项目.
