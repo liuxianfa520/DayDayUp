@@ -266,3 +266,81 @@ public TopicConfigManager(BrokerController brokerController) { // 省略其他�
 ![image-20211206205501398](images/image-20211206205501398.png)
 
 详见：[consumeQueue文件详解](https://gitee.com/anxiaole/rocketmq/blob/master/docs/cn/design.md#consumequeue)
+
+
+
+
+
+
+
+
+
+# 使用场景
+
+- 如果broker是master，才会启动 `延迟消息服务ScheduleMessageService`——使用其中的timer投递延迟消息。
+  - slave只会定期从master拉取配置，然后持久化到slave的磁盘中。
+  - 如果某天master宕机了，slave变成master，持久化到磁盘中的配置才能使用上。
+  - DLedger详见：[broker高可用——DLedger机制](../Broker/ha/broker高可用——DLedger机制.md)
+- 源码：
+
+```java
+public class DefaultMessageStore implements MessageStore {
+    
+    private final ScheduleMessageService scheduleMessageService;
+    
+    public DefaultMessageStore(MessageStoreConfig messageStoreConfig, 省略其他构造参数...) {
+        this.scheduleMessageService = new ScheduleMessageService(this);
+    }
+    
+    @Override
+    public void start(){ // 启动 DefaultMessageStore 的其他逻辑省略。。。。
+        
+        // 如果没有启用DLedger模式:
+        //  1、启动HA服务
+        //  2、根据broker角色处理延迟消息服务：如果broker是master,则启动 ScheduleMessageService
+        if (!messageStoreConfig.isEnableDLedgerCommitLog()) {
+            // HA服务启动
+            this.haService.start();
+            
+            this.handleScheduleMessageService(messageStoreConfig.getBrokerRole());
+        }
+    }
+    
+    @Override
+    public void handleScheduleMessageService(BrokerRole brokerRole) {
+        if (this.scheduleMessageService != null) {
+            if (brokerRole == BrokerRole.SLAVE) {
+                this.scheduleMessageService.shutdown();
+            } else {
+                // 只有master才会启动延迟消息服务.
+                this.scheduleMessageService.start();
+            }
+        }
+    }
+}    
+```
+
+> 注释：
+>
+> 从上面源码上，你可能会觉得：*“当broker没有启动DLedger模式，并且broker是master，才会启动 ScheduleMessageService”*。
+>
+> 这种感觉是不对的！
+>
+> 如果启动了DLedger模式，broker的角色会自动变化：
+>
+> org.apache.rocketmq.broker.BrokerController#changeToMaster(int brokerId) 
+>
+> ![image-20211223235046144](images/image-20211223235046144.png)
+>
+> org.apache.rocketmq.broker.BrokerController#changeToSlave(int brokerId) 
+>
+> ![image-20211223235141276](images/image-20211223235141276.png)
+>
+> - 通过这也是能从侧面反映：DLedger模式只是进行commitLog文件的数据同步，并不会处理延迟队列消费的持久化数据。
+
+
+
+
+
+
+
