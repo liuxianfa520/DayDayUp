@@ -1,3 +1,9 @@
+
+
+# broker高可用
+
+![image-20211227215806108](images/image-20211227215806108.png)
+
 # 说明
 
 broker分为maste和slave：
