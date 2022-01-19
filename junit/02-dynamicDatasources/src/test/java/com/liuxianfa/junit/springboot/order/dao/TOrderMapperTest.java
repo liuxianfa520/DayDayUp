@@ -2,6 +2,8 @@ package com.liuxianfa.junit.springboot.order.dao;
 
 import com.liuxianfa.junit.springboot.DynamicDatasourcesApplication;
 import com.liuxianfa.junit.springboot.order.entity.TOrder;
+import com.liuxianfa.junit.springboot.user.dao.TUserMapper;
+import com.liuxianfa.junit.springboot.user.entity.TUser;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,9 +26,18 @@ public class TOrderMapperTest {
     @Autowired
     TOrderMapper tOrderMapper;
 
+    @Autowired
+    TUserMapper tUserMapper;
+
     @Test
     public void selectByExample() {
         List<TOrder> tOrders = tOrderMapper.selectByExample(null);
         System.out.println(JSONUtil.toJsonPrettyStr(tOrders));
+    }
+
+    @Test
+    public void tUserMapper() {
+        List<TUser> tUsers = tUserMapper.selectByExample(null);
+        System.out.println(JSONUtil.toJsonPrettyStr(tUsers));
     }
 }
