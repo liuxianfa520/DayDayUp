@@ -2,6 +2,7 @@ package com.liuxianfa.junit.springboot.order.dao;
 
 import com.liuxianfa.junit.springboot.DynamicDatasourcesApplication;
 import com.liuxianfa.junit.springboot.order.entity.TOrder;
+import com.liuxianfa.junit.springboot.service.OrderService;
 import com.liuxianfa.junit.springboot.user.dao.TUserMapper;
 import com.liuxianfa.junit.springboot.user.entity.TUser;
 
@@ -28,6 +29,17 @@ public class TOrderMapperTest {
 
     @Autowired
     TUserMapper tUserMapper;
+
+    @Autowired
+    OrderService orderService;
+
+    @Test
+    public void orderService() {
+        orderService.saveOrderAndUser();
+
+        orderService.saveOrderAndUserRollback();
+        System.out.println("done");
+    }
 
     @Test
     public void selectByExample() {
