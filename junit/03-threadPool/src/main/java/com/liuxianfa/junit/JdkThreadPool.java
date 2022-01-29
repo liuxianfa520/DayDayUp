@@ -32,6 +32,15 @@ public class JdkThreadPool {
                                                                        // 拒绝策略:调用者执行.
                                                                        new ThreadPoolExecutor.CallerRunsPolicy());
 
+    static ThreadFactory daemonThreadFactory = new ThreadFactoryBuilder().setNameFormat("MyDaemonThread-%d").setDaemon(true).build();
+
+    static ThreadPoolExecutor DAEMON_JDK_THREAD_POOL = new ThreadPoolExecutor(10, 100,
+                                                                              0L, TimeUnit.MILLISECONDS,
+                                                                              new LinkedBlockingQueue<>(1000),
+                                                                              daemonThreadFactory,
+                                                                              // 拒绝策略:调用者执行.
+                                                                              new ThreadPoolExecutor.CallerRunsPolicy());
+
 
     public static void sleep(long l) {
         try {

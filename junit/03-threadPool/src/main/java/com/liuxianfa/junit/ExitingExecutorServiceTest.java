@@ -5,6 +5,7 @@ import com.google.common.util.concurrent.MoreExecutors;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import static com.liuxianfa.junit.JdkThreadPool.DAEMON_JDK_THREAD_POOL;
 import static com.liuxianfa.junit.JdkThreadPool.JDK_THREAD_POOL;
 import static com.liuxianfa.junit.JdkThreadPool.sleep;
 
@@ -15,15 +16,17 @@ import static com.liuxianfa.junit.JdkThreadPool.sleep;
 public class ExitingExecutorServiceTest {
 
     public static void main(String[] args) {
-        guava守护线程池();
+//        guava守护线程池();
 
-//        jdk线程池中的任务都执行完毕之后jvm也不会退出();
+        使用守护线程工厂();
+
+//        默认情况下JDK线程池中的任务都执行完毕之后JVM也不会退出();
 
         System.out.println("main 线程执行到最后了.");
     }
 
 
-    private static void jdk线程池中的任务都执行完毕之后jvm也不会退出() {
+    private static void 默认情况下JDK线程池中的任务都执行完毕之后JVM也不会退出() {
         JDK_THREAD_POOL.execute(() -> {
             sleep(4);
             System.out.println("线程执行完毕." + Thread.currentThread().getName());
@@ -32,6 +35,26 @@ public class ExitingExecutorServiceTest {
 
 
         JDK_THREAD_POOL.execute(() -> {
+            sleep(4);
+            System.out.println("线程执行完毕." + Thread.currentThread().getName());
+        });
+        System.out.println("2");
+    }
+
+    /**
+     * 并不会等待两个线程执行完毕之后,再退出jvm进程.
+     * <p>
+     * 而是直接在main方法执行完毕之后,就退出jvm
+     */
+    private static void 使用守护线程工厂() {
+        DAEMON_JDK_THREAD_POOL.execute(() -> {
+            sleep(4);
+            System.out.println("线程执行完毕." + Thread.currentThread().getName());
+        });
+        System.out.println("1");
+
+
+        DAEMON_JDK_THREAD_POOL.execute(() -> {
             sleep(4);
             System.out.println("线程执行完毕." + Thread.currentThread().getName());
         });
