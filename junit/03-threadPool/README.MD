@@ -8,7 +8,7 @@
 
 # JDK线程池
 
-## 线程工厂
+## Guava线程工厂
 
 ```java
 /**
@@ -21,18 +21,17 @@ static ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat("M
 
 这个线程工厂，是使用的guava创建的。
 
-如果不想用guava也可以使用java原生创建：首先需要先创建一个线程工厂实现类：`ThreadFactoryImpl`  
+## JDK线程工厂
+
+如果不想引用guava依赖，也可以使用java原生创建：首先需要先创建一个线程工厂实现类：`ThreadFactoryImpl`  
 
 ```java
-
-
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * 线程工厂
  * @author LiuXianfa
-
  * @date 2021/12/30 9:54
  */
 public class ThreadFactoryImpl implements ThreadFactory {
@@ -74,13 +73,18 @@ ThreadFactoryImpl threadFactory = new ThreadFactoryImpl("xxxThreadPool-", true);
 
 ```java
 /**
+ * 线程工厂,指定线程的名称.
+ * %d   可以指定线程池中的线程下标.从0开始.
+ */
+ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat("My-thread-%d").build();
+
+/**
  * JDK线程池
  */
 ThreadPoolExecutor JDK_THREAD_POOL = new ThreadPoolExecutor(10, 100,
                                                                    0L, TimeUnit.MILLISECONDS,
                                                                    new LinkedBlockingQueue<>(1000),
                                                                    threadFactory,
-                                                                   // 拒绝策略:调用者执行.
                                                                    new ThreadPoolExecutor.CallerRunsPolicy());
 ```
 
@@ -98,7 +102,7 @@ ThreadPoolExecutor JDK_THREAD_POOL = new ThreadPoolExecutor(10, 100,
 
 
 
-# 直接线程池
+# Guava直接线程池
 
 ```java
 public class DirectExectorTest {
@@ -129,7 +133,7 @@ DirectExecutor是一个实现了Executor接口的枚举类。调用execute(Runna
 在当前线程执行任务，而不会另起一个线程。
 2、当前线程执行完毕后,会退出.
 
-# 守护线程池
+# Guava守护线程池
 
 当线程池中的任务都执行完毕之后，jvm会退出。如下例子，当2个线程sleep4秒之后，jvm会正常退出。
 
@@ -216,7 +220,7 @@ Process finished with exit code 0
 
 
 
-# 可监听线程池
+# Guava可监听线程池
 
 Future接口为异步计算取回结果提供了一个存根(stub)，
 然而这样每次调用Future接口的get方法取回计算结果每每是须要面临阻塞的可能性。
@@ -348,7 +352,7 @@ Process finished with exit code 0
 
 
 
-# 顺序线程池
+# Guava顺序线程池
 
 线程执行的顺序和任务提交的顺序相同。上一个任务执行不完，下一个任务就不会开始。
 
