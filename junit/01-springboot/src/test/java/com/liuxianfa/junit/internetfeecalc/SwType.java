@@ -2,7 +2,7 @@ package com.liuxianfa.junit.internetfeecalc;
 
 /**
  * @author LiuXianfa
- * @email xianfaliu2@creditease.cn
+ * @email LiuXianfa
  * @date 2021/11/23 10:57
  */
 public enum SwType {

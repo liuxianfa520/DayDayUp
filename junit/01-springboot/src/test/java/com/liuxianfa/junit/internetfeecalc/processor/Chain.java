@@ -10,7 +10,7 @@ import lombok.Getter;
 
 /**
  * @author LiuXianfa
- * @email xianfaliu2@creditease.cn
+ * @email LiuXianfa
  * @date 2021/11/23 10:52
  */
 public class Chain {

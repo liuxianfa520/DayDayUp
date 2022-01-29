@@ -20,7 +20,7 @@ import static com.liuxianfa.junit.JdkThreadPool.sleep;
  * <p>
  * 但是其实使用java8也能实现.   而且java8的 {@link CompletableFuture} 让开发者更专注于[任务]和[执行任务时是否需要异步].   并不需要关心线程池.
  *
- * @author xianfaliu2@creditease.cn
+ * @author LiuXianfa
  * @date 2022/1/27 22:02
  */
 public class FuturesTest {

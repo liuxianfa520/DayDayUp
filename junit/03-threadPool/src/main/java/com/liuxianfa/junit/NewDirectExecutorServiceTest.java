@@ -15,7 +15,7 @@ import static com.liuxianfa.junit.JdkThreadPool.sleep;
  * <p>
  * 和DirectExecutor实例类似，调用DirectExecutorService实例的submit()方法时，会在当前线程执行任务，而不会另起一个线程。
  *
- * @author xianfaliu2@creditease.cn
+ * @author LiuXianfa
  * @date 2022/1/27 20:31
  */
 public class NewDirectExecutorServiceTest {

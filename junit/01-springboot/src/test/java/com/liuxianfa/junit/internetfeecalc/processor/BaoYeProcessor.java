@@ -16,7 +16,7 @@ import lombok.extern.slf4j.Slf4j;
  * 流程图:https://docs.qq.com/flowchart/DQVRBRXBISmJteXBy
  *
  * @author LiuXianfa
- * @email xianfaliu2@creditease.cn
+ * @email LiuXianfa
  * @date 2021/11/23 11:07
  */
 @Slf4j

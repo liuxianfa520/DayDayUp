@@ -11,7 +11,7 @@ import static com.liuxianfa.junit.JdkThreadPool.JDK_THREAD_POOL;
 import static com.liuxianfa.junit.JdkThreadPool.sleep;
 
 /**
- * @author xianfaliu2@creditease.cn
+ * @author LiuXianfa
  * @date 2022/1/27 13:24
  */
 public class ExitingExecutorServiceTest {

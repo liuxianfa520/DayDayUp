@@ -15,7 +15,7 @@ import static com.liuxianfa.junit.JdkThreadPool.sleep;
  * <p>
  * 2、当前线程执行完毕后,会退出.
  *
- * @author xianfaliu2@creditease.cn
+ * @author LiuXianfa
  * @date 2022/1/27 20:27
  */
 public class DirectExectorTest {

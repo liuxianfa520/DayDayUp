@@ -11,7 +11,7 @@ import cn.hutool.json.JSONUtil;
 
 /**
  * @author LiuXianfa
- * @email xianfaliu2@creditease.cn
+ * @email LiuXianfa
  * @date 2021/11/24 18:57
  */
 public class YouHuiProcessorTest {

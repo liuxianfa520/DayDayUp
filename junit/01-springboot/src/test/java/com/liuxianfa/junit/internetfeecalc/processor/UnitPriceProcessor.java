@@ -13,7 +13,7 @@ import lombok.experimental.Accessors;
  * 注意:在构建处理器链的时候,需要保证这个处理器在处理器链中的最后一个.
  *
  * @author LiuXianfa
- * @email xianfaliu2@creditease.cn
+ * @email LiuXianfa
  * @date 2021/11/23 10:47
  */
 @Data

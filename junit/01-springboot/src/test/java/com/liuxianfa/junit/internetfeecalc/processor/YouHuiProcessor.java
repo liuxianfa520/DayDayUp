@@ -19,7 +19,7 @@ import lombok.experimental.Accessors;
 
 /**
  * @author LiuXianfa
- * @email xianfaliu2@creditease.cn
+ * @email LiuXianfa
  * @date 2021/11/24 18:37
  */
 public class YouHuiProcessor implements InternetFeeCalcProcessor {

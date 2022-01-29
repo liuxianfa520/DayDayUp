@@ -11,7 +11,7 @@ import lombok.Data;
 
 /**
  * @author LiuXianfa
- * @email xianfaliu2@creditease.cn
+ * @email LiuXianfa
  * @date 2021/11/24 9:20
  */
 public class TimeSlotUtils {

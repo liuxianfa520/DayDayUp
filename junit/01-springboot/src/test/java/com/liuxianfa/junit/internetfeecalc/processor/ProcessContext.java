@@ -12,7 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author LiuXianfa
- * @email xianfaliu2@creditease.cn
+ * @email LiuXianfa
  * @date 2021/11/23 10:55
  */
 @Data

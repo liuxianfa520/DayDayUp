@@ -32,7 +32,7 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * 线程工厂
  * @author LiuXianfa
- * @author xianfaliu2@creditease.cn
+
  * @date 2021/12/30 9:54
  */
 public class ThreadFactoryImpl implements ThreadFactory {

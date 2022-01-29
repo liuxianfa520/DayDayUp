@@ -17,7 +17,7 @@ import cn.hutool.core.util.StrUtil;
 /**
  * 字符串类型的日期 序列化器
  *
- * @author xianfaliu2@creditease.cn
+ * @author LiuXianfa
  * @date 2022/1/13 10:45
  */
 public interface StringDateSerializer {

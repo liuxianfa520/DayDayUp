@@ -7,7 +7,7 @@ import lombok.experimental.Accessors;
 
 /**
  * @author LiuXianfa
- * @email xianfaliu2@creditease.cn
+ * @email LiuXianfa
  * @date 2021/11/23 10:56
  */
 @Data

@@ -5,7 +5,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import static com.liuxianfa.junit.JdkThreadPool.sleep;
 
 /**
- * @author xianfaliu2@creditease.cn
+ * @author LiuXianfa
  * @date 2022/1/29 21:52
  */
 public class JstackTest {

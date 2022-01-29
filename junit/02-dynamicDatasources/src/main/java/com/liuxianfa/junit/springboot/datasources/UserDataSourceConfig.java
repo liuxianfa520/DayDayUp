@@ -18,7 +18,7 @@ import javax.sql.DataSource;
 /**
  * 配置多数据源
  *
- * @author xianfaliu2@creditease.cn
+ * @author LiuXianfa
  */
 @Configuration
 @MapperScan(basePackages = "com.liuxianfa.junit.springboot.user.dao", sqlSessionFactoryRef = "userSqlSessionFactory")

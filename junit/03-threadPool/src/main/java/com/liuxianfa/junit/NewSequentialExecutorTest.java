@@ -14,7 +14,7 @@ import static com.liuxianfa.junit.JdkThreadPool.sleep;
  * <p>
  * 线程池按照任务添加顺序执行任务。上一个任务执行不完，下一个任务就不会开始。
  *
- * @author xianfaliu2@creditease.cn
+ * @author LiuXianfa
  * @date 2022/1/27 21:20
  */
 public class NewSequentialExecutorTest {

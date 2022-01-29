@@ -12,7 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * @author xianfaliu2@creditease.cn
+ * @author LiuXianfa
  * @date 2022/1/19 10:17
  */
 @Slf4j

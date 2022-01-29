@@ -17,7 +17,7 @@ import java.util.List;
 import cn.hutool.json.JSONUtil;
 
 /**
- * @author xianfaliu2@creditease.cn
+ * @author LiuXianfa
  * @date 2022/1/14 15:56
  */
 @SpringBootTest(classes = DynamicDatasourcesApplication.class)

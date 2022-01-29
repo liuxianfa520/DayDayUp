@@ -28,7 +28,7 @@ import static com.liuxianfa.junit.JdkThreadPool.sleep;
  *
  * </pre>
  *
- * @author xianfaliu2@creditease.cn
+ * @author LiuXianfa
  * @date 2022/1/27 20:21
  */
 public class ListeningDecoratorTest {
