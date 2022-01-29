@@ -1,12 +1,12 @@
 这个项目主要是为了研究线程池：
 
-- 对比jdk自带的线程池和guava线程池。
+- 对比JDK自带的线程池和guava线程池。
 
 
 
 
 
-# jdk线程池
+# JDK线程池
 
 ## 线程工厂
 
@@ -74,7 +74,7 @@ ThreadFactoryImpl threadFactory = new ThreadFactoryImpl("xxxThreadPool-", true);
 
 ```java
 /**
- * jdk线程池
+ * JDK线程池
  */
 ThreadPoolExecutor JDK_THREAD_POOL = new ThreadPoolExecutor(10, 100,
                                                                    0L, TimeUnit.MILLISECONDS,
@@ -170,53 +170,49 @@ Process finished with exit code 0
 
 ```
 
-如果使用jdk线程池，并且线程工厂创建的线程都是守护线程，是无法达到这个效果的。
+**适用场景**
 
-因为：线程池中的线程都是守护线程，jvm并不会等待守护线程执行完毕之后，才退出jvm。而是main方法执行完之后，直接关闭jvm进程。
+​	如果应用程序是个跑批的任务，适用linux crontab -e每隔一段时间，就使用java启动项目，在main函数中去向线程池中提交任务，当线程池中的任务都执行完毕后，jvm进程会自动结束。当下一次需要执行定时任务时，crontab -e会再次启动一个新的进程。这种场景估计才能用到这个线程池。
+
+
+
+**使用jdk实现：**
 
 ```java
-    static ThreadFactory daemonThreadFactory = new ThreadFactoryBuilder().setNameFormat("MyDaemonThread-%d").setDaemon(true).build();
-
-    static ThreadPoolExecutor DAEMON_JDK_THREAD_POOL = new ThreadPoolExecutor(10, 100,
-                                                                              0L, TimeUnit.MILLISECONDS,
-                                                                              new LinkedBlockingQueue<>(1000),
-                                                                              daemonThreadFactory,
-                                                                              new ThreadPoolExecutor.CallerRunsPolicy());
-                                                                              
-	public static void main(String[] args) {
-        DAEMON_JDK_THREAD_POOL.execute(() -> {
+    public static void main(String[] args) {
+        CompletableFuture<Void> future1 = CompletableFuture.runAsync(() -> {
             sleep(4);
             System.out.println("线程执行完毕." + Thread.currentThread().getName());
         });
-        System.out.println("1");
+        System.out.println("第1个任务提交完毕.");
 
-
-        DAEMON_JDK_THREAD_POOL.execute(() -> {
+        CompletableFuture<Void> future2 = CompletableFuture.runAsync(() -> {
             sleep(4);
             System.out.println("线程执行完毕." + Thread.currentThread().getName());
         });
-        System.out.println("2");
+        System.out.println("第2个任务提交完毕.");
+
+
+        // 等待所有future执行完毕.
+        CompletableFuture.allOf(future1, future2).join();
 
         System.out.println("main 线程执行到最后了.");
     }
 ```
 
-控制台打印：
+So Easy。简单到不能再简单了。
+
+控制台输出：
 
 ```
-1
-2
+第1个任务提交完毕.
+第2个任务提交完毕.
+线程执行完毕.ForkJoinPool.commonPool-worker-18
+线程执行完毕.ForkJoinPool.commonPool-worker-25
 main 线程执行到最后了.
 
 Process finished with exit code 0
-
 ```
-
-可见，并没有等待两个线程执行完毕。就直接退出jvm进程了。
-
-
-
-
 
 
 
@@ -227,7 +223,7 @@ Future接口为异步计算取回结果提供了一个存根(stub)，
 这样在最坏的状况下，异步计算和同步计算的消耗是一致的。
 所以,Guava库中提供一个很是强大的装饰后的Future接口，
 使用观察者模式为在异步计算完成以后,立刻执行addListener指定一个Runnable对象，从而实现“完成当即通知”。
-更多详见:  http://ifeve.com/google-guava-listenablefuture/
+更多详见: [并发编程网——google Guava包的ListenableFuture解析](  http://ifeve.com/google-guava-listenablefuture/)
 
 ```java
 static ListeningExecutorService pool = MoreExecutors.listeningDecorator(JDK_THREAD_POOL);
