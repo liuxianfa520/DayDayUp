@@ -1,6 +1,7 @@
 package com.liuxianfa.junit.internetfeecalc.testcase;
 
 import com.alibaba.fastjson.JSON;
+import com.liuxianfa.junit.internetfeecalc.processor.BaoJianProcessor;
 import com.liuxianfa.junit.internetfeecalc.processor.BaoYeProcessor;
 import com.liuxianfa.junit.internetfeecalc.processor.Chain;
 import com.liuxianfa.junit.internetfeecalc.processor.KaiJiProcessor;
@@ -68,6 +69,18 @@ public class InterNetFeeCalcTest {
         int fee = kaiJiProcessor.process(start, end, chain, processContext);
         System.out.printf("网费=%s%n", fee);
         System.out.println(JSON.toJSONString(processContext.getFeeList(), true));
+    }
+
+    @Test
+    public void baoJianProcessor() {
+        // 注意:由于实现的原因,处理器顺序是固定的.
+        Chain chain = new Chain(kaiJiProcessor, lowestCostProcessor, baoYeProcessor, youHuiProcessor, unitPriceProcessor);
+        // 包间计费规则 测试
+        BaoJianProcessor baoJianProcessor = new BaoJianProcessor(5, chain);
+        ProcessContext baojianContext = new ProcessContext();
+        int fee = baoJianProcessor.process(start, end, baojianContext);
+        System.out.printf("包间网费=%s%n", fee);
+        System.out.println(JSON.toJSONString(baojianContext.getFeeList(), true));
     }
 
     private static boolean isIn(LocalTime time, LocalTime begin, LocalTime end) {
