@@ -443,6 +443,8 @@ Executor框架主要由三个部分组成：任务、任务的执行、异步计
 
 ### [Guava线程池介绍](https://blog.csdn.net/qq_36042938/article/details/109182992)
 
+[CompletableFuture使用场景和实现原理](https://mp.weixin.qq.com/s/CknffYLn_kXdDumb_SZN0w)
+
 ### [CompletableFuture回调函数](https://blog.csdn.net/winterking3/article/details/116025829)
 
 
