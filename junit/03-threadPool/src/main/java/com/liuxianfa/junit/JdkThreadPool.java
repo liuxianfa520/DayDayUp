@@ -42,9 +42,9 @@ public class JdkThreadPool {
                                                                               new ThreadPoolExecutor.CallerRunsPolicy());
 
 
-    public static void sleep(long l) {
+    public static void sleep(long second) {
         try {
-            Thread.sleep(l * 1000);
+            Thread.sleep(second * 1000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
