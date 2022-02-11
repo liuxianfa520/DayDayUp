@@ -14,7 +14,7 @@ import static com.liuxianfa.junit.JdkThreadPool.sleep;
  *
  * parallelism = Runtime.getRuntime().availableProcessors() - 1
  *
- * 详见: java.util.concurrent.ForkJoinPool#makeCommonPool()
+ * 详见:  ForkJoinPool#makeCommonPool
  *
  * </pre>
  *
@@ -22,6 +22,11 @@ import static com.liuxianfa.junit.JdkThreadPool.sleep;
  * @date 2022/2/11 18:31
  */
 public class ForkJoinPoolTest {
+
+    static {
+        // 设置并行度
+        System.setProperty("java.util.concurrent.ForkJoinPool.common.parallelism", "1");
+    }
 
     static ForkJoinPool commonForkJoinPool = ForkJoinPool.commonPool();
 
