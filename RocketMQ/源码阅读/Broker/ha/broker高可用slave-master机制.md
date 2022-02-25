@@ -12,6 +12,14 @@ broker高可用（HA），其实就是每个broker节点都有复制——slave�
 
 本文只讨论第一种第一种情况，使用 `HAService` 来实现主从数据同步的。
 
+
+
+# 流程图
+
+[RocketMQ 主从同步 https://bpmhvbyegn.feishu.cn/docs/doccnB0W7Epc4vehMpSAHaOa8Mb](https://bpmhvbyegn.feishu.cn/docs/doccnB0W7Epc4vehMpSAHaOa8Mb)
+
+
+
 # 说明
 
 broker分为maste和slave：
