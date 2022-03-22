@@ -15,7 +15,7 @@ import java.util.Collections;
  * 主配置类
  *
  * @author LiuXianfa
- * @email xianfaliu@newbanker.cn
+ * 
  * @date 4/8 19:14
  */
 @Configurable

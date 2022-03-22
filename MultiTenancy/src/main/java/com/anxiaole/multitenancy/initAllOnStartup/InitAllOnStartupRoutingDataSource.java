@@ -25,7 +25,7 @@ import static com.anxiaole.multitenancy.utils.Utils.jdbcPrefix;
  * 在启动时一次性把所有租户的数据源都初始化完毕 的多租户切换数据源
  *
  * @author LiuXianfa
- * @email xianfaliu@newbanker.cn
+ * 
  * @date 4/8 19:05
  */
 public class InitAllOnStartupRoutingDataSource extends AbstractRoutingDataSource {

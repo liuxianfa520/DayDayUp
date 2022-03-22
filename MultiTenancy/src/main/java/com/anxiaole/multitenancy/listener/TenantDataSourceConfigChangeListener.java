@@ -10,7 +10,7 @@ import static com.anxiaole.multitenancy.utils.Utils.pathToTenantId;
 
 /**
  * @author LiuXianfa
- * @email xianfaliu@newbanker.cn
+ * 
  * @date 4/11 0:47
  */
 public class TenantDataSourceConfigChangeListener implements org.I0Itec.zkclient.IZkDataListener {

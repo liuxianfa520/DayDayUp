@@ -24,7 +24,7 @@ import static com.anxiaole.multitenancy.utils.Utils.jdbcPrefix;
  * 懒加载租户数据源 —— 在程序使用租户的数据源时,才去初始化此租户的数据源.
  *
  * @author LiuXianfa
- * @email xianfaliu@newbanker.cn
+ * 
  * @date 4/8 19:05
  */
 public class LazyLoadRoutingDataSource extends AbstractRoutingDataSource {

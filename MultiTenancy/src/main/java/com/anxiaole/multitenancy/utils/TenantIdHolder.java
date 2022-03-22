@@ -2,7 +2,7 @@ package com.anxiaole.multitenancy.utils;
 
 /**
  * @author LiuXianfa
- * @email xianfaliu@newbanker.cn
+ * 
  * @date 4/10 22:16
  */
 public class TenantIdHolder {

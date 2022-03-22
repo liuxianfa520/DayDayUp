@@ -15,7 +15,7 @@ import javax.sql.DataSource;
  * 新租户 监听器
  *
  * @author LiuXianfa
- * @email xianfaliu@newbanker.cn
+ * 
  * @date 4/11 1:11
  */
 public class TenantAddListener implements IZkChildListener {

@@ -32,7 +32,7 @@ import lombok.SneakyThrows;
  * </pre>
  *
  * @author LiuXianfa
- * @email xianfaliu@newbanker.cn
+ * 
  * @date 4/11 1:43
  */
 @Configurable

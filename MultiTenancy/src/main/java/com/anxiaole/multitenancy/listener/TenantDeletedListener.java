@@ -11,7 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * 租户移除 监听器
  *
  * @author LiuXianfa
- * @email xianfaliu@newbanker.cn
+ * 
  * @date 4/11 0:55
  */
 public class TenantDeletedListener implements IZkChildListener {

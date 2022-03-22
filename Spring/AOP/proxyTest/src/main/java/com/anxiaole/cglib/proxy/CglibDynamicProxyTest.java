@@ -52,7 +52,7 @@ import java.lang.reflect.Method;
  * </pre>
  *
  * @author LiuXianfa
- * @email xianfaliu@newbanker.cn
+ * 
  * @date 2/10 14:58
  */
 public class CglibDynamicProxyTest implements MethodInterceptor {

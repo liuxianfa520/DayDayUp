@@ -25,7 +25,7 @@ import lombok.experimental.Accessors;
 
 /**
  * @author LiuXianfa
- * @email xianfaliu@newbanker.cn
+ * 
  * @date 11/20 15:52
  */
 public class InternetFeeCalculation {

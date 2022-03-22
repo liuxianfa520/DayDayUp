@@ -10,7 +10,7 @@ import java.lang.reflect.InvocationTargetException;
 
 /**
  * @author LiuXianfa
- * @email xianfaliu@newbanker.cn
+ * 
  * @date 4/26 14:18
  */
 public class JavassistProxyTest {

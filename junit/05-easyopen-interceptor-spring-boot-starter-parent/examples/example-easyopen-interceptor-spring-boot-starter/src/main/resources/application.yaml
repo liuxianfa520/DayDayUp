@@ -1,0 +1,4 @@
+easyopen:
+  api-interceptor:
+    enable: true
+    enable-interceptors: tenantChooseInterceptor,xssFilter,loginInterceptor,ApiPermissionInterceptor

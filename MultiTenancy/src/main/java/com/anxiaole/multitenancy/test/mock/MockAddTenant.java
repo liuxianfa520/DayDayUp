@@ -15,7 +15,7 @@ import javax.annotation.PostConstruct;
  * 模拟:启动时向ZooKeeper中写入租户数据库配置信息
  *
  * @author LiuXianfa
- * @email xianfaliu@newbanker.cn
+ * 
  * @date 4/9 23:23
  */
 @Component

@@ -102,7 +102,7 @@ import java.lang.reflect.Proxy;
  * </pre>
  *
  * @author LiuXianfa
- * @email xianfaliu@newbanker.cn
+ * 
  * @date 2/9 14:08
  */
 public class JdkDynamicProxyTest implements InvocationHandler {

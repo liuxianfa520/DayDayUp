@@ -7,7 +7,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
  * @author LiuXianfa
- * @email xianfaliu@newbanker.cn
+ * 
  * @date 4/9 23:11
  */
 @Component

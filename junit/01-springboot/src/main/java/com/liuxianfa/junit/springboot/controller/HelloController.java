@@ -18,7 +18,7 @@ import lombok.Data;
 
 /**
  * @author LiuXianfa
- * @email xianfaliu@newbanker.cn
+ * 
  * @date 3/17 16:44
  */
 @RestController
