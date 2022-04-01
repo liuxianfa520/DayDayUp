@@ -46,7 +46,7 @@
 
 ### 可靠的
 
-- 在数据传输过程中，每个数据包都需要对方ack，否则就会将数据包重新发送。
+- 在数据传输过程中，每个数据包都需要对方ack，否则超时重传。
 
 ### 流式通信协议
 
@@ -62,6 +62,8 @@
 
 ### 三次握手
 
+- 参考视频： https://www.bilibili.com/video/BV1Gf4y137dF
+
 - c syn s
 s syn-ack c
 c ack s
@@ -71,7 +73,7 @@ c ack s
 	- socket
 
 		- 套接字：四元组：源ip端口+目标ip端口
-	能确定唯一的链接
+		能确定唯一的链接
 		- Recv-Q
 
 			- 数据接收队列
@@ -85,7 +87,17 @@ c ack s
 ### 数据传输
 
 - 接收到数据后，都需要发送ack，
-否则会重新发送数据
+否则超时重传
+
+### 滑动窗口
+
+- 【TCP滑动窗口动态演示-哔哩哔哩】https://www.bilibili.com/video/BV1qi4y1V7cz
+- 滑动窗口演示 https://www.bilibili.com/video/BV1FE411C7dk 视频疑问：
+  - 疑问：发送0~4号数据包，0号数据包发送时丢失。Receiver没有收到0号数据包，Receiver不应该发送1、 2、 3、 4 的ack 才对吧？
+  - 解答：是的，这个视频有问题。
+  - 详见：https://www.bilibili.com/video/BV1p7411e7py  7:17
+  - ![image-20220401223419946](images/image-20220401223419946.png)
+- TCP两次挥手，你见过吗？那四次握手呢？ https://mp.weixin.qq.com/s/tWysfUVbOMa8CmdmJ_SUaQ 
 
 ### 传输控制层每隔一段时间，发送心跳ack包
 确保对方仍然存在。
@@ -133,11 +145,7 @@ tcpdump -nn -i eth0 port 8080
 
 ### RST 报文
 
-### 滑动窗口
 
-- 【TCP滑动窗口动态演示-哔哩哔哩】https://b23.tv/ZzlWWB
-
-- https://mp.weixin.qq.com/s/tWysfUVbOMa8CmdmJ_SUaQ TCP两次挥手，你见过吗？那四次握手呢？
 
 ## 为什么要学习IO和Epoll
 
