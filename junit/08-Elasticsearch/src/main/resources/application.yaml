@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: Elasticsearch
+  elasticsearch:
+    rest:
+      uris: http://localhost:9200
+      username:
+      password:
+      connection-timeout:
+      read-timeout:
