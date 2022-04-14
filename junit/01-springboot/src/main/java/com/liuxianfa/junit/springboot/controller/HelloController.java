@@ -60,10 +60,10 @@ public class HelloController {
         @JsonFormat(pattern = DatePattern.CHINESE_DATE_PATTERN)
         Date dateCn = new Date();
 
-        @JsonSerialize(using = StringDateSerializer.NORM_DATE_FORMAT.class)
+        @JsonSerialize(using = StringDateSerializer.NormDateFormatJsonSerializer.class)
         String tradeDateString = "20210503";
 
-        @JsonSerialize(using = StringDateSerializer.CHINESE_DATE_PATTERN.class)
+        @JsonSerialize(using = StringDateSerializer.ChineseDatePatternJsonSerializer.class)
         String tradeDateCnString = "20210503";
 
         /**

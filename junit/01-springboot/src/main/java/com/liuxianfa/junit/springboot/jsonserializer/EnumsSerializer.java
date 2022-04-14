@@ -83,13 +83,17 @@ public interface EnumsSerializer {
         try {
             Object[] enumConstants = jsonEnumSerialize.enumClass().getEnumConstants();
             if (enumConstants != null && enumConstants.length > 0) {
+                String desc = null;
                 for (Object enumConstant : enumConstants) {
                     if (Objects.equals(invokeEnumMethod(enumConstant, "getCode"), value)) {
-                        return String.valueOf(invokeEnumMethod(enumConstant, "getRemark"));
+                        desc = String.valueOf(invokeEnumMethod(enumConstant, "getRemark"));
                     } else if (Objects.equals(invokeEnumMethod(enumConstant, "getValue"), value)) {
-                        return String.valueOf(invokeEnumMethod(enumConstant, "getCnName"));
+                        desc = String.valueOf(invokeEnumMethod(enumConstant, "getCnName"));
                     } else if (Objects.equals(invokeEnumMethod(enumConstant, "getValue"), value)) {
-                        return String.valueOf(invokeEnumMethod(enumConstant, "getCnName", "getName"));
+                        desc = String.valueOf(invokeEnumMethod(enumConstant, "getCnName", "getName"));
+                    }
+                    if (StrUtil.isNotEmpty(desc)) {
+                        return desc;
                     }
                 }
             }
@@ -116,6 +120,6 @@ public interface EnumsSerializer {
             } catch (Exception ignored) {
             }
         }
-        throw new RuntimeException();
+        return "";
     }
 }
