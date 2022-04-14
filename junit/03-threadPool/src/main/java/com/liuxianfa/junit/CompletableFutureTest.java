@@ -18,13 +18,40 @@ public class CompletableFutureTest {
 
     public static void main(String[] args) {
 //        completableFuture并行度();
+        thenAccept();
 
-
-        其中一个任务异常();
+//        其中一个任务异常();
 
 
     }
 
+
+    /**
+     * thenAccept 方法是否按照提交顺序执行的?
+     */
+    private static void thenAccept() {
+        AtomicInteger atomicInteger = new AtomicInteger();
+
+        for (int i = 0; i < 10; i++) {
+            // 在线程池中,异步执行. 乱序
+            CompletableFuture.completedFuture("")
+                             .thenAcceptAsync(s -> {
+                                 sleep(1);
+                                 System.out.println(Thread.currentThread().getName() + "\t\t" + atomicInteger.incrementAndGet());
+                             });
+        }
+
+
+        AtomicInteger atomicInteger2 = new AtomicInteger();
+        for (int i = 0; i < 10; i++) {
+            // 在main方法中,阻塞、按照提交顺序执行的.
+            CompletableFuture.completedFuture("")
+                             .thenAccept(s -> {
+                                 sleep(1);
+                                 System.out.println(Thread.currentThread().getName() + "\t\t" + atomicInteger2.incrementAndGet());
+                             });
+        }
+    }
 
     /**
      * 说明:总共4个任务,其中i=3这个任务会抛出异常(模拟其中一个任务会抛异常.) 此时在join()处会抛出异常.
