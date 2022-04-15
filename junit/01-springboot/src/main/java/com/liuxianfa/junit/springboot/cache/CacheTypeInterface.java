@@ -55,6 +55,10 @@ public interface CacheTypeInterface {
         int CACHE_EXPIRE_IN_SECONDS = 28800;
         /**
          * 缓存名
+         * <p>
+         * 注意: 只有重写了 RedisCacheManager 才能设置过期时间
+         * <p>
+         * 参考: {@link RedisAutoCacheManager}
          */
         String CACHE_NAME = CACHE_NAME_PREFIX + "#" + CACHE_EXPIRE_IN_SECONDS;
 
