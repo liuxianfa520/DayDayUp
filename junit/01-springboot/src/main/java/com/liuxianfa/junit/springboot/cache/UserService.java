@@ -24,7 +24,7 @@ public class UserService {
     /**
      * 需要在启动类上:  @EnableCaching  使用这个注解
      */
-    @Cacheable(cacheNames = "01-springboot:user:birthday", keyGenerator = "simpleDateKeyGenerator")
+    @Cacheable(cacheNames = CacheTypeInterface.User.CACHE_NAME, keyGenerator = "simpleDateKeyGenerator")
     public String getUserNameByDate(Date birthday) {
         System.out.println("todo:从数据库中查询用户名称.....");
         return "张三";
