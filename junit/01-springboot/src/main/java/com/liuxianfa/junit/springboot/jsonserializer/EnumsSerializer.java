@@ -19,7 +19,7 @@ import cn.hutool.core.util.StrUtil;
 /**
  * 枚举 序列化器
  *
- * @author xianfaliu2@creditease.cn
+ * @author xianfaliu
  * @date 2022/4/12 15:45
  */
 public interface EnumsSerializer {

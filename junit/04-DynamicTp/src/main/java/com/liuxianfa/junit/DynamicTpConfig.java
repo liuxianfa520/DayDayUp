@@ -14,7 +14,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * @author xianfaliu2@creditease.cn
+ * @author xianfaliu
  * @date 2022/1/29 22:53
  */
 @Configuration

@@ -21,7 +21,7 @@ import java.util.Objects;
  * }
  * </pre>
  *
- * @author xianfaliu2@creditease.cn
+ * @author xianfaliu
  * @date 2022/1/12 21:43
  */
 public interface BigDecimalSerializer {

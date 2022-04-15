@@ -18,7 +18,7 @@ import static com.liuxianfa.junit.JdkThreadPool.sleep;
  *
  * </pre>
  *
- * @author xianfaliu2@creditease.cn
+ * @author xianfaliu
  * @date 2022/2/11 18:31
  */
 public class ForkJoinPoolTest {

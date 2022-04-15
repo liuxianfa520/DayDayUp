@@ -3,7 +3,7 @@ package com.liuxianfa.junit;
 import java.util.Arrays;
 
 /**
- * @author xianfaliu2@creditease.cn
+ * @author xianfaliu
  * @date 2022/3/31 13:03
  */
 public class 奇数在前偶数在后 {

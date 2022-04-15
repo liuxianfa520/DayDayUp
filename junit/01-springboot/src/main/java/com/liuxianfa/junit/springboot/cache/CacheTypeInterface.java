@@ -18,7 +18,6 @@ import static java.util.stream.Collectors.toList;
 /**
  * 缓存类型及过期时间
  *
- * @author xianfaliu2@creditease.cn
  * @date 2022/1/17 18:43
  */
 public interface CacheTypeInterface {

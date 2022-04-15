@@ -11,7 +11,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.util.Date;
 
 /**
- * @author xianfaliu2@creditease.cn
+ * @author xianfaliu
  * @date 2022/4/15 17:23
  */
 @SpringBootTest(classes = SpringbootApplication.class)

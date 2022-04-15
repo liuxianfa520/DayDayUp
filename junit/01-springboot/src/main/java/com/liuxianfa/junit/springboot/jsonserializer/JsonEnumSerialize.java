@@ -13,7 +13,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 /**
  * 指定字段的枚举类
  *
- * @author xianfaliu2@creditease.cn
+ * @author xianfaliu
  * @date 2022/4/14 17:01
  */
 @Retention(RUNTIME)

@@ -9,7 +9,7 @@ import cn.hutool.json.JSONUtil;
 /**
  * https://www.hutool.cn/docs/#/db/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%AE%80%E5%8D%95%E6%93%8D%E4%BD%9C-Db?id=%e4%bd%bf%e7%94%a8
  *
- * @author xianfaliu2@creditease.cn
+ * @author xianfaliu
  * @date 2022/4/2 15:58
  */
 public class DbUtilTest {

@@ -16,7 +16,7 @@ import cn.hutool.core.map.MapUtil;
 import cn.hutool.json.JSONUtil;
 
 /**
- * @author xianfaliu2@creditease.cn
+ * @author xianfaliu
  * @date 2022/4/6 11:05
  */
 @SpringBootTest(classes = MeheEsApplication.class)

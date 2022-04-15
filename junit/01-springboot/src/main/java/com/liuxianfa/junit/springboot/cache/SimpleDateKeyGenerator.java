@@ -15,7 +15,6 @@ import cn.hutool.core.date.DateUtil;
  * <p>
  * 使用场景:如果方法参数是 java.util.Date 类型的,则把Date转成简单日期格式:yyyyMMdd格式
  *
- * @author xianfaliu2@creditease.cn
  * @date 2022/4/15 16:52
  */
 @Component

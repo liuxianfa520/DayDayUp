@@ -5,7 +5,7 @@ import java.nio.charset.Charset;
 import cn.hutool.core.io.FileUtil;
 
 /**
- * @author xianfaliu2@creditease.cn
+ * @author xianfaliu
  * @date 2022/4/1 16:56
  */
 public class FileTest {
