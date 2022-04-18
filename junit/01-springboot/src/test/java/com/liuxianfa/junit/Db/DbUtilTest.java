@@ -19,6 +19,11 @@ public class DbUtilTest {
     }
 
     private static void crud() throws SQLException {
+
+        // sql
+        System.out.println(Db.use().query("select * from t_user"));
+
+
         Db.use().insert(
                 Entity.create("t_user")
                       .set("name", "unitTestUser")
