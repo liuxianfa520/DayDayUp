@@ -1,4 +1,4 @@
-package com.liuxianfa.junit.Db;
+package com.liuxianfa.junit.hutool.db;
 
 import java.sql.SQLException;
 

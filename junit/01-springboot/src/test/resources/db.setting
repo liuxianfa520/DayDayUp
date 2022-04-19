@@ -1,4 +1,20 @@
-url = jdbc:mysql://localhost:3306/user?useSSL=false&useUnicode=true&characterEncoding=UTF-8
+# 默认
+url = jdbc:mysql://localhost:13306/user?useSSL=false&useUnicode=true&characterEncoding=UTF-8
+user = root
+pass = root
+
+
+# 开发环境
+[dev]
+url = jdbc:mysql://localhost:13306/dev?useSSL=false&useUnicode=true&characterEncoding=UTF-8
+user = root
+pass = root
+
+
+
+# 测试环境
+[test]
+url = jdbc:mysql://localhost:13306/test?useSSL=false&useUnicode=true&characterEncoding=UTF-8
 user = root
 pass = root
 
