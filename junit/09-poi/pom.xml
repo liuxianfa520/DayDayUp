@@ -14,7 +14,18 @@
         <dependency>
             <groupId>com.deepoove</groupId>
             <artifactId>poi-tl</artifactId>
-            <version>1.11.1</version>
+            <version>1.10.0</version>
+        </dependency>
+        <!-- html插件   https://github.com/draco1023/poi-tl-ext   -->
+        <dependency>
+            <groupId>io.github.draco1023</groupId>
+            <artifactId>poi-tl-ext</artifactId>
+            <version>0.3.14</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.8.1</version>
         </dependency>
 
 
