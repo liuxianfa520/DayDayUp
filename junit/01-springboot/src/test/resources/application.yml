@@ -1,3 +1,5 @@
 spring:
+  application:
+    name: 01-springboot
   profiles:
     active: dev
