@@ -25,11 +25,12 @@ public class ConditionalJsonSerializer extends JsonSerializer implements Context
     @Override
     public void serialize(Object value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
         if (value == null) {
-            serializers.findNullValueSerializer(beanProperty);
+            serializers.findNullValueSerializer(beanProperty).serialize(value, gen, serializers);
             return;
         }
         if (beanProperty == null) {
             serializeValue(value, gen, serializers);
+            return;
         }
 
         ConditionalJsonSerialize annotation = beanProperty.getAnnotation(ConditionalJsonSerialize.class);
@@ -46,6 +47,8 @@ public class ConditionalJsonSerializer extends JsonSerializer implements Context
             Boolean eq = new SpelExpressionParser().parseExpression(expression).getValue(Boolean.class);
             if (eq != null && eq) {
                 serializeValue(value, gen, serializers);
+            } else {
+                serializers.findNullValueSerializer(beanProperty).serialize(value, gen, serializers);
             }
         } catch (Exception e) {
             throw new RuntimeException("序列化失败", e);
@@ -53,7 +56,7 @@ public class ConditionalJsonSerializer extends JsonSerializer implements Context
     }
 
     private void serializeValue(Object value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
-        serializers.findKeySerializer(value.getClass(), beanProperty).serialize(value, gen, serializers);
+        serializers.findValueSerializer(value.getClass(), beanProperty).serialize(value, gen, serializers);
     }
 
     /**
