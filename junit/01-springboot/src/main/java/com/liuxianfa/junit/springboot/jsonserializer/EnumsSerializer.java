@@ -11,9 +11,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.lang.reflect.Method;
+import java.lang.reflect.Field;
 import java.util.Objects;
 
+import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 
 /**
@@ -66,34 +67,32 @@ public interface EnumsSerializer {
     /**
      * 根据枚举key获取中文描述
      *
-     * @param value             枚举key值
-     * @param jsonEnumSerialize 枚举class
+     * @param value      枚举key值
+     * @param annotation 枚举class
      * @return 枚举的中文描述
      */
-    static String getEnumCnDesc(String value, JsonEnumSerialize jsonEnumSerialize) {
+    static String getEnumCnDesc(String value, JsonEnumSerialize annotation) {
         // 没有指定枚举,返回原字符串
-        if (jsonEnumSerialize == null) {
+        if (annotation == null) {
             return value;
         }
         // 指定的class不是枚举,返回原字符串
-        if (!jsonEnumSerialize.enumClass().isEnum()) {
+        if (!annotation.enumClass().isEnum()) {
             return value;
         }
 
         try {
-            Object[] enumConstants = jsonEnumSerialize.enumClass().getEnumConstants();
+            Object[] enumConstants = annotation.enumClass().getEnumConstants();
             if (enumConstants != null && enumConstants.length > 0) {
                 String desc = null;
                 for (Object enumConstant : enumConstants) {
-                    if (Objects.equals(invokeEnumMethod(enumConstant, "getCode"), value)) {
-                        desc = String.valueOf(invokeEnumMethod(enumConstant, "getRemark"));
-                    } else if (Objects.equals(invokeEnumMethod(enumConstant, "getValue"), value)) {
-                        desc = String.valueOf(invokeEnumMethod(enumConstant, "getCnName"));
-                    } else if (Objects.equals(invokeEnumMethod(enumConstant, "getValue"), value)) {
-                        desc = String.valueOf(invokeEnumMethod(enumConstant, "getCnName", "getName"));
-                    }
-                    if (StrUtil.isNotEmpty(desc)) {
-                        return desc;
+                    String keyFieldName = annotation.enumKeyField();
+                    String descFieldName = annotation.enumDescField();
+                    if (Objects.equals(getEnumFieldValue(enumConstant, keyFieldName), value)) {
+                        desc = String.valueOf(getEnumFieldValue(enumConstant, descFieldName));
+                        if (StrUtil.isNotEmpty(desc)) {
+                            return desc;
+                        }
                     }
                 }
             }
@@ -105,20 +104,18 @@ public interface EnumsSerializer {
 
 
     /**
-     * 调用此枚举对象的指定方法
+     * 获取枚举中指定字段的值
      *
-     * @param enumObject  枚举对象
-     * @param methodNames 枚举方法
-     * @return 指定方法的返回值
+     * @param enumObject 枚举对象
+     * @param fieldName  枚举类中字段明
+     * @return 获取枚举中指定字段的值
      */
-    static String invokeEnumMethod(Object enumObject, String... methodNames) {
-        for (String methodName : methodNames) {
-            try {
-                Method method = enumObject.getClass().getMethod(methodName);
-                Object invoke = method.invoke(enumObject);
-                return String.valueOf(invoke);
-            } catch (Exception ignored) {
-            }
+    static String getEnumFieldValue(Object enumObject, String fieldName) {
+        try {
+            Field code = ReflectUtil.getField(enumObject.getClass(), fieldName);
+            code.setAccessible(true);
+            return String.valueOf(code.get(enumObject));
+        } catch (Exception ignored) {
         }
         return "";
     }

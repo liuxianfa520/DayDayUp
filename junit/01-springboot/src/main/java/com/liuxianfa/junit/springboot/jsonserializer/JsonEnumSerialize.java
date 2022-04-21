@@ -24,15 +24,18 @@ public @interface JsonEnumSerialize {
 
     /**
      * 指定枚举类
-     * <pre>
-     * 仅支持以下几种字段的枚举:
-     * value     cnName
-     * value     name
-     * code      remark
-     * </pre>
      */
     Class<?> enumClass();
 
+    /**
+     * 枚举的key字段名称
+     */
+    String enumKeyField() default "code";
+
+    /**
+     * 枚举的中文描述字段名称
+     */
+    String enumDescField() default "remark";
 
     /**
      * 枚举输出的新字段名称
