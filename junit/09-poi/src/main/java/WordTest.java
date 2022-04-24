@@ -19,7 +19,7 @@ import cn.hutool.core.map.MapUtil;
 public class WordTest {
 
     public static void main(String[] args) throws Exception {
-        HashMap<String, Object> param = new HashMap<>();
+        HashMap<String, Object> param = new HashMap<String, Object>();
         param.put("comName", "百度");
         param.put("address", "北京-软件园");
         param.put("mobile", "010-651xxx151");
@@ -36,6 +36,7 @@ public class WordTest {
 
         InputStream templateInputStream = WordTest.class.getResourceAsStream("template.docx");
         Configure config = Configure.builder()
+                                    .useSpringEL()
                                     .bind("fuhao", new HtmlRenderPolicy())
                                     .bind("biz", new LoopRowTableRenderPolicy())
                                     .bind("prd", new LoopRowTableRenderPolicy())
@@ -45,5 +46,6 @@ public class WordTest {
         // 导出的文件保存到临时文件夹中.
         String tmpFileName = "D://" + System.currentTimeMillis() + ".docx";
         template.writeAndClose(new FileOutputStream(tmpFileName));
+        System.out.println("生成的文件在:" + tmpFileName);
     }
 }
