@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.ReUtil;
 import cn.hutool.core.util.StrUtil;
 import lombok.SneakyThrows;
@@ -36,8 +37,8 @@ public class LatexTest {
     @SneakyThrows
     private static void extracted() {
         ArrayList<String> lines = new ArrayList<>();
-//        FileUtil.readLines(LatexTest.class.getResource("latex.txt"), "utf-8", lines);
-        lines.add("φ_{C_{2}H_{6}·g}");
+        FileUtil.readLines(LatexTest.class.getResource("latex.txt"), "utf-8", lines);
+//        lines.add("φ_{C_{2}H_{6}·g}");
         List<HashMap<Object, Object>> list = lines.stream()
                                                   .map(s -> String.format("$$ %s $$", s))
                                                   .map(latex -> {
