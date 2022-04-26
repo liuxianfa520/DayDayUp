@@ -29,6 +29,8 @@ public class WordTest {
 
     private static void base() throws IOException {
         HashMap<String, Object> param = new HashMap<String, Object>();
+        // {{T(java.lang.Integer).parseInt(testKey1)/1000}}kg
+        param.put("testKey1", "18000");
         param.put("comName", "百度");
         param.put("address", "北京-软件园");
         param.put("mobile", "010-651xxx151");
