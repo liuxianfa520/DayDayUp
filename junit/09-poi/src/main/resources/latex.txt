@@ -217,7 +217,7 @@ V_{f.b}
 q_{v}
 P_{f.b}
 t_{fg.Cond.Lv.D}
-\eta_{D}
+η_{D}
 --
 Q_{net.ar}
 Q_{gr.ar}
@@ -227,22 +227,33 @@ Q_{in.a}
 A_{SH}
 A_{Rh}
 A_{cond}
-\varphi _{CH_4·g}
-\varphi _{C_{2}H_{6}·g}
-\varphi _{C_{3}H_{8}·g}
-\varphi _{C_{4}H_{10}·g}
-\varphi _{C_{5}H_{12}·g}
-\varphi _{H_{2}·g}
-\varphi _{O_{2}·g}
-\varphi _{N_{2}·g}
-\varphi _{CO·g}
-\varphi _{CO_{2}·g}
-\varphi _{H_{2}S·g}
-\varphi \sum_{C_{m}H_{n}·g}
+φ_{CH_4·g}
+φ_{C2H6·g}
+φ_{C3H8·g}
+φ_{C4H10·g}
+φ_{C5H12·g}
+φ_{H2·g}
+φ_{O2·g}
+φ_{N2·g}
+φ_{CO·g}
+φ_{CO2·g}
+φ_{H2S·g}
+φ∑_{CmHn·g}
 V_{F.H_2O.g}
 h_{ab.F}
 V_{F.Ash.g}
-\rho_F.g
+ρ_F.g
+φ_{CH_4·g}
+φ_{C_{2}H_{6}·g}
+φ_{C_{3}H_{8}·g}
+φ_{C_{4}H_{10}·g}
+φ_{C_{5}H_{12}·g}
+φ_{H_{2}·g}
+φ_{O_{2}·g}
+φ_{N_{2}·g}
+φ_{CO_{2}·g}
+φ_{H_{2}S·g}
+φ∑_{C_{m}H_{n}·g}
 Q_{qr.ar}
 Vr_{F.FI}
 Mr_{W.Bd}
@@ -257,7 +268,6 @@ P_{Cond.Lv}
 Mr_{FW.FI}
 t_{FW.FI}
 p_{st.Sat}
-\omega
 Mr_{BW.Sa}
 Mr_{Sut.Fl}
 Mr_{Sut.Sa}
@@ -276,14 +286,14 @@ t_{re}
 t_{a.d}
 h_{RH.a}
 p_{at}
-\varphi_{CO_{2}.fg}
-\varphi_{SO_{2}.fg}
-\varphi_{O_{2}.fg}
-\varphi_{CO.fg}
-\varphi_{H_{2}.fg}
-\varphi_{SO_{x}.fg}
-\varphi\sum_{C_mH_n.fg}
-\varphi_{CH_{4}.fg}
+φ_{CO_{2}.fg}
+φ_{SO_{2}.fg}
+φ_{O_{2}.fg}
+φ_{CO.fg}
+φ_{H_{2}.fg}
+φ_{SO_{x}.fg}
+φ∑_{C_mH_n.fg}
+φ_{CH_{4}.fg}
 t_{fg.Cond.Lv}
 t_2
 h_{RH.fg.i}
@@ -292,7 +302,7 @@ t_{F}
 Q_X
 EX
 t_{a}
- \eta_1
+ η_1
 H_{Sat}
 Qr_{Bd}
 Qr_{HW.Cond}
@@ -306,10 +316,10 @@ Qr_{O.Sut}
 D_{ev.Sut.O.M}
 Qr_1
 h_{ab.a}
-\varphi_{RO_{2}.fg}
-\varphi_{N_{2}.fg}
+φ_{RO_{2}.fg}
+φ_{N_{2}.fg}
 V_{a.d.th.g}
-\alpha
+α
 V_{a.d.g}
 V_{a.H_2O.g}
 V_{a.w.g}
@@ -320,7 +330,6 @@ H_{HW.En}
 H_{HW.Lv}
 H_{Cond.En}
 H_{Cond.Lv}
-\gamma
 H_{Sut}
 H_{WJ}
 H_{Sut.Rh.Lv}
@@ -350,7 +359,7 @@ q_{p.B.a.d.net}
 q_{p.B.a.d.gr}
 H_{a.H_{2}O.g.En}
 H_{a.H_{2}O.g.Re}
-q_{p.B.H_{2}O.net}
+q_{p.B.H2O.net}
 H_{a.H_{2}O.l.Re}
 q_{p.B.H_{2}O.gr}
 H_{F.En}
@@ -359,16 +368,15 @@ q_{p.B.F.net}
 q_{p.B.F.gr}
 q_{p.B.X.net}
 q_{p.B.X.gr}
- \eta_{2}
- \eta_{2.gr}
- \eta_{1,2}
- \eta_{1,2gr}
+ η_{2}
+η_{2.gr}
+ η_{1,2gr}
 H_{Sat.D}
 H_{FW.D}
 D_{ev.Sat.cr}
 H_{Sut.D}
 D_{ev.Sut.cr}
- \eta_{1.gr}
+η_{1.gr}
 t_{ex.rec}
 t_{pd}
 t_{as}
@@ -438,20 +446,18 @@ Q_out
 C_s
 C_N
 C_{CO}
-\varphi_{O2.N}
-\varphi_{O2}
+φ_{O2.N}
+φ_{O2}
 P_d
 P_s
 C_{cS}
 C_{cN}
 C'_S
 C'_N
-\rho_n
-\rho_s
 V_S
 C'_P
 φ_{O2.c}
-\%
+%
 kJ/kg
 kg/h
 g/m^3
@@ -489,8 +495,9 @@ q_{6.cr}
 η_{2.cr}
 D_{con}
 α_D
+个
 kg/h
-\%
+%
 kg/m^{3}
 ℃
 ^{o}E
@@ -512,26 +519,25 @@ kV
 A
 H_{Z}
 m2
-kJ/h
 M_{Pa}
 m^3
 W/m^3
-％
---
+单位
 kJ/m3
 m^3/h
 Pa
 m^2
-\% / m^3/m^3
+% / m^3/m^3
 g/m^3
 kg/m^3
+m^3/m^3
 kJ/m^3
 kWh/h
+kJ/h
 GJ/h
 t/h
-m^3/m^3
 hPa
-kJ/(m^3\cdot℃)
+kJ/(m^3·℃)
 C^o
 mm
 min
