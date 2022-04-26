@@ -1,6 +1,7 @@
 import com.deepoove.poi.XWPFTemplate;
 import com.deepoove.poi.config.Configure;
 import com.deepoove.poi.plugin.table.LoopRowTableRenderPolicy;
+import com.deepoove.poi.render.compute.SpELRenderDataCompute;
 
 import org.ddr.poi.html.HtmlRenderPolicy;
 import org.ddr.poi.latex.LaTeXRenderPolicy;
@@ -9,6 +10,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,9 +25,8 @@ import cn.hutool.core.util.StrUtil;
 public class WordTest {
 
     public static void main(String[] args) throws Exception {
-//        base();
-
-        test_latexTextRm();
+        base();
+//        test_latexTextRm();
     }
 
     private static void test_latexTextRm() {
@@ -56,7 +57,10 @@ public class WordTest {
 
         InputStream templateInputStream = WordTest.class.getResourceAsStream("template.docx");
         Configure config = Configure.builder()
+                                    // 启用spring el
                                     .useSpringEL()
+                                    // 设置spring el的数据计算器.并且设置非严格模式.isStrict=false
+                                    .setRenderDataComputeFactory(model -> new SpELRenderDataCompute(model, false, Collections.emptyMap()))
                                     .bind("fuhao", new HtmlRenderPolicy())
                                     // latex 使用 \textrm 取消斜体
                                     .bind("fuhao_latex", new LaTeXRenderPolicy())
