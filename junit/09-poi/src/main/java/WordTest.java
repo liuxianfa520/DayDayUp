@@ -16,8 +16,6 @@ import java.util.Map;
 
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.map.MapUtil;
-import cn.hutool.core.util.ReUtil;
-import cn.hutool.core.util.StrUtil;
 
 /**
  * @date 2022/4/19 10:15
@@ -26,18 +24,8 @@ public class WordTest {
 
     public static void main(String[] args) throws Exception {
         base();
-//        test_latexTextRm();
     }
 
-    private static void test_latexTextRm() {
-        System.out.println(latexTextRm("$$ 2K_2Cr_2O7$$"));
-        System.out.println(latexTextRm("$$ 36Fe_3O_4 $$"));
-        System.out.println(latexTextRm("$$ 62H_2SO_4 $$"));
-        System.out.println(latexTextRm("$$ 18Fe_2 $$"));
-        System.out.println(latexTextRm("$$ 2Cr_2 $$"));
-        System.out.println(latexTextRm("$$ 31H_2O $$"));
-        System.out.println(latexTextRm("$$ CO_2 $$"));
-    }
 
     private static void base() throws IOException {
         HashMap<String, Object> param = new HashMap<String, Object>();
@@ -75,28 +63,5 @@ public class WordTest {
         String tmpFileName = "D://" + System.currentTimeMillis() + ".docx";
         template.writeAndClose(new FileOutputStream(tmpFileName));
         System.out.println("生成的文件在:" + tmpFileName);
-    }
-
-    /**
-     * 把公式转成正体格式
-     *
-     * @param latex latex公式
-     */
-    public static String latexTextRm(String latex) {
-        if (StrUtil.isEmpty(latex)) {
-            return "";
-        }
-        latex = latex.replaceAll("[$]", "").trim();
-        latex = ReUtil.replaceAll(latex, "(.*?)_\\{(.*?)\\}", "$1\\textrm_{$2}");
-        latex = ReUtil.replaceAll(latex, "(.*?)\\^\\{(.*?)\\}", "$1\\textrm^{$2}");
-
-        // 部分公式,没有{}大括号      比如:   CO_2
-        latex = ReUtil.replaceAll(latex, "(.*?)_(.)", "\\textrm{$1}_\\textrm{$2}");
-        latex = ReUtil.replaceAll(latex, "(.*?)\\^(.)", "\\textrm{$1}^\\textrm{$2}");
-
-        if (!latex.endsWith("}")) {
-            latex = ReUtil.replaceAll(latex, "(.*)\\}(.*)", "$1\\textrm{$2}");
-        }
-        return String.format("$$ %s $$", latex);
     }
 }
