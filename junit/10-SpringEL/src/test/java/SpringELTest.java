@@ -28,6 +28,10 @@ public class SpringELTest {
     class User {
         String name;
         Integer age;
+
+        public String getAge() {
+            return age + "岁";
+        }
     }
 
     @Test
@@ -92,6 +96,17 @@ public class SpringELTest {
         // 自定义函数,使用 #myFunction()
         context.registerFunction("toInt", SpringELTest.class.getMethod("toInt", String.class));
         context.setVariable("number", "18000");
+        System.out.println(expression.getValue(context));
+    }
+
+    @Test
+    @SneakyThrows
+    public void 使用root对象自带的方法() {
+        // 如果使用root对象的实例方法,就不需要使用 # 号前缀了.
+        String expressionString = "getName() +','+ getAge()";
+        ExpressionParser parser = new SpelExpressionParser();
+        Expression expression = parser.parseExpression(expressionString);
+        StandardEvaluationContext context = new StandardEvaluationContext(new User("安小乐", 18));
         System.out.println(expression.getValue(context));
     }
 }
