@@ -20,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class ConditionalJsonSerializer extends JsonSerializer implements ContextualSerializer {
+    private static final SpelExpressionParser expressionParser = new SpelExpressionParser();
     private BeanProperty beanProperty = null;
 
     @Override
@@ -43,8 +44,8 @@ public class ConditionalJsonSerializer extends JsonSerializer implements Context
             String condition = annotation.condition();
             // 解析spring中的占位符
             String expression = SpringUtil.getApplicationContext().getEnvironment().resolvePlaceholders(condition);
-            // spel
-            Boolean eq = new SpelExpressionParser().parseExpression(expression).getValue(Boolean.class);
+            // spel      context设置的是当前序列化的对象.如果需要设置变量和方法,可以使用: org.springframework.expression.spel.support.StandardEvaluationContext
+            Boolean eq = expressionParser.parseExpression(expression).getValue(gen.getCurrentValue(), Boolean.class);
             if (eq != null && eq) {
                 serializeValue(value, gen, serializers);
             } else {

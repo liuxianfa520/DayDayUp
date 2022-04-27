@@ -28,8 +28,9 @@ public @interface ConditionalJsonSerialize {
     /**
      * 条件表达式,当表达式返回true时,才会对此字段序列化.否则不序列化
      * <pre>
-     * 支持使用 ${} 引用spring的属性
-     * 比如: {@code '${spring.profiles.active}' == 'dev' }
+     * 支持使用 ${} 引用spring的属性 比如: '${spring.profiles.active}' == 'dev'
+     * 支持使用当前对象中的属性       比如:  name.equals('admin')
+     * 支持使用当前对象中的方法       比如:  hello().equals('Hello,admin')
      * </pre>
      */
     String condition() default "true";

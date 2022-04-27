@@ -36,4 +36,39 @@ public class ConditionalJsonSerializeTest {
         User user = new User("安小乐", "123456");
         System.out.println(objectMapper.writeValueAsString(user));
     }
+
+
+    @Data
+    @AllArgsConstructor
+    public static class User2 {
+        String name;
+        // 表达式中,可以使用当前对象中的字段,来作为判断条件
+        @ConditionalJsonSerialize(condition = "name.equals('admin')")
+        String hobby;
+    }
+
+    @Test
+    public void test2() throws JsonProcessingException {
+        System.out.println(objectMapper.writeValueAsString(new User2("admin", "吃饭,睡觉,打豆豆")));
+        System.out.println(objectMapper.writeValueAsString(new User2("豆豆", "吃饭,睡觉")));
+    }
+
+    @Data
+    @AllArgsConstructor
+    public static class User3 {
+        String name;
+        // 表达式中,可以使用当前对象中的方法,来作为判断条件
+        @ConditionalJsonSerialize(condition = "hello().equals('Hello,admin')")
+        String hobby;
+
+        public String hello() {
+            return String.format("Hello,%s", name);
+        }
+    }
+
+    @Test
+    public void test3() throws JsonProcessingException {
+        System.out.println(objectMapper.writeValueAsString(new User3("admin", "吃饭,睡觉,打豆豆")));
+        System.out.println(objectMapper.writeValueAsString(new User3("豆豆", "吃饭,睡觉")));
+    }
 }
