@@ -225,7 +225,7 @@ java -jar target/jmh-demo.jar StringConnectTest
 
 ### @OutputTimeUnit
 
-为统计结果的时间单位，可用于类或者方法注解
+统计结果的时间单位。可用于类或者方法注解
 
 ### @Warmup
 
