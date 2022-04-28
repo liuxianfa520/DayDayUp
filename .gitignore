@@ -11,3 +11,6 @@ rebel.xml
 /.settings/
 
 *.prefs
+
+#jmh 执行结果
+*result.json
