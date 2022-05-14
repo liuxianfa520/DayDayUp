@@ -1,6 +1,10 @@
 import com.alibaba.fastjson.JSON;
 
 import org.apache.http.HttpHost;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.elasticsearch.client.RestClient;
 
 import java.util.HashMap;
@@ -32,15 +36,12 @@ public class ElasticsearchClientTest {
     }
 
     public static void setUp() {
-        // Create the low-level client
-        RestClient restClient = RestClient.builder(new HttpHost("127.0.0.1", 9200)).build();
-
-
-        // Create the transport with a Jackson mapper
-        ElasticsearchTransport transport = new RestClientTransport(restClient, new JacksonJsonpMapper());
-
-        // And create the API client
-        client = new ElasticsearchClient(transport);
+        final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+        credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials("elastic", "changeme"));
+        RestClient restClient = RestClient.builder(new HttpHost("192.168.100.72", 9200))
+                                    .setHttpClientConfigCallback(builder -> builder.setDefaultCredentialsProvider(credentialsProvider))
+                                    .build();
+        client = new ElasticsearchClient(new RestClientTransport(restClient, new JacksonJsonpMapper()));
     }
 
     static String indexName = "user";
@@ -50,62 +51,35 @@ public class ElasticsearchClientTest {
     @lombok.SneakyThrows
     public static void index() {
         IndexResponse index = client.index(builder -> builder.index(indexName).id(id).document(doc));
-        System.out.println(JSON.toJSONString(index.result(), true));
-        System.out.println(index.id());
+        System.err.println(JSON.toJSONString(index.result(), true));
+        System.err.println(index.id());
     }
 
     @lombok.SneakyThrows
     public static void get() {
         GetResponse<HashMap> r = client.get(builder -> builder.index(indexName).id(id), HashMap.class);
-        System.out.println(JSON.toJSONString(r, true));
-        System.out.println(r.index());
-        System.out.println(r.id());
-        System.out.println(JSONUtil.toJsonPrettyStr(r.source()));
+        System.err.println(JSON.toJSONString(r, true));
+        System.err.println(r.index());
+        System.err.println(r.id());
+        System.err.println(JSONUtil.toJsonPrettyStr(r.source()));
     }
 
 
     @SneakyThrows
     public static void search() {
         SearchResponse<HashMap> r = client.search(builder -> builder.index(indexName).query(query -> query.match(e -> e.field("name").query("zhangsan"))), HashMap.class);
-        System.out.println(JSON.toJSONString(r, true));
-        System.out.println(JSON.toJSONString(r.hits(), true));
+        System.err.println(JSON.toJSONString(r, true));
+        System.err.println(JSON.toJSONString(r.hits(), true));
     }
 
     @SneakyThrows
     public static void upsert() {
-        Map<Object, Object> build = MapUtil.builder().put("name", "张三").put("age", "18").build();
-        UpdateResponse<Map> update = client.update(builder -> builder.id(id).index(indexName).upsert(build), Map.class);
-        System.out.println(JSON.toJSONString(update, true));
-        System.out.println(JSON.toJSONString(update.result(), true));
+        Map<Object, Object> doc = MapUtil.builder().put("name", "张三").put("age", "18").build();
+        UpdateResponse<Map> update = client.update(builder -> builder.id("555").index(indexName).upsert(doc).doc(doc), Map.class);
+        System.err.println("修改还是新增?" + update.result());
+        System.err.println(JSON.toJSONString(update, true));
 
         GetResponse<Map> mapGetResponse = client.get(builder -> builder.index(indexName).id(id), Map.class);
-        System.out.println(JSON.toJSONString(mapGetResponse.source(), true));
+        System.err.println(JSON.toJSONString(mapGetResponse.source(), true));
     }
-
-
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
