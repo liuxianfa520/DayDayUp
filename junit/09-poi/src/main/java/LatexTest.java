@@ -28,9 +28,9 @@ public class LatexTest {
     @SneakyThrows
     public static void main(String[] args) {
 
-        System.out.println(getRegex("fad{adb}","(.*?)_\\{(.*?)\\}"));
-        System.out.println(getRegex("asfasf{ad{ddf}dfsdf}","(.*?)_\\{(.*?)\\}"));
-        System.out.println(getRegex("$$ φ_{C_{2}H_{6}·g} $$","(.*?)_\\{(.*?)\\}"));
+//        System.out.println(getRegex("fad{adb}","(.*?)_\\{(.*?)\\}"));
+//        System.out.println(getRegex("asfasf{ad{ddf}dfsdf}","(.*?)_\\{(.*?)\\}"));
+//        System.out.println(getRegex("$$ φ_{C_{2}H_{6}·g} $$","(.*?)_\\{(.*?)\\}"));
         extracted();
     }
 
