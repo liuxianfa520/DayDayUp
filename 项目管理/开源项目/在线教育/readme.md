@@ -67,6 +67,8 @@
 
 ### 3.1 首页
 
+启动项目后，访问路径：http://localhost:8081/default/default 
+
 ![图片](https://mmbiz.qpic.cn/mmbiz_png/OwiaX7M4K6dH9R6vmgib5SRTXJWDVfVfw1fqfFWGSMqnW3diaXDXYaNcjss41BHBB0ClQvH7jqpRQbpicTszrYzd5w/640?wx_fmt=png&wxfrom=5&wx_lazy=1&wx_co=1)
 
 ### 3.2 课程
