@@ -14,6 +14,9 @@
             <if test="name!=null">and name = #{name}</if>
             <if test="age!=null">and age = #{age}</if>
             <if test="address!=null">and address = #{address}</if>
+            <!-- 如果判断某个字段是否等于 单个字符的字符串,需要写.toString()  -->
+            <if test="xxx != null and xxx == '1'.toString()">and xxx = #{xxx}</if>
+            <if test="bbb != null and bbb == 'b'.toString()">and bbb = bbb</if>
         </where>
     </select>
 </mapper>

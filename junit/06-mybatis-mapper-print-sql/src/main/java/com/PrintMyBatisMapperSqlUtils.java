@@ -18,7 +18,7 @@ public class PrintMyBatisMapperSqlUtils {
      * @param mappedStatementId 查询方法id
      * @param param             参数
      */
-    public void printSql(String resource, String mappedStatementId, HashMap<String, Object> param) {
+    public static void printSql(String resource, String mappedStatementId, HashMap<String, Object> param) {
         resource = resource.replace("/resources/", "");
         Configuration configuration = new Configuration();
         XMLMapperBuilder builder = new XMLMapperBuilder(FileUtil.getInputStream(resource), configuration, resource, configuration.getSqlFragments());
