@@ -31,13 +31,13 @@
 
 
 
-![img](https:////upload-images.jianshu.io/upload_images/26223917-9debbe6991e10bba.png?imageMogr2/auto-orient/strip|imageView2/2/w/780/format/webp)
+![img](images/26223917-9debbe6991e10bba.png)
 
 经修改，开发反馈请求返回预期报文了：
 
 
 
-![img](https:////upload-images.jianshu.io/upload_images/26223917-23f10d4639132e46.png?imageMogr2/auto-orient/strip|imageView2/2/w/770/format/webp)
+![img](images/26223917-23f10d4639132e46.png)
 
 **问题二**：**多线程并发，连接MQ服务器后，启动生产者失败****。**
 
@@ -45,21 +45,21 @@
 
 **原因：**经与开发沟通并自查脚本，每一个线程的生产者组名和实例名不可重复，于是修改脚本，对生产者组名和实例名进行参数分块；
 
-![img](https:////upload-images.jianshu.io/upload_images/26223917-54e6f0cf7541e931.png?imageMogr2/auto-orient/strip|imageView2/2/w/917/format/webp)
+![img](images/26223917-54e6f0cf7541e931.png)
 
 重新发起多并发请求，仍然有上述异常请求出现，于是查看java sample中的具体请求代码，经过本地多次调试，最终定位是成员变量中producer和producerName设置为静态变量导致；
 
 
 
-![img](https:////upload-images.jianshu.io/upload_images/26223917-e251a4a373c26a16.png?imageMogr2/auto-orient/strip|imageView2/2/w/752/format/webp)
+![img](images/26223917-e251a4a373c26a16.png)
 
 **解决方案：**将去掉producer和producerName中static关键字，重新打包放到..\lib\ext下，本地多线程并发测试通过，如图：
 
-![img](https:////upload-images.jianshu.io/upload_images/26223917-2f7cee52dce55ed1.png?imageMogr2/auto-orient/strip|imageView2/2/w/653/format/webp)
+![img](images/26223917-2f7cee52dce55ed1.png)
 
 
 
-![img](https:////upload-images.jianshu.io/upload_images/26223917-90d1d16f89931438.png?imageMogr2/auto-orient/strip|imageView2/2/w/1200/format/webp)
+![26223917-90d1d16f89931438.png (1200×240)](images/26223917-90d1d16f89931438.png)
 
 **问题三**：**如何通过查看队列堆积情况，确定消费者的处理能力****。**
 
