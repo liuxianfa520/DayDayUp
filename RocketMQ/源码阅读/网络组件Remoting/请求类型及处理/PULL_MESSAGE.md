@@ -1,28 +1,22 @@
-todo:
-
-
-
 # 简述
 
-slave broker使用定时任务，每隔10秒发送请求从master broker拉取topic配置信息，保存到slave broker中，并持久化。
-
-client：slave broker
-
-server：master broker
 
 
+consumer给broker发消息，拉取指定queue中的消息。
 
-**定时任务**
+client：consumer
 
-![image-20211209185724321](images/image-20211209185724321.png)
+server：broker
 
+请求code
 
-
-
-
-**此定时任务在以下场景会注册：**
-
-[client何时发送请求](#client%E4%BD%95%E6%97%B6%E5%8F%91%E9%80%81%E8%AF%B7%E6%B1%82)
+```java
+// org.apache.rocketmq.common.protocol.RequestCode#PULL_MESSAGE
+/**
+ * client给broker发送RPC请求,从broker拉取mq消息.
+ */
+public static final int PULL_MESSAGE = 11;
+```
 
 
 
@@ -32,90 +26,77 @@ server：master broker
 
 # client
 
-client是slave broker，也就是从master broker同步数据时，会发送这个请求：
+client是consumer，当consumer从broker拉取消息并消费时，会先发送这个请求，如果拉取消息成功，则会进行消费：*[传送门去gitee查看源码](https://gitee.com/anxiaole/rocketmq/blob/master/client/src/main/java/org/apache/rocketmq/client/impl/consumer/DefaultMQPushConsumerImpl.java#L241)*
 
-![image-20211207091511833](images/image-20211207091511833.png)
+![image-20220706202622223](images/image-20220706202622223.png)
 
-![image-20211207091603278](images/image-20211207091603278.png)
+[**pullKernelImpl**](https://gitee.com/anxiaole/rocketmq/blob/master/client/src/main/java/org/apache/rocketmq/client/impl/consumer/PullAPIWrapper.java#L145)
 
+![image-20220706202818073](images/image-20220706202818073.png)
 
+[构造请求request，并发送：](https://gitee.com/anxiaole/rocketmq/blob/master/client/src/main/java/org/apache/rocketmq/client/impl/MQClientAPIImpl.java#L746)
 
-# 请求body
-
-client构建请求，并使用`remotingClient`同步发送请求，如果response成功，则会decode到：`TopicConfigSerializeWrapper` 序列化包装类中，从这个包装类中，我们可以知道**`GET_ALL_CONSUMER_OFFSET`这个请求类型，到底传输了哪些数据**：
-
-```java
-package org.apache.rocketmq.common.protocol.body;
-
-public class TopicConfigSerializeWrapper extends RemotingSerializable {
-
-    private ConcurrentMap<String, TopicConfig> topicConfigTable = new ConcurrentHashMap<>();
-
-    private DataVersion dataVersion = new DataVersion();
-
-    // 忽略 getter  setter
-}
-```
-
-主要传输了个数据：
-
-- topicConfigTable        topic配置表
-- dataVersion                 数据版本号
+![image-20220706202923583](images/image-20220706202923583.png)
 
 
 
-# response之后，client处理逻辑
+## 请求参数
 
-slave broker使用同步阻塞的方式，发送请求，当slave broker收到master broker的响应response之后，如果响应成功并且slave broker 和master broker的数据版本号不一样，则：slave会用master的配置覆盖自己的配置：
+org.apache.rocketmq.common.protocol.header.PullMessageRequestHeader
 
-![org.apache.rocketmq.broker.slave.SlaveSynchronize#syncTopicConfig](images/image-20211207094313091.png)
-
-
-
-
-
-# client何时发送请求
-
-> 上面我们知道了这个请求是slave发送给master的，也知道了slave收到响应之后处理逻辑。
->
-> 但是slave在什么时候/什么场景才会给master发送这个请求呢？
-
-是在定时任务中，每隔10秒slave和master之间同步一次数据：
-
-![image-20211209185724321](images/image-20211209185724321.png)
-
-**这个定时任务是在broker是slave的情况下，才会注册、才会执行。**
-
-**下面两种情况，会注册定时任务：**
-
-- broker启动时，并且broker是 slave
-- 当broker的角色由master变成slave时
-
-![image-20211202185024295](images/image-20211202185024295.png)
+![image-20220706203021214](images/image-20220706203021214.png)
 
 
 
 
 
 
+
+
+
+## response之后，client处理逻辑
+
+如果从broker成功拉取到新消息，则consumer会提交消费请求：
+
+![image-20220706210353375](images/image-20220706210353375.png)
+
+
+
+## client何时发送请求
+
+详见：[消费者拉取消息服务.md](../../Consumer/消费者拉取消息服务.md)
 
 
 
 # server
 
-server端是master broker，使用请求处理器来处理：
+broker收到这个请求，并且使用 `org.apache.rocketmq.broker.processor.PullMessageProcessor` 来处理请求。
 
-![image-20211207092545622](images/image-20211207092545622.png)
+[broker启动的时候，注册请求处理器：](https://gitee.com/anxiaole/rocketmq/blob/master/broker/src/main/java/org/apache/rocketmq/broker/BrokerController.java#L611)
 
-![image-20211207092924619](images/image-20211207092924619.png)
+![image-20220706203625121](images/image-20220706203625121.png)
 
-那么问题来了：
+## [PullMessageProcessor](https://gitee.com/anxiaole/rocketmq/blob/master/broker/src/main/java/org/apache/rocketmq/broker/processor/PullMessageProcessor.java#L80)
 
-- TopicConfigManager 是什么？
+![image-20220706204052341](images/image-20220706204052341.png)
 
-- 又是如何把 `topicConfigTable` 和`dataVersion`转成字符串的？
 
-# TopicConfigManager
 
-详见：[ConfigManager——TopicConfigManager.md](../../配置管理ConfigManager/TopicConfigManager.md)
+## [processRequest()](https://gitee.com/anxiaole/rocketmq/blob/master/broker/src/main/java/org/apache/rocketmq/broker/processor/PullMessageProcessor.java#L100)
+
+处理请求分为如下步骤：
+
+[1、初始化response，并把请求id设置到response中](https://gitee.com/anxiaole/rocketmq/blob/master/broker/src/main/java/org/apache/rocketmq/broker/processor/PullMessageProcessor.java#L106)
+
+2、校验请求参数、校验broker状态等（各种校验）
+
+[3、从broker消息存储中，读取消息  （使用了消息过滤器 `messageFilter`）](https://gitee.com/anxiaole/rocketmq/blob/master/broker/src/main/java/org/apache/rocketmq/broker/processor/PullMessageProcessor.java#L248)![image-20220706204650253](images/image-20220706204650253.png)
+
+[4、根据 `getMessageResult` 设置response.code   （也是一顿判断，然后根据不同的情况，设置响应code）](https://gitee.com/anxiaole/rocketmq/blob/master/broker/src/main/java/org/apache/rocketmq/broker/processor/PullMessageProcessor.java#L296)
+
+5、[如果responseCode == ResponseCode.SUCCESS，则使用 `Channel channel` 把消息内容通过网络io发送给consumer：](https://gitee.com/anxiaole/rocketmq/blob/master/broker/src/main/java/org/apache/rocketmq/broker/processor/PullMessageProcessor.java#L380)
+
+![image-20220706205126256](images/image-20220706205126256.png)
+
+[6、如果responseCode不是成功，则处理其他状态的情况，并给consumer返回对应的状态。](https://gitee.com/anxiaole/rocketmq/blob/master/broker/src/main/java/org/apache/rocketmq/broker/processor/PullMessageProcessor.java#L411)
 
