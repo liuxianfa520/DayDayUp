@@ -430,7 +430,13 @@ public class TopicConfig {
 
 在 TopicConfig 中写的默认读写queue数量都是16，
 
-但是很多人说，在RocketMQ控制台新建一个topic后，默认的queue数量是4：
+在RocketMQ控制台直接创建topic时候：
+
+![image-20220707184436423](images/image-20220707184436423.png)
+
+
+
+但是很多人说，在使用producer向一个不存在的topic发送消息后，自动新建topic的queue数量是4：
 
 ![image-20220707180930233](images/image-20220707180930233.png)
 
@@ -457,6 +463,8 @@ public class TopicConfig {
 ![image-20220707180702364](images/image-20220707180702364.png)
 
 
+
+所以，如果要执行topic的queue的数量，还是在RocketMQ控制台提前新建好，比较好。
 
 
 
