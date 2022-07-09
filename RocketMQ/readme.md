@@ -54,10 +54,6 @@ Consumer启动流程.md
 
 [NettyRequestProcessor.md](./源码阅读/网络组件Remoting/NettyRequestProcessor.md)
 
-### 客户端管理器ClientManager
-
-[客户端管理器.md](./源码阅读/客户端管理器/客户端管理器.md)
-
 
 
 ### 存储组件StoreService

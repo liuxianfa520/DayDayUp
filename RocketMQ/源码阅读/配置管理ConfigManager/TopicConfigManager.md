@@ -417,7 +417,54 @@ public class TopicConfig {
 
 
 
+## 默认topic中到底有多少个queue
 
+上面小节中：
+
+```java
+public class TopicConfig {
+    public static int defaultReadQueueNums = 16;
+    public static int defaultWriteQueueNums = 16;
+}    
+```
+
+在 TopicConfig 中写的默认读写queue数量都是16，
+
+在RocketMQ控制台直接创建topic时候：
+
+![image-20220707184436423](images/image-20220707184436423.png)
+
+
+
+但是很多人说，在使用producer向一个不存在的topic发送消息后，自动新建topic的queue数量是4：
+
+![image-20220707180930233](images/image-20220707180930233.png)
+
+
+
+**那是因为当producer给broker生产消息时，如果broker没有此topic，则会新创建此topic。此时创建的topic的queue的数量是4。**
+
+跟踪源码：
+
+在默[DefaultMQProducer](https://gitee.com/anxiaole/rocketmq/blob/master/client/src/main/java/org/apache/rocketmq/client/producer/DefaultMQProducer.java#L86)中配置了默认每个topic创建多少queue，默认是4：
+
+![image-20220707175945105](images/image-20220707175945105.png)
+
+在producer给broker发送mq消息时，会把这个值发送给broker：
+
+[DefaultMQProducerImpl#sendKernelImpl 方法](https://gitee.com/anxiaole/rocketmq/blob/master/client/src/main/java/org/apache/rocketmq/client/impl/producer/DefaultMQProducerImpl.java#L818)中：
+
+![image-20220707180317674](images/image-20220707180317674.png)
+
+
+
+[当broker收到消息之后，使用 AbstractSendMessageProcessor 检查时会判断topic是否存在，如果不存在，则创建：](https://gitee.com/anxiaole/rocketmq/blob/master/broker/src/main/java/org/apache/rocketmq/broker/processor/AbstractSendMessageProcessor.java#L187)
+
+![image-20220707180702364](images/image-20220707180702364.png)
+
+
+
+所以，如果要执行topic的queue的数量，还是在RocketMQ控制台提前新建好，比较好。
 
 
 
