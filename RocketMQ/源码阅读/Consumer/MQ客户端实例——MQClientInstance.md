@@ -32,6 +32,8 @@ public class MQClientInstance {
 
 # 属性
 
+## 生产者分组表和消费者分组表
+
 ```java
 /**
  * note:记录producer列表
@@ -49,19 +51,7 @@ private final ConcurrentMap<String/* consumerGroup */, MQConsumerInner> consumer
 
 
 
-```java
-/**
- * client端本地路由表    topic路由表的本地缓存.
- *
- * key: topic名称
- * value: TopicRouteData  topic的路由信息
- *
- * 和此变量类似的: {@link DefaultMQProducerImpl#topicPublishInfoTable}
- */
-private final ConcurrentMap<String/* topicName */, TopicRouteData> topicRouteTable = new ConcurrentHashMap<>();
-```
-
-
+## broker地址表
 
 ```java
 /**
@@ -79,7 +69,37 @@ private final ConcurrentMap<String/* Broker Name */, HashMap<String/* brokerAddr
 
 
 
+## 本地路由表
 
+```java
+/**
+ * client端本地路由表    topic路由表的本地缓存.
+ *
+ * key: topic名称
+ * value: TopicRouteData  topic的路由信息
+ *
+ * 和此变量类似的: {@link DefaultMQProducerImpl#topicPublishInfoTable}
+ */
+private final ConcurrentMap<String/* topicName */, TopicRouteData> topicRouteTable = new ConcurrentHashMap<>();
+```
+
+1、从NameServer中获取路由表,并更新本地路由表缓存
+如果参数 isDefault==true 则说明topic不存在.则获取默认topic,并使用默认topic的配置,新建一个topic.
+2、需要给NameServer发送remoting远程消息 {@link RequestCode#GET_ROUTEINFO_BY_TOPIC}.
+获取 {@link TopicRouteData} 之后,然后更新:
+
+  - {@link #brokerAddrTable}
+  - {@link #producerTable}
+  - {@link #consumerTable}
+  - {@link #topicRouteTable}
+
+3、详见：[org.apache.rocketmq.client.impl.factory.MQClientInstance#updateTopicRouteInfoFromNameServer](https://gitee.com/anxiaole/rocketmq/blob/master/client/src/main/java/org/apache/rocketmq/client/impl/factory/MQClientInstance.java#L736)
+
+
+
+
+
+## netty配置、客户端api
 
 ```java
 /**
@@ -97,7 +117,7 @@ private final MQClientAPIImpl mQClientAPIImpl;
 
 
 
-
+## 客户端定时任务线程池
 
 ```java
 /**
@@ -113,7 +133,7 @@ private final ScheduledExecutorService scheduledExecutorService = Executors.newS
 
 
 
-
+## 请求处理器
 
 ```java
 /**
@@ -129,7 +149,7 @@ private final ClientRemotingProcessor clientRemotingProcessor;
 
 
 
-
+## consumer拉取mq消息服务.
 
 ```java
 /**
@@ -141,7 +161,7 @@ private final ClientRemotingProcessor clientRemotingProcessor;
 private final PullMessageService pullMessageService;
 ```
 
-
+## 负载均衡服务
 
 ```java
 /**
@@ -152,7 +172,7 @@ private final PullMessageService pullMessageService;
 private final RebalanceService rebalanceService;
 ```
 
-
+## 默认 MQ 生产者
 
 ```java
 /**
@@ -162,7 +182,7 @@ private final RebalanceService rebalanceService;
 private final DefaultMQProducer defaultMQProducer;
 ```
 
-
+##  当前客户端状态
 
 ```java
 /**
@@ -178,8 +198,6 @@ private ServiceState serviceState = ServiceState.CREATE_JUST;
 
 
 # 构造方法
-
-
 
 ```java
 public MQClientInstance(ClientConfig clientConfig, int instanceIndex, String clientId, RPCHook rpcHook) {
@@ -212,7 +230,27 @@ public MQClientInstance(ClientConfig clientConfig, int instanceIndex, String cli
 }
 ```
 
+启动
 
+![image-20220711165904796](images/image-20220711165904796.png)
+
+
+
+
+
+# 启动定时任务
+
+客户端启动的定时任务： 所在方法： org.apache.rocketmq.client.impl.factory.MQClientInstance#startScheduledTask
+
+定时获取NameServer地址
+
+定时从NameServer中，拉去topic路由信息，保存到本地
+
+定时任务：移除已下线的broker 和 给所有broker发送心跳请求。
+
+定时持久化所有的消费偏移量。  (consumer执行,producer空转)
+
+调整线程池  (consumer执行,producer空转) 每分钟执行1次
 
 
 
