@@ -1,6 +1,6 @@
 # 前言
 
-在  [01消费者QuickStart.md](01消费者QuickStart.md)  中介绍了consumer分为两种：
+在  [消费者QuickStart.md](消费者QuickStart.md)  中介绍了consumer分为两种：
 
 - 基于 拉 pull 的消费者    [基于pull模式的消费者.md](基于pull模式的消费者.md)
 - 基于 推送 push 的消费者

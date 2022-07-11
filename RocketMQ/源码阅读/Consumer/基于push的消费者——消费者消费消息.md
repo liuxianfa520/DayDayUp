@@ -1,6 +1,6 @@
 # 前言
 
-在  [01消费者QuickStart.md](01消费者QuickStart.md)  中介绍了consumer分为两种：
+在  [消费者QuickStart.md](消费者QuickStart.md)  中介绍了consumer分为两种：
 
 - 基于 拉 pull 的消费者   传送门：[基于pull模式的消费者.md](基于pull模式的消费者.md)
 - 基于 推送 push 的消费者
@@ -12,7 +12,7 @@
 - 1、使用单例线程池从broker拉取消息
 - 2、当有新消息时，在消费线程池中，调用 `org.apache.rocketmq.client.consumer.listener.MessageListener` 处理消费逻辑
 
-本篇只来讲述consumer的消息消费。consumer如何从broker拉取消息，传送门： [1、消费者拉取消息服务.md](消费者拉取消息服务.md) 
+本篇只来讲述consumer的消息消费。consumer如何从broker拉取消息，传送门： [1、基于push的消费者——消费者拉取消息服务.md](基于push的消费者——消费者拉取消息服务.md)
 
 > 注意：
 >

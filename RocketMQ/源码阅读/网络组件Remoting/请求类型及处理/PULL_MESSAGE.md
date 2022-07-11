@@ -64,7 +64,7 @@ org.apache.rocketmq.common.protocol.header.PullMessageRequestHeader
 
 ## client何时发送请求
 
-详见：[消费者拉取消息服务.md](../../Consumer/消费者拉取消息服务.md)
+详见：[基于push的消费者——消费者拉取消息服务.md](../../Consumer/基于push的消费者——消费者拉取消息服务.md)
 
 
 
