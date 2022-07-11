@@ -18,4 +18,4 @@
 
  [消息队列分配策略算法-AllocateMessageQueueStrategy.md](消息队列分配策略算法-AllocateMessageQueueStrategy.md) 
 
- [MQClientInstance.md](MQClientInstance.md) 
+ [MQ客户端实例——MQClientInstance.md](MQ客户端实例——MQClientInstance.md)
