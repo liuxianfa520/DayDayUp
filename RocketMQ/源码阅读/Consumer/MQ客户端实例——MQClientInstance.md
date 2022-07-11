@@ -240,17 +240,27 @@ public MQClientInstance(ClientConfig clientConfig, int instanceIndex, String cli
 
 # 启动定时任务
 
-客户端启动的定时任务： 所在方法： org.apache.rocketmq.client.impl.factory.MQClientInstance#startScheduledTask
+客户端启动的定时任务： 所在方法： [org.apache.rocketmq.client.impl.factory.MQClientInstance#startScheduledTask](https://gitee.com/anxiaole/rocketmq/blob/master/client/src/main/java/org/apache/rocketmq/client/impl/factory/MQClientInstance.java#L356)
 
-定时获取NameServer地址
+### 定时获取NameServer地址
 
-定时从NameServer中，拉去topic路由信息，保存到本地
+![image-20220711170123508](images/image-20220711170123508.png)
 
-定时任务：移除已下线的broker 和 给所有broker发送心跳请求。
+### 定时从NameServer中，拉去topic路由信息，保存到本地
 
-定时持久化所有的消费偏移量。  (consumer执行,producer空转)
+![image-20220711170130294](images/image-20220711170130294.png)
 
-调整线程池  (consumer执行,producer空转) 每分钟执行1次
+### 定时任务：移除已下线的broker 和 给所有broker发送心跳请求。
+
+![image-20220711170137270](images/image-20220711170137270.png)
+
+### 定时持久化所有的消费偏移量。  (consumer执行,producer空转)
+
+![image-20220711170154929](images/image-20220711170154929.png)
+
+### 调整线程池  (consumer执行,producer空转) 每分钟执行1次
+
+![image-20220711170201203](images/image-20220711170201203.png)
 
 
 
