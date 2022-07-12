@@ -14,6 +14,10 @@ https://gitee.com/starsky20/docker-compose-application#docker%E5%AE%89%E8%A3%85
 # 安装组件
 
 ## [elk](https://gitee.com/daitougege/elk-docker-compose)
+
+- [Kibana常用命令](https://blog.csdn.net/yuntianyun/article/details/114187301)
+- [ELK可视化管理工具之：kibana常用操作命令](https://dandelioncloud.cn/article/details/1486718450675601409)
+
 ## [docker-compose-redis](https://gitee.com/usual-docker-compose/docker-compose-redis)
 ##  [Redis各种版本俱全](https://gitee.com/starsky20/docker-compose-application#redis)
 
