@@ -50,6 +50,12 @@ https://gitee.com/starsky20/docker-compose-application#docker%E5%AE%89%E8%A3%85
 
 ## [解决docker下载安装速度慢的问题](https://www.jb51.net/article/206785.htm)
 
+> ```bash
+> 查看是否设置成功：   docker info
+> ```
+>
+> ![img](images/dc07f666715a2a96b672221b04b177d0.png)
+
 ## [Windows10子系统ubuntu如何重启](https://www.yisu.com/zixun/599912.html)
 
 > net stop LxssManager
