@@ -10,8 +10,13 @@ https://gitee.com/starsky20/docker-compose-application#docker%E5%AE%89%E8%A3%85
 
 
 
-
 # 安装组件
+
+## [RocketMQ](https://github.com/modouxiansheng/about-docker/tree/master/RockertMQ)
+
+## [ZooKeeper](https://github.com/modouxiansheng/about-docker/tree/master/ZooKeeper)
+
+[RabbitMQ](https://github.com/modouxiansheng/about-docker/tree/master/RabbitMQ)
 
 ## [elk](https://gitee.com/daitougege/elk-docker-compose)
 
@@ -23,8 +28,13 @@ https://gitee.com/starsky20/docker-compose-application#docker%E5%AE%89%E8%A3%85
 - [ELK可视化管理工具之：kibana常用操作命令](https://dandelioncloud.cn/article/details/1486718450675601409)
 - [ES官方文档：使用docker-compose启动一个多节点集群](https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html#docker-compose-file)
 
-## [docker-compose-redis](https://gitee.com/usual-docker-compose/docker-compose-redis)
-##  [Redis各种版本俱全](https://gitee.com/starsky20/docker-compose-application#redis)
+## redis
+
+- [docker-compose-redis](https://gitee.com/usual-docker-compose/docker-compose-redis)
+
+- [Redis各种版本俱全](https://gitee.com/starsky20/docker-compose-application#redis)
+
+- [Mac上最简单明了的利用Docker搭建Redis集群](https://github.com/modouxiansheng/about-docker/tree/master/redis-cluster) 
 
 ## [mysql](https://gitee.com/starsky20/docker-compose-application#mysql)
 
