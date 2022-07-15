@@ -69,6 +69,7 @@ https://gitee.com/starsky20/docker-compose-application#docker%E5%AE%89%E8%A3%85
 ## [Windows10子系统ubuntu如何重启](https://www.yisu.com/zixun/599912.html)
 
 > net stop LxssManager
+>
 > net start LxssManager
 >
 > 然后需要重启docker 控制台
