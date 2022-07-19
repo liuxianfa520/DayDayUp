@@ -68,6 +68,7 @@ public class CompletableFutureTest {
         CompletableFuture<String> imgUrlFuture = t1.thenApplyAsync(file -> {
             // 假设转成img并上传文件到服务器,需要4秒
             sleep(4);
+            int x = 1 / 0;
             // 上传完毕,返回文件url
             return "http://xxxx/img/CompletableFutureTest.png";
         });
@@ -89,6 +90,7 @@ public class CompletableFutureTest {
             if (StrUtil.isNotEmpty(pdfUrl) && StrUtil.isNotEmpty(imgUrl)) {
                 // 保存pdfurl 和 img url
                 // service.saveInTransaction(ids, pdfUrl, imgUrl);
+                System.out.println("saveInTransaction 保存成功.");
             }
         } catch (Exception e) {
             // 保存失败,修改状态
