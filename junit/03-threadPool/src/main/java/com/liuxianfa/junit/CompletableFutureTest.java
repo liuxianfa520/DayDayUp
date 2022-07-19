@@ -5,6 +5,9 @@ import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import cn.hutool.core.exceptions.ExceptionUtil;
+import cn.hutool.log.Log;
+
 import static com.liuxianfa.junit.JdkThreadPool.JDK_THREAD_POOL;
 import static com.liuxianfa.junit.JdkThreadPool.sleep;
 
@@ -18,9 +21,9 @@ public class CompletableFutureTest {
 
     public static void main(String[] args) {
 //        completableFuture并行度();
-        thenAccept();
+//        thenAccept();
 
-//        其中一个任务异常();
+        其中一个任务异常();
 
 
     }
@@ -56,6 +59,7 @@ public class CompletableFutureTest {
     /**
      * 说明:总共4个任务,其中i=3这个任务会抛出异常(模拟其中一个任务会抛异常.) 此时在join()处会抛出异常.
      */
+    // @Transactional
     private static void 其中一个任务异常() {
         ArrayList<Object> list = new ArrayList<>();
         for (int i = 1; i <= 100; i++) {
@@ -68,9 +72,18 @@ public class CompletableFutureTest {
                 System.out.println(finalI + "    =====     " + Thread.currentThread().getName());
             });
             list.add(voidCompletableFuture);
+
+            voidCompletableFuture.exceptionally(throwable -> {
+                // note:注意:exceptionally()方法,还是在'异步线程'中执行的,而不是提交异步任务的主线程中执行的.
+                //      通过这种方式,无法达到事务回滚的目的.
+                System.out.println("当前线程名称:"+Thread.currentThread().getName() + "  异步任务出现了异常:" + ExceptionUtil.stacktraceToString(throwable));
+                throw new RuntimeException("转换之后的Runtime异常.", throwable);
+            });
         }
         System.out.println("任务提交完毕.");
         CompletableFuture.allOf(list.toArray(new CompletableFuture[0])).join();
+        // note: 任意一个任务抛出异常时,都不会打印下面这句话.
+        //    可以通过这中方式,来监控异步任务是否全部成功,如果全部成功,则提交事务;任意任务失败,则回滚事务.
         System.out.println("所有任务执行完毕.");
         sleep(10);
     }
