@@ -21,9 +21,9 @@ public class CompletableFutureTest {
 
     public static void main(String[] args) {
 //        completableFuture并行度();
-//        thenAccept();
+        thenAccept();
 
-        其中一个任务异常();
+//        其中一个任务异常();
 
 
     }
@@ -36,7 +36,7 @@ public class CompletableFutureTest {
         AtomicInteger atomicInteger = new AtomicInteger();
 
         for (int i = 0; i < 10; i++) {
-            // 在线程池中,异步执行. 乱序
+            // note:结论: 异步执行时,任务在线程池中. 乱序
             CompletableFuture.completedFuture("")
                              .thenAcceptAsync(s -> {
                                  sleep(1);
@@ -47,7 +47,7 @@ public class CompletableFutureTest {
 
         AtomicInteger atomicInteger2 = new AtomicInteger();
         for (int i = 0; i < 10; i++) {
-            // 在main方法中,阻塞、按照提交顺序执行的.
+            // note:结论: 不使用异步,任务在main方法中,阻塞、按照提交顺序执行的.
             CompletableFuture.completedFuture("")
                              .thenAccept(s -> {
                                  sleep(1);
