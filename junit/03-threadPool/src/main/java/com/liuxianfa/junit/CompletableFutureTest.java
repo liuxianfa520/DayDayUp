@@ -1,12 +1,15 @@
 package com.liuxianfa.junit;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import cn.hutool.core.exceptions.ExceptionUtil;
-import cn.hutool.log.Log;
+import cn.hutool.core.util.StrUtil;
 
 import static com.liuxianfa.junit.JdkThreadPool.JDK_THREAD_POOL;
 import static com.liuxianfa.junit.JdkThreadPool.sleep;
@@ -21,11 +24,76 @@ public class CompletableFutureTest {
 
     public static void main(String[] args) {
 //        completableFuture并行度();
-        thenAccept();
-
+//        thenAccept();
 //        其中一个任务异常();
 
+        其中一个任务异常With_exception();
+    }
 
+    /**
+     * <pre>
+     * 场景:
+     *
+     * 主线程中:查询数据库,并修改数据某表.然后主线程中提交三个异步任务:
+     *      异步任务1：先查询数据库，在本地生成File
+     *      异步任务2：根据任务1生成的File，转成PDF，并上传到服务器，然后把PDF的文件地址，保存到数据库
+     *      异步任务3：根据任务1生成的File，转成图片，并上传到服务器，然后把图片的文件地址，保存到数据库
+     * 要实现：
+     * 如果任务2失败了，则把主线程中的update和任务3保存到图片的地址回滚； 如果任务3失败了，则把主线程中的update和任务2保存到PDF的地址回滚；
+     * 也就是:如果任意一个异步任务失败,则回滚.
+     * </pre>
+     */
+    private static void 其中一个任务异常With_exception() {
+        // 模拟查询和修改数据库
+        List<Integer> ids = Arrays.asList(1, 2, 3, 4);
+        // 修改数据库     比如修改任务状态为:启动中.
+        //   update task set status = 'running' where id in  (#{ids});
+
+
+        // 任务1:异步生成文件
+        CompletableFuture<File> t1 = CompletableFuture.supplyAsync(() -> {
+            sleep(3);
+            return new File("CompletableFutureTest.txt");
+        });
+
+        // 任务2:转成pdf并上传文件到服务器
+        CompletableFuture<String> pdfUrlFuture = t1.thenApplyAsync(file -> {
+            // 假设转成pdf并上传文件到服务器,需要5秒
+            sleep(5);
+            // 上传完毕,返回文件url
+            return "http://xxxx/pdf/CompletableFutureTest.pdf";
+        });
+
+        // 任务3:转成img并上传文件到服务器
+        CompletableFuture<String> imgUrlFuture = t1.thenApplyAsync(file -> {
+            // 假设转成img并上传文件到服务器,需要4秒
+            sleep(4);
+            // 上传完毕,返回文件url
+            return "http://xxxx/img/CompletableFutureTest.png";
+        });
+
+        // 等待所有的异步任务都执行完毕.   如果任意一个异步任务抛出异常,则join()方法会抛出异常.
+        try {
+            CompletableFuture.allOf(t1, pdfUrlFuture, imgUrlFuture).join();
+        } catch (Exception e) {
+            System.out.println("子任务失败:" + ExceptionUtil.stacktraceToString(e));
+            // 异步子任务失败了,修改任务状态为失败:
+            //   update task set status = 'fail' where id in  (#{ids});
+            return;
+        }
+
+        try {
+            // 所有任务都成功,则获取任务返回的url,开始事务,保存到数据库.
+            String pdfUrl = pdfUrlFuture.get();
+            String imgUrl = imgUrlFuture.get();
+            if (StrUtil.isNotEmpty(pdfUrl) && StrUtil.isNotEmpty(imgUrl)) {
+                // 保存pdfurl 和 img url
+                // service.saveInTransaction(ids, pdfUrl, imgUrl);
+            }
+        } catch (Exception e) {
+            // 保存失败,修改状态
+            //   update task set status = 'fail' where id in  (#{ids});
+        }
     }
 
 
