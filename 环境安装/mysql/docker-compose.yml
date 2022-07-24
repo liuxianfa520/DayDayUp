@@ -1,0 +1,20 @@
+# mysql是5.7版本的
+# mysql账号密码:root/root
+# 端口号:  3307   也可以自己修改成3306
+# 启动之后,可以浏览器打开:   http://localhost:8080    这个web管理后台对数据库进行管理.
+# 文档:   https://hub.docker.com/_/mysql
+version: '3.1'
+services:
+  db:
+    image: mysql:5.7
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    ports:
+      - 3307:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
