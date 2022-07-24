@@ -2,13 +2,14 @@ package com.liuxianfa.junit.springboot;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import java.util.List;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
-import javax.transaction.Transactional;
-
+import cn.hutool.core.exceptions.ExceptionUtil;
+import cn.hutool.json.JSONUtil;
 import lombok.SneakyThrows;
 
 /**
@@ -27,15 +28,10 @@ public class MainService {
     @Autowired
     UserService userService;
 
-
     @SneakyThrows
-    @Transactional(rollbackOn = Exception.class)
     public void runWithTx() {
+        System.out.println("runWithTx:  " + Thread.currentThread().getName());
         List<User> all = userMapper.findAll();
-
-        User user = all.get(0);
-        user.setName(user.getName() + "update");
-        userMapper.save(user);
 
         List<Future> collect = all.stream()
                                   .map(user1 -> userService.run(user1))
@@ -43,7 +39,14 @@ public class MainService {
 
 
         for (Future future : collect) {
-            Object o = future.get();
+            try {
+                Object o = future.get();
+                System.out.println("SpringBoot异步任务返回:" + JSONUtil.toJsonPrettyStr(o));
+            } catch (Exception e) {
+                System.out.println("SpringBoot异步任务异常:" + ExceptionUtil.stacktraceToString(e));
+                //因为是在try catch 里面所以需要代码手动去踹他一脚,如果没用就不需要会自动回滚
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            }
         }
     }
 }
