@@ -18,7 +18,7 @@ https://gitee.com/starsky20/docker-compose-application#docker%E5%AE%89%E8%A3%85
 
 ## [github: docker-elk](https://github.com/deviantony/docker-elk/)
 
-## [elk](https://gitee.com/daitougege/elk-docker-compose)
+### [elk](https://gitee.com/daitougege/elk-docker-compose)
 
 - 使用这个方式安装mac会报错：![image-20220712120745606](images/image-20220712120745606.png)
 
