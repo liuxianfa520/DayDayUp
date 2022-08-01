@@ -2,18 +2,23 @@ package com.liuxianfa.junit.springboot.controller;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.liuxianfa.junit.springboot.entity.User;
 import com.liuxianfa.junit.springboot.jsonserializer.BigDecimalSerializer;
 import com.liuxianfa.junit.springboot.jsonserializer.StringDateSerializer;
 import com.liuxianfa.junit.springboot.service.HelloService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 import cn.hutool.core.date.DatePattern;
+import cn.hutool.json.JSONUtil;
 import lombok.Data;
 
 /**
@@ -32,6 +37,19 @@ public class HelloController {
         helloService.hello(name);
 
         return "controller hello " + name;
+    }
+
+    /**
+     * 此接口参数是List,可以直接进行参数绑定.
+     *
+     * @param users
+     * @return
+     */
+    @RequestMapping("helloList")
+    @ResponseBody
+    public List<User> helloList(@RequestBody List<User> users) {
+        System.out.println(JSONUtil.toJsonPrettyStr(users));
+        return users;
     }
 
 

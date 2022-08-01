@@ -1,0 +1,23 @@
+###
+GET http://localhost:8080/hello?name=anxiaole
+
+
+### 可以直接传json数组,controller中可以接收到.但是应该只支持jdk8及以上.
+GET http://localhost:8080/helloList
+Content-Type: application/json
+
+[
+  {
+    "id": 1,
+    "name": "xx"
+  },
+  {
+    "id": 333,
+    "name": "xx1"
+  }
+]
+
+
+
+###
+GET http://localhost:8080/json
