@@ -13,4 +13,16 @@ public class User {
     Integer id;
 
     String name;
+
+    /**
+     * fixme:这里有个大坑.需要注意!!!
+     *  前端传参时,需要传 fageXx 才能接收到参数.
+     */
+    String fAgeXx;
+
+    /**
+     * fixme:这里有个大坑.需要注意!!!
+     *  前端传参时,需要传 faddressXx 才能接收到参数.
+     */
+    String fAddressXx;
 }
