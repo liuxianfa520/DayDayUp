@@ -2,7 +2,7 @@
 GET http://localhost:8080/hello?name=anxiaole
 
 
-### 可以直接传json数组,controller中可以接收到.但是应该只支持jdk8及以上.
+### 可以直接传json数组
 GET http://localhost:8080/helloList
 Content-Type: application/json
 
@@ -10,14 +10,16 @@ Content-Type: application/json
   {
     "id": 1,
     "name": "xx",
+    "userName": "用户名",
     "fageXx": "11",
-    "faddressXx": "河北"
+    "fAddressXx": "河北"
   },
   {
-    "id": 333,
-    "name": "xx1",
-    "fageXx": "21",
-    "faddressXx": "北京"
+    "id": 21,
+    "name": "2xx",
+    "userName": "2用户名",
+    "fageXx": "211",
+    "fAddressXx": "2河北"
   }
 ]
 
