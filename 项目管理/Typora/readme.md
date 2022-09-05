@@ -6,3 +6,10 @@ Typora安装激活包
 
 
 
+
+
+
+
+另一种安装方式：
+
+https://xclient.info/s/typora.html#versions
