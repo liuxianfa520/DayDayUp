@@ -155,7 +155,7 @@ alter table product_sku add column  brand_id int(10) not null default 0;
 
 mysql中支持的`字符集`有很多，常用的有：latin1、utf-8、utf8mb4、GBK等。
 
-这4种字符集情况如下：![图片](images/640)
+这4种字符集情况如下：![image-20220908111828982](images/image-20220908111828982.png)
 
 `latin1`容易出现乱码问题，在实际项目中使用比较少。
 
