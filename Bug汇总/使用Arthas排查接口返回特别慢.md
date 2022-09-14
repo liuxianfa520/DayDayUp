@@ -64,7 +64,7 @@ nginx日志中：如果接口返回数据量比较小，则响应时间就很快
 
 从nginx层面看，此接口从请求到响应，使用了5.965秒 。
 
-运维在容器中，直接调用接口（不走nginx），发现容器中的接口返回时间确实是很长的：
+运维在容器中，直接调用接口（不走nginx），发现容器中的接口返回时间确实是很长的：5.921秒
 
 ![image-20220914174503839](images/image-20220914174503839.png)
 
@@ -87,30 +87,7 @@ nginx日志中：如果接口返回数据量比较小，则响应时间就很快
 			"@within(org.springframework.web.bind.annotation.RestController))"
 	)
 	public Object aroundApi(ProceedingJoinPoint point) throws Throwable {
-		BladeLogLevel level = properties.getLevel();
-		// 不打印日志，直接返回
-		if (BladeLogLevel.NONE == level) {
-			return point.proceed();
-		}
-		HttpServletRequest request = WebUtil.getRequest();
-		String requestUrl = Objects.requireNonNull(request).getRequestURI();
-		String requestMethod = request.getMethod();
-
-		// 构建成一条长 日志，避免并发下日志错乱
-		StringBuilder beforeReqLog = new StringBuilder(300);
-		// 日志参数
-		List<Object> beforeReqArgs = new ArrayList<>();
-		beforeReqLog.append("\n\n================  Request Start  ================\n");
-		// 打印路由
-		beforeReqLog.append("===> {}: {}");
-		beforeReqArgs.add(requestMethod);
-		beforeReqArgs.add(requestUrl);
-		// 打印请求参数
-		logIngArgs(point, beforeReqLog, beforeReqArgs);
-		// 打印请求 headers
-		logIngHeaders(request, level, beforeReqLog, beforeReqArgs);
-		beforeReqLog.append("================   Request End   ================\n");
-
+		//     省略部分代码。
 		// 打印执行时间
 		long startNs = System.nanoTime();
 		log.info(beforeReqLog.toString(), beforeReqArgs.toArray());
@@ -140,7 +117,7 @@ nginx日志中：如果接口返回数据量比较小，则响应时间就很快
 	}
 ```
 
-计算接口响应时间的位置是在finnaly代码块中，也是没有问题的。
+计算接口响应时间的位置是在 finnaly 代码块中，也是没有问题的。
 
 那么问题出在哪里了呢？
 
@@ -149,13 +126,15 @@ nginx日志中：如果接口返回数据量比较小，则响应时间就很快
 
 # 上神器：Arthas
 
-当时想的是：接口是使用SpringBoot 的controller写的，controller的方法返回之后，还有很多处理，比如需要把返回数据转成json、把json字符串写到response输出流中等等吧。
+**当时想的是：接口是使用SpringBoot 的controller写的，controller的方法返回之后，还有很多处理，比如需要把返回数据转成json、把json字符串写到response输出流中等等吧。**
 
-所以就想用Arthas监控一下这个接口，看看每个方法调用都花费多长时间：
+**所以就想用Arthas监控一下这个接口，看看每个方法调用都花费多长时间：**
 
 ![image-20220914172502139](images/image-20220914172502139.png)
 
-用Arthas抓到了两个方法调用，并且能看到每个方法执行时间，
+用Arthas抓到了两个方法调用，并且能看到每个方法执行时间。
+
+
 
 熟悉Spring AOP原理的都知道，耗时最长的这个方法，其实执行的是AOP的增强方法。
 
@@ -183,11 +162,11 @@ nginx日志中：如果接口返回数据量比较小，则响应时间就很快
 	)
 ```
 
-能知道，这个AOP拦截的是Controller接口，并且返回值为 R 类型的，
+能知道，这个AOP拦截的是Controller接口中返回值为 R 类型的方法。
 
-那我们只需要把查询协议详情的这个接口返回值，改成`java.lang.Object`就行了。
+那么偏方治大病：
 
-把：
+只需要把查询协议详情的这个接口返回值，改成 `Object`就行了。也就是把：
 
 ```java
     @PostMapping("/detailById")
