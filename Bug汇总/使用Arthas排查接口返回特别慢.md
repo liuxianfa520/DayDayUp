@@ -68,6 +68,11 @@ nginx日志中：如果接口返回数据量比较小，则响应时间就很快
 
 ![image-20220914174503839](images/image-20220914174503839.png)
 
+```shell
+# curl 命令查看接口响应时间
+curl -o /dev/null -s -w "time_connect: %{time_connect}\ntime_starttransfer: %{time_starttransfer}\ntime_total: %{time_total}\n" --request POST 'http://xxxx.com/xxxxx' -H "Content-Type:application/json" -d '{"current": 1,"size": 20}'
+```
+
 此时，压力就到了开发这边了：
 
 > **为什么从java日志中看到的响应时间只有几十毫秒，**
