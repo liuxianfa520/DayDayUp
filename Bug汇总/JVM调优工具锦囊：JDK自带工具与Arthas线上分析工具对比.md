@@ -723,6 +723,41 @@ Load = 2时马路都跑满了
 
 通过仪表盘，我们能从整体了解当前线程的运行健康状况
 
+# Linux怎么查看CPU核数
+
+在Linux中，可以使用 cat /proc/cpuinfo| grep "cpu cores"| uniq 来查看CPU核数，即每个物理CPU中core的个数。
+
+**一、知识点介绍**
+
+1、cpu信息记录在/proc/cpuinfo中；
+
+2、Linux中的Top相当于win系统下的任务管理器，也可以用来查询；
+
+3、CPU总核数 = 物理CPU个数 * 每颗物理CPU的核数；
+
+4、总逻辑CPU数 = 物理CPU个数 * 每颗物理CPU的核数 * 超线程数；
+
+**二、查询命令**
+
+```perl
+#查看CPU信息（型号）
+[root@ecsnode-no ~]# cat /proc/cpuinfo | grep name | cut -f2 -d: | uniq -c
+     16  Intel Core Processor (Skylake)
+# 查看物理CPU个数
+[root@ecsnode-no ~]# cat /proc/cpuinfo | grep "physical id" | sort | uniq | wc -l
+1
+# 查看每个物理CPU中core的个数(即核数)
+[root@ecsnode-no ~]# cat /proc/cpuinfo | grep "cpu cores" | uniq
+cpu cores    : 8
+# 查看逻辑CPU的个数
+[root@ecsnode-no ~]# cat /proc/cpuinfo | grep "processor" | wc -l
+16
+```
+
+这些都代表什么，那就请看CPU架构
+
+
+
 # 3.thread命令查询CPU使用率最高的线程及问题原因
 
 通过dashboard我们可以看到当前进程下运行的所有的线程。那么如果想要具体查看某一个线程的运行情况，可以使用thread命令
