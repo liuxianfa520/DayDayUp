@@ -21,6 +21,8 @@ public class LoggingLevelModifyController {
 
     /**
      * 修改日志等级
+     * <p>
+     * curl -X GET --location "http://localhost:8080/loggingLevelModify?name=com.liuxianfa.junit.springboot&level=debug"
      *
      * @param name  日志名称,比如:root 或者包名 com.baidu.service  或者全类名
      * @param level 等级(off/trace/debug/info/warn/error/fatal
@@ -46,6 +48,8 @@ public class LoggingLevelModifyController {
 
     /**
      * 通过名称查询日志等级
+     * <p>
+     * curl -X GET --location "http://localhost:8080/loggerLevelGet?name=com.liuxianfa.junit.springboot"
      *
      * @param name 日志名称,比如:root 或者包名 com.baidu.service  或者全类名
      */
@@ -66,22 +70,22 @@ public class LoggingLevelModifyController {
     }
 
     /**
-     * 测试输出日志等级(需要从日志文件中查看)
+     * 测试输出日志等级(需要从日志文件或控制台中查看)
+     *
+     * curl -X GET --location "http://localhost:8080/loggerTest"
      */
-    @RequestMapping("test")
-    public String test() {
+    @RequestMapping("loggerTest")
+    public String loggerTest() {
         logger.error("我是error");
         logger.warn("我是warn");
         logger.info("我是info");
         logger.debug("我是debug");
 
-        if (logger.isDebugEnabled()) {
-            LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
-            logger.debug(">>>所有日志等级:{}", loggerContext.getLoggerList().stream()
-                                                      .filter(log -> log.getLevel() != null)
-                                                      .map(log -> log.getLevel().levelStr + ":" + log.getName())
-                                                      .collect(toList()));
-        }
+        LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
+        logger.debug(">>>所有日志等级:{}", loggerContext.getLoggerList().stream()
+                                                  .filter(log -> log.getLevel() != null)
+                                                  .map(log -> log.getLevel().levelStr + ":" + log.getName())
+                                                  .collect(toList()));
         return "接口执行成功,打印日志需要去日志文件查看.";
     }
 }
