@@ -2,9 +2,11 @@ package com.liuxianfa.junit.springboot.controller;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.liuxianfa.junit.springboot.entity.Address;
 import com.liuxianfa.junit.springboot.entity.User;
 import com.liuxianfa.junit.springboot.jsonserializer.BigDecimalSerializer;
 import com.liuxianfa.junit.springboot.jsonserializer.StringDateSerializer;
+import com.liuxianfa.junit.springboot.request.XssHttpServletRequestWrapper;
 import com.liuxianfa.junit.springboot.service.HelloService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,9 +16,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.json.JSONUtil;
 import lombok.Data;
@@ -37,6 +41,30 @@ public class HelloController {
         helloService.hello(name);
 
         return "controller hello " + name;
+    }
+
+    /**
+     * 两个 @RequestBody参数
+     *
+     * <pre>
+     * 使用 {@link XssHttpServletRequestWrapper} 可以让request输入流重复读取,
+     * 此时就可以写多个 @RequestBody 参数了.
+     *
+     *
+     * curl -X POST --location "http://localhost:8080/moreRequestBodyParam" \
+     *     -H "Content-Type: application/json" \
+     *     -d "{
+     *           \"detailAddress\": \"北京市丰台区xxx大厦\",
+     *           \"userName\": \"安小乐\"
+     *         }"
+     * </pre>
+     */
+    @RequestMapping("moreRequestBodyParam")
+    @ResponseBody
+    public ArrayList<Object> moreRequestBodyParam(@RequestBody Address address, @RequestBody User user) {
+        System.out.println(JSONUtil.toJsonPrettyStr(address));
+        System.out.println(JSONUtil.toJsonPrettyStr(user));
+        return CollUtil.newArrayList(address, user);
     }
 
     /**

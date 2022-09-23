@@ -27,3 +27,12 @@ Content-Type: application/json
 
 ###
 GET http://localhost:8080/json
+
+###
+POST http://localhost:8080/moreRequestBodyParam
+Content-Type: application/json
+
+{
+  "detailAddress": "北京市丰台区xxx大厦",
+  "userName": "安小乐"
+}
