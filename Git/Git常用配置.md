@@ -74,4 +74,75 @@ git remote -v # 查看远程仓库地址
 git remote set-url origin http://gitlab.xxx.com/xxx/xxx.git  
 ```
 
-![img](data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==)![点击并拖拽以移动](data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==)
+
+
+
+
+# $ git config --list
+
+可以查看配置的一些东西。可以看到 user.name 和 user.email 分别是什么。。
+
+如果你没有初始化过。那么直接：
+
+$ git config --global user.name "输入你的用户名"
+
+$ git config --global user.email "输入你的邮箱"
+
+ 
+
+# 撤销提交
+
+## 一、commit 到本地，但没有 push
+
+1. 找到上次 Git commit 的 id
+
+   git log
+
+   找到你想撤销的 <commit_id>
+
+2. git reset --hard <commit_id>
+
+   完成撤销，同时将代码恢复到前一 <commit_id> 对应的版本。
+
+3. git reset <commit_id>
+
+   完成 Commit 命令的撤销，但是不对代码修改进行撤销，可以直接通过 git commit 重新提交对本地代码的修改。
+
+## 二：push 之后的回退方法
+
+   git reset --hard <commit_id>
+
+   git push origin HEAD --force
+
+![img](images/up-4c705b4cbd7a06559984dbba914cc3c1b74.png)
+
+ 
+
+ 
+
+
+
+# git操作报错及解决
+
+> ====20:01  Can't Update==================================
+>
+> ​    No tracked branch configured for branch bug_SpringAOP_20180403 or the branch doesn't exist.
+>
+> ​    To make your branch track a remote branch call, for example,
+>
+> ​    git branch --set-upstream-to origin/bug_SpringAOP_20180403 bug_SpringAOP_20180403 (show balloon)
+
+原因：新建了分支，只是在本地存在，需要 push。
+
+执行：git -c core.quotepath=false -c log.showSignature=false push --progress --porcelain origin refs/heads/dev:dev --set-upstream
+
+或者：idea 操作：
+
+![img](images/up-de54fccc98d0c974e6429b0785c7054bd3d.png)
+
+
+
+
+
+
+
