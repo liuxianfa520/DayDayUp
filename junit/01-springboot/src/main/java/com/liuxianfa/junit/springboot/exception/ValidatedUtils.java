@@ -1,4 +1,4 @@
-package exception;
+package com.liuxianfa.junit.springboot.exception;
 
 import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
 

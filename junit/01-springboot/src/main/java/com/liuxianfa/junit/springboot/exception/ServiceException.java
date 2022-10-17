@@ -1,4 +1,4 @@
-package exception;
+package com.liuxianfa.junit.springboot.exception;
 
 public class ServiceException extends RuntimeException {
 
