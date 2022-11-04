@@ -17,7 +17,14 @@ import cn.hutool.cron.pattern.CronPatternUtil;
 public class CronTest {
 
     public static void main(String[] args) {
-        extracted();
+        打印近10次执行时间("0 0 8 * * ?");
+    }
+
+    private static void 打印近10次执行时间(String cron) {
+        List<Date> dates = CronPatternUtil.matchedDates(cron, new Date(), DateUtil.endOfYear(new Date()), 10, true);
+        for (Date date : dates) {
+            System.out.println(new DateTime(date));
+        }
     }
 
     private static void extracted() {
