@@ -36,7 +36,12 @@ public class TOrderMapperTest {
     @Test
     public void orderService() {
         orderService.saveOrderAndUser();
+        System.out.println("done");
+    }
 
+
+    @Test
+    public void saveOrderAndUserRollback() {
         orderService.saveOrderAndUserRollback();
         System.out.println("done");
     }
