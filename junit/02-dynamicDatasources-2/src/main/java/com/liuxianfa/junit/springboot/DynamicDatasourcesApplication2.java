@@ -7,8 +7,8 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 
 @MapperScan("com.liuxianfa.junit.springboot.*.dao")
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
-public class DynamicDatasourcesApplication {
+public class DynamicDatasourcesApplication2 {
     public static void main(String[] args) {
-        SpringApplication.run(DynamicDatasourcesApplication.class, args);
+        SpringApplication.run(DynamicDatasourcesApplication2.class, args);
     }
 }

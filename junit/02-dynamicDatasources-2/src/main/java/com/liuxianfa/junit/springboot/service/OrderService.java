@@ -35,6 +35,7 @@ public class OrderService {
         TOrder order = new TOrder();
         order.setOrderNo(1);
         order.setSkuId(4);
+        // 如果使用的是 AbstractRoutingDataSource ,则这里会直接报错.Table 'user.t_order' doesn't exist
         int insert1 = tOrderMapper.insert(order);
         System.out.println("保存完毕");
     }

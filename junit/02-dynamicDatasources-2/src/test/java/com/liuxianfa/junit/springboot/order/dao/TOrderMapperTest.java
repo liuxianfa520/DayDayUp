@@ -1,6 +1,6 @@
 package com.liuxianfa.junit.springboot.order.dao;
 
-import com.liuxianfa.junit.springboot.DynamicDatasourcesApplication;
+import com.liuxianfa.junit.springboot.DynamicDatasourcesApplication2;
 import com.liuxianfa.junit.springboot.order.entity.TOrder;
 import com.liuxianfa.junit.springboot.service.OrderService;
 import com.liuxianfa.junit.springboot.user.dao.TUserMapper;
@@ -20,7 +20,7 @@ import cn.hutool.json.JSONUtil;
  * @author LiuXianfa
  * @date 2022/1/14 15:56
  */
-@SpringBootTest(classes = DynamicDatasourcesApplication.class)
+@SpringBootTest(classes = DynamicDatasourcesApplication2.class)
 @RunWith(value = SpringRunner.class)
 public class TOrderMapperTest {
 
