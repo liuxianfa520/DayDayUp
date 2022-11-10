@@ -1,0 +1,13 @@
+#数据源配置
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      user: # 基金库数据源
+        jdbcUrl: jdbc:mysql://localhost:13306/user?useSSL=false&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&transformedBitIsBoolean=true&serverTimezone=GMT%2B8&nullCatalogMeansCurrent=true&allowPublicKeyRetrieval=true
+        username: root
+        password: root
+      order: # wind库数据源
+        jdbcUrl: jdbc:mysql://localhost:13306/order?useUnicode=true&characterEncoding=UTF-8&useSSL=false
+        username: root
+        password: root
