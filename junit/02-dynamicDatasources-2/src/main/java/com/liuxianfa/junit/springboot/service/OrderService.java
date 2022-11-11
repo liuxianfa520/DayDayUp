@@ -97,6 +97,8 @@ public class OrderService {
         // 用户新增也可以
         tUserMapper.insert(new TUser().setAge(1).setName("张三"));
 
+        int a = 1 / 0;// 搞个异常,也能正常回滚user表的新增操作.
+
         // 此时,这个不需要事务的,可以正常查询order库
         System.out.println(JSONUtil.toJsonStr(orderService.getById(3)));
     }
