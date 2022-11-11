@@ -91,7 +91,11 @@ AutoProxyRegistrar主要就是往容器中注入一个类InfrastructureAdvisorAu
 
 **「看一下继承关系，原来是继承自AbstractAutoProxyCreator，用来实现自动代理没跑了！」**
 
-![图片](images/640-165242797297112.png)BeanFactoryTransactionAttributeSourceAdvisor主要就是往容器中注入了一个Advisor类，用来保存Pointcut和Advice
+![图片](images/640-165242797297112.png)
+
+
+
+BeanFactoryTransactionAttributeSourceAdvisor主要就是往容器中注入了一个Advisor类，用来保存Pointcut和Advice
 
 ![图片](images/640-165242797297113.png)对应的Pointcut为TransactionAttributeSourcePointcut的实现类，是一个匿名内部类，即筛选的逻辑是通过TransactionAttributeSourcePointcut类来实现的
 
@@ -101,16 +105,26 @@ BeanFactoryTransactionAttributeSourceAdvisor![图片](images/640-165242797297114
 
 我们来看针对事务增强的逻辑，当执行被@Transactional标记的方法时，会调用到如下方法（TransactionInterceptor#invoke有点类似我们的@Around）
 
-TransactionInterceptor#invoke![图片](images/640-165242797297215.png)TransactionAspectSupport#invokeWithinTransaction![图片](images/640-165242797297216.png)我挑出这个方法比较重要的几个部分来分析吧（上图圈出来的部分）
+TransactionInterceptor#invoke![图片](images/640-165242797297215.png)TransactionAspectSupport#invokeWithinTransaction![图片](images/640-165242797297216.png)
+
+我挑出这个方法比较重要的几个部分来分析吧（上图圈出来的部分）
 
 1. 如果需要的话开启事务（和传播属性相关，我们后面会提到）
 2. 执行业务逻辑
 3. 如果发生异常则会滚事务
 4. 如果正常执行则提交事务
 
+
+
 **「所以当发生异常需要会滚的时候，我们一定不要自己把异常try catch掉，不然事务会正常提交」**
 
-TransactionAspectSupport#createTransactionIfNecessary![图片](images/640-165242797297217.png)当开启事务的时候，可以看到各种传播属性的行为（即@Transactional方法调用@Transactional方法会发生什么？）
+TransactionAspectSupport#createTransactionIfNecessary![图片](images/640-165242797297217.png)当开启
+
+
+
+**事务传播行为**
+
+事务的时候，可以看到各种传播属性的行为（即@Transactional方法调用@Transactional方法会发生什么？）
 
 AbstractPlatformTransactionManager#getTransaction![图片](images/640-165242797297218.png)
 
@@ -270,15 +284,29 @@ AbstractFallbackTransactionAttributeSource#computeTransactionAttribute
 
 ### 异常类型不正确，默认只支持RuntimeException和Error，不支持检查异常
 
-![图片](images/640-165242797297222.png)**「为什么不支持检查异常呢？」**
+![图片](images/640-165242797297222.png)
 
-拿出我们上面分析过的代码![图片](images/640-165242797297216.png)当执行业务逻辑发生异常的时候，会调用到TransactionAspectSupport#completeTransactionAfterThrowing方法
+**「为什么不支持检查异常呢？」**
 
-![图片](images/640-165242797297323.png)可以看到对异常类型做了判断，根据返回的结果来决定是否会滚事务，会调用到如下方法进行判断
+拿出我们上面分析过的代码
 
-RuleBasedTransactionAttribute#rollbackOn![图片](images/640-165242797297324.png)如果用户指定了回滚的异常类型，则根据用户指定的规则来判断，否则用默认的规则
+![图片](images/640-165242797297216.png)
 
-DefaultTransactionAttribute![图片](images/640-165242797297325.png)默认的规则为只支持RuntimeException和Error
+当执行业务逻辑发生异常的时候，会调用到TransactionAspectSupport#completeTransactionAfterThrowing方法
+
+![图片](images/640-165242797297323.png)
+
+可以看到对异常类型做了判断，根据返回的结果来决定是否会滚事务，会调用到如下方法进行判断
+
+RuleBasedTransactionAttribute#rollbackOn
+
+![图片](images/640-165242797297324.png)
+
+如果用户指定了回滚的异常类型，则根据用户指定的规则来判断，否则用默认的规则
+
+DefaultTransactionAttribute![图片](images/640-165242797297325.png)
+
+默认的规则为只支持RuntimeException和Error
 
 我们可以通过@Transactional属性指定回滚的类型，一般为Exception即可
 
