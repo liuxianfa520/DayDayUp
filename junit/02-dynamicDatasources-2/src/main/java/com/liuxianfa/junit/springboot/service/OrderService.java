@@ -5,9 +5,13 @@ import com.liuxianfa.junit.springboot.order.entity.TOrder;
 import com.liuxianfa.junit.springboot.user.dao.TUserMapper;
 import com.liuxianfa.junit.springboot.user.entity.TUser;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import cn.hutool.json.JSON;
+import cn.hutool.json.JSONUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -73,4 +77,27 @@ public class OrderService {
         System.out.println("保存完毕");
     }
 
+
+    /**
+     * 事务传播特性:不需要事务
+     */
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    public TOrder getById(Integer id) {
+        return tOrderMapper.selectByPrimaryKey(id);
+    }
+
+    @Autowired
+    OrderService orderService;
+
+    @Transactional(rollbackFor = Exception.class)
+    public void NOT_SUPPORTED() {
+        // 此时,这个不需要事务的,可以正常查询order库
+        System.out.println(JSONUtil.toJsonStr(orderService.getById(3)));
+
+        // 用户新增也可以
+        tUserMapper.insert(new TUser().setAge(1).setName("张三"));
+
+        // 此时,这个不需要事务的,可以正常查询order库
+        System.out.println(JSONUtil.toJsonStr(orderService.getById(3)));
+    }
 }

@@ -25,6 +25,7 @@ public class Runner {
 
     @PostConstruct
     public void run() {
-        orderService.saveOrderAndUserError();
+//        orderService.saveOrderAndUserError();
+        orderService.NOT_SUPPORTED();
     }
 }
