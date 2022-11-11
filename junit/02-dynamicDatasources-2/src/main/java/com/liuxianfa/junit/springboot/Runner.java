@@ -1,4 +1,4 @@
-package com.liuxianfa.junit.springboot.datasources;
+package com.liuxianfa.junit.springboot;
 
 import com.liuxianfa.junit.springboot.service.OrderService;
 
@@ -25,7 +25,6 @@ public class Runner {
 
     @PostConstruct
     public void run() {
-        orderService.saveOrderAndUser();
-        orderService.saveOrderAndUserRollback();
+        orderService.saveOrderAndUserError();
     }
 }

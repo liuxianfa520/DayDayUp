@@ -40,6 +40,21 @@ public class OrderService {
         System.out.println("保存完毕");
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    public void saveOrderAndUserError() {
+        TOrder order = new TOrder().setOrderNo(1).setSkuId(4);
+        // 如果使用的是 AbstractRoutingDataSource ,则这里会直接报错.Table 'user.t_order' doesn't exist
+        // 因为在创建事务时,也就是在进入此service方法之前,就会创建一个jdbcConnection,
+        // 而创建jdbcConnection时,还没指定datasource,
+        // 所以会使用默认的数据库 datasource —— userDataSource
+        // user的数据库中,肯定没有t_order表,就直接报错了.
+        tOrderMapper.insert(order);
+
+
+        TUser user = new TUser().setName("success transaction").setAge(12);
+        tUserMapper.insert(user);
+    }
+
 
     @Transactional(rollbackFor = Exception.class)
     public void saveOrderAndUserRollback() {
