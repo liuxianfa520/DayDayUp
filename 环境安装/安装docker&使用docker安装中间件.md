@@ -46,6 +46,11 @@ https://gitee.com/starsky20/docker-compose-application#docker%E5%AE%89%E8%A3%85
 
 ## [Nacos](https://gitee.com/starsky20/docker-compose-application#nacos)
 
+> ```shell
+> # https://hub.docker.com/r/nacos/nacos-server
+> docker run --name nacos -e MODE=standalone -p 8848:8848 -d nacos/nacos-server:2.0.2
+> ```
+
 ## [Nginx](https://gitee.com/starsky20/docker-compose-application#nginx)
 
 ## [Neo4j](https://gitee.com/anxiaole/neo4j_docker-compose)
