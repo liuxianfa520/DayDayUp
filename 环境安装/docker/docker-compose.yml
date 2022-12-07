@@ -1,0 +1,162 @@
+version: '3'
+services:
+#  myadmin:
+#    container_name: myadmin
+#    image: phpmyadmin/phpmyadmin
+#    # ports:
+#      # - 8080:8080
+#      # - 8089:80
+#    environment:
+#        PMA_HOSTS: mysql8
+#        PMA_PORT: 3306
+#        #PMA_USER: root
+#        #PMA_PASSWORD: Zhuge@888
+
+  redis:
+    container_name: redis
+    image: redis:5.0.9
+    restart: always
+    ports:
+      - 26379:6379
+    volumes:
+      - ./redis/redis.conf:/etc/redis/redis.conf:rw
+      - ./redis/data:/data:rw
+
+#  rabbitmq:
+#    hostname: rabbitmq
+#    container_name: rabbitmq
+#    environment:
+#     RABBITMQ_DEFAULT_VHOST: "0.0.0.0"
+#     RABBITMQ_DEFAULT_USER: "admin"
+#     RABBITMQ_DEFAULT_PASS: "admin"
+#    image: "rabbitmq:3.8.6-management"
+#    restart: always
+#    volumes:
+#     - "./rabbitmq/data:/var/lib/rabbitmq"
+#     - "./rabbitmq/log:/var/log/rabbitmq/log"
+#    ports:
+#     - "15672:15672"
+#     - "4369:4369"
+#     - "5672:5672"
+#     - "25672:25672"
+
+  mysql8:
+    # builder: './dir'
+    hostname: "mysql8"
+    image: "mysql:8.0.21"
+    container_name: mysql8
+    command:
+      --default-authentication-plugin=mysql_native_password
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_general_ci
+      --explicit_defaults_for_timestamp=true
+      --lower_case_table_names=1
+    environment:
+        TZ: Asia/Shanghai
+        MYSQL_ROOT_PASSWORD: MYSQL
+        MYSQL_USER: 'anxiaole'
+        MYSQL_PASS: 'anxiaole'
+    restart: always
+    volumes:
+        - ./mysql8/mysql:/var/lib/mysql
+        # - "./my.cnf:/etc/my.cnf"
+        - ./mysql8/init:/docker-entrypoint-initdb.d
+    # network_mode: "host"
+    ports:
+        - "23306:3306"
+
+  nginx:
+    # restart: always
+    image: nginx
+    container_name: nginx
+    ports:
+      - 80:80
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/vhosts:/etc/nginx/vhosts
+      - ./nginx/log:/var/log/nginx
+      - ./nginx/wwwroot:/usr/share/nginx/wwwroot
+    logging:
+      driver: "json-file"
+      options:
+          max-size: "50m"
+
+#  emqx:
+#    container_name: emqx
+#    image: emqx/emqx:4.2.7
+#    volumes:
+#      - "./emqx/lib:/opt/emqx/lib"
+#      - "./emqx/etc:/opt/emqx/etc"
+#      - "./emqx/data:/opt/emqx/data"
+#      - "./emqx/log:/opt/emqx/log"
+#    ports:
+#      - "1883:1883"
+#      - "8083:8083"
+#      - "8081:8081"
+#      - "8883:8883"
+#      - "8084:8084"
+#      - "18083:18083"
+#    logging:
+#      driver: "json-file"
+#      options:
+#        max-size: "1m"
+#        max-file: "1"
+
+#  postgres:
+#    image: postgres:12.5
+#    container_name: postgres
+#    volumes:
+#      - ./pgdata:/var/lib/postgresql/data
+#    environment:
+#      POSTGRES_USER: facedb
+#      POSTGRES_DB: facedb
+#      POSTGRES_PASSWORD: facedb123
+#    ports:
+#      - "15432:5432"
+#  nacos:
+#    image: nacos/nacos-server:2.0.2
+#    container_name: nacos
+#    environment:
+#      MODE: standalone
+#    ports:
+#      - "8848:8848"
+#  orange:
+#    container_name: orange
+#    restart: always
+#    image: sapmachine/jdk11
+#    entrypoint: java -jar -Dfile.encoding=UTF-8  -Dspring.profiles.active=prod /data/jar/ruoyi-admin.jar
+#    environment:
+#      - TZ=Asia/Shanghai
+#      - LANG=en_US.UTF-8
+#    volumes:
+#      - /data/jar:/data/jar
+#      - /data/uploadPath:/data/uploadPath
+#    ports:
+#      - "9980:8080"
+#    logging:
+#      driver: "json-file"
+#      options:
+#        max-size: "10m"
+#        max-file: "1"
+
+
+#  minio:
+#    image: minio/minio:latest
+#    container_name: minio
+#    ports:
+#      - "9000:9000"
+#    restart: always
+#    command: server /data
+#    volumes:
+#      - ./minio/data:/data
+#      - ./minio/config:/root/.minio
+#    environment:
+#      MINIO_ACCESS_KEY: minio
+#      MINIO_SECRET_KEY: minio123
+#
+#    logging:
+#      driver: "json-file"
+#      options:
+#        max-size: "10m"
+#        max-file: "1"
+

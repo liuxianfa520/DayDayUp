@@ -29,6 +29,16 @@ git config user.name "LiuXianfa" && git config user.email "745024471@qq.com" && 
 git config user.name "LiuXianfa" && git config user.email "xianfaliu2@creditease.cn" && git config --list --show-origin | findstr user && git config credential.helper "store --file .git/.git-credentials" && git config --list --show-origin | findstr credential
 ```
 
+在linux系统上设置
+```bash
+# 设置git本地项目用户名、邮箱 —— 使用个人邮箱
+git config user.name "LiuXianfa" \
+    && git config user.email "745024471@qq.com" \
+    && git config credential.helper "store --file .git/.git-credentials" \
+    && git config --list --show-origin | grep user \
+    && git config --list --show-origin | grep credential
+```
+
 ![img](data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==)![点击并拖拽以移动](data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==)
 
 git config --list 查看项目配置+全局配置, 使用的时候会优先使用当前项目的配置
