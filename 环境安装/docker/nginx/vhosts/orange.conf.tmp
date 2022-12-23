@@ -1,0 +1,5 @@
+server  {
+        listen       80;
+        server_name jisuan.zheshige.com;
+	    rewrite ^/(.*)$   https://glnx.csei.org.cn/$1 permanent;
+}
