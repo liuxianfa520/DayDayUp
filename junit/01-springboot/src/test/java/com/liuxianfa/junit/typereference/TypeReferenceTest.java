@@ -1,4 +1,4 @@
-package com.liuxianfa.junit.springboot.typereference;
+package com.liuxianfa.junit.typereference;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -11,6 +11,7 @@ import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl;
 import java.lang.reflect.Type;
 
 import cn.hutool.json.JSONUtil;
+import lombok.Data;
 import lombok.SneakyThrows;
 
 /**
@@ -35,12 +36,24 @@ public class TypeReferenceTest {
         TypeReference<Result<T>> typeReferenceType = new TypeReference<Result<T>>() {
             @Override
             public Type getType() {
-                return ParameterizedTypeImpl.make(Result.class, new Type[] {dataClass}, null);
+                return ParameterizedTypeImpl.make(Result.class, new Type[]{dataClass}, null);
             }
         };
 
         Result<T> tResult = new ObjectMapper().readValue(json, typeReferenceType);
         System.out.println(JSONUtil.toJsonPrettyStr(tResult));
     }
+
+    // 如果是内部类,则必须是static静态类
+    @Data
+    static class Result<T> {
+
+        int code;
+
+        String msg;
+
+        T data;
+    }
+
 
 }
