@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.liuxianfa.junit.springboot.entity.User;
 
 import org.apache.poi.ss.formula.functions.T;
+import org.springblade.core.tool.jackson.JsonUtil;
 
 import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl;
 
@@ -42,6 +43,12 @@ public class TypeReferenceTest {
 
         Result<T> tResult = new ObjectMapper().readValue(json, typeReferenceType);
         System.out.println(JSONUtil.toJsonPrettyStr(tResult));
+
+
+        // bladex
+        Result<User> parse = JsonUtil.parse(json, new TypeReference<Result<User>>() {
+        });
+        System.out.println("parse.getData().getClass() = " + parse.getData().getClass());
     }
 
     // 如果是内部类,则必须是static静态类
