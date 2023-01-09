@@ -149,9 +149,40 @@ ADD INDEX `idx_userId` (`userId`);
 
 
 
+## show warnings
+
+可以使用show warnings查看详细执行sql
+
+语法：
+
+```
+explain
+select * from xxxx ;
+show warnings;
+```
 
 
 
+![image-20230109105926621](images/image-20230109105926621.png)
+
+结果2：
+
+mysql服务器真正执行的sql语句，可以发现，使用了CONVERT函数进行了字符集转换
+
+```sql
+SELECT
+	`wind`.`c`.`F_INFO_WINDCODE` AS `Wind代码`,
+	`wind`.`c`.`S_INFO_SECTORENTRYDT` AS `起始日期`,
+	`wind`.`c`.`S_INFO_SECTOREXITDT` AS `截止日期`,
+	`wind`.`a`.`INDUSTRIESNAME` AS `一级基金分类板块名称`
+FROM
+	`wind`.`chinamutualfundsector` `c`
+JOIN `wind`.`ashareindustriescode` `a`
+WHERE
+	`wind`.`c`.`S_INFO_SECTOR` LIKE '200101%'
+	AND CONVERT (`wind`.`c`.`S_INFO_SECTOR` USING utf8) = `wind`.`a`.`INDUSTRIESCODE`
+	AND `wind`.`a`.`LEVELNUM` = '4'
+```
 
 
 
