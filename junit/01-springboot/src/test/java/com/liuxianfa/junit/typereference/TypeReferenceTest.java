@@ -45,10 +45,17 @@ public class TypeReferenceTest {
         System.out.println(JSONUtil.toJsonPrettyStr(tResult));
 
 
+        TypeReference<Result<User>> typeReference = new TypeReference<Result<User>>() {
+        };
+        // hutool
+        Result<User> o = JSONUtil.toBean(json, typeReference.getType(), false);
+        System.out.println(JSONUtil.toJsonPrettyStr(o));
+
+
+
         // bladex
-        Result<User> parse = JsonUtil.parse(json, new TypeReference<Result<User>>() {
-        });
-        System.out.println("parse.getData().getClass() = " + parse.getData().getClass());
+        Result<User> parse = JsonUtil.parse(json, typeReference);
+        System.out.println(JSONUtil.toJsonPrettyStr(parse));
     }
 
     // 如果是内部类,则必须是static静态类
