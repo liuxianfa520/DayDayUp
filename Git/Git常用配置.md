@@ -43,7 +43,34 @@ git config --list 查看项目配置+全局配置, 使用的时候会优先使�
 
 参考：https://blog.csdn.net/pintu274111451/article/details/79767970
 
-## GIT 拉取所有远程分支
+
+
+## 批量修改git提交记录中的邮箱、用户名
+
+```sh
+git filter-branch --env-filter '
+WRONG_EMAIL="要被替换掉的姓名"
+NEW_NAME="新用户名称"
+NEW_EMAIL="新用户邮箱"
+
+if [ "$GIT_COMMITTER_EMAIL" = "$WRONG_EMAIL" ]
+then
+    export GIT_COMMITTER_NAME="$NEW_NAME"
+    export GIT_COMMITTER_EMAIL="$NEW_EMAIL"
+fi
+if [ "$GIT_AUTHOR_EMAIL" = "$WRONG_EMAIL" ]
+then
+    export GIT_AUTHOR_NAME="$NEW_NAME"
+    export GIT_AUTHOR_EMAIL="$NEW_EMAIL"
+fi
+' --tag-name-filter cat -- --branches --tags
+```
+
+
+
+
+
+# GIT 拉取所有远程分支
 
 ```
 git clone https://github.com/tanguosheng/spring-framework.git
