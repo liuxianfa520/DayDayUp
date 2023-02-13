@@ -22,14 +22,14 @@ git config --list --show-origin | findstr user
 
 ```bash
 # 设置git本地项目用户名、邮箱 —— 使用个人邮箱
-git config user.name "LiuXianfa" && git config user.email "745024471@qq.com" && git config --list --show-origin | findstr user && git config credential.helper "store --file .git/.git-credentials" && git config --list --show-origin | findstr credential
+git config user.name "AnXiaole" && git config user.email "xxxxxxxxx@qq.com" && git config --list --show-origin | findstr user && git config credential.helper "store --file .git/.git-credentials" && git config --list --show-origin | findstr credential
 ```
 
 在linux系统上设置
 ```bash
 # 设置git本地项目用户名、邮箱 —— 使用个人邮箱
-git config user.name "LiuXianfa" \
-    && git config user.email "745024471@qq.com" \
+git config user.name "AnXiaole" \
+    && git config user.email "xxxxxxxxx@qq.com" \
     && git config credential.helper "store --file .git/.git-credentials" \
     && git config --list --show-origin | grep user \
     && git config --list --show-origin | grep credential
