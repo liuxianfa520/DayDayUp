@@ -10,11 +10,15 @@ import com.liuxianfa.junit.springboot.request.XssHttpServletRequestWrapper;
 import com.liuxianfa.junit.springboot.service.HelloService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
@@ -22,6 +26,7 @@ import java.util.List;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DatePattern;
+import cn.hutool.core.io.IoUtil;
 import cn.hutool.json.JSONUtil;
 import lombok.Data;
 
@@ -44,6 +49,17 @@ public class HelloController {
 
         return "controller hello " + name;
     }
+
+
+    @PostMapping("fileUpload")
+    public String fileUpload(MultipartFile file) throws Exception {
+        InputStream inputStream = file.getInputStream();
+        FileOutputStream out = new FileOutputStream("d://tmp.file");
+        IoUtil.copy(inputStream, out);
+        IoUtil.close(out);
+        return file.getSize() + "";
+    }
+
 
     /**
      * 两个 @RequestBody参数

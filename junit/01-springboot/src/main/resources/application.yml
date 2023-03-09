@@ -2,3 +2,9 @@ server:
   tomcat:
     #默认10，最小也是10；当服务端收到的请求，超过10个连接数的时候，会创建新的连接。
     max-connections: 15
+    max-http-form-post-size: 100MB
+spring:
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
