@@ -110,6 +110,13 @@
             <version>4.3.0</version>
         </dependency>
 
+        <!--热部署-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <optional>true</optional> <!-- 表示依赖不会传递 -->
+        </dependency>
+
 <!--        <dependency>-->
 <!--            <groupId>org.springblade</groupId>-->
 <!--            <artifactId>blade-core-tool</artifactId>-->
@@ -125,6 +132,7 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
+                    <fork>true</fork> <!-- 如果没有该配置，devtools不会生效 -->
                     <excludes>
                         <exclude>
                             <groupId>org.projectlombok</groupId>
@@ -132,6 +140,13 @@
                         </exclude>
                     </excludes>
                 </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

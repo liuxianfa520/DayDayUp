@@ -19,8 +19,8 @@ public class CommandLineRunnerImpl implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        // 项目启动之后,先调用此接口
-        String s = HttpUtil.get(String.format("http://localhost:%s/hello?name=xxx", port));
-        System.out.println(String.format("Springboot启动后执行方法,返回值:[%s]", s));
+//        // 项目启动之后,先调用此接口
+//        String s = HttpUtil.get(String.format("http://localhost:%s/hello?name=xxx", port));
+//        System.out.println(String.format("Springboot启动后执行方法,返回值:[%s]", s));
     }
 }

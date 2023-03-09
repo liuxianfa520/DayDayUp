@@ -40,6 +40,8 @@ public class HelloController {
     public String hello(String name) {
         helloService.hello(name);
 
+//        ThreadUtil.sleep(5, TimeUnit.SECONDS);
+
         return "controller hello " + name;
     }
 
