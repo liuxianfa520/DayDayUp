@@ -259,5 +259,120 @@ public class MessageStoreConfig {
 }
 ```
 
+**broker无论是主还是从，都会使用java nio监听此端口号！！**
+
+在store模块中，只要没有启用DLedger模式，就会使用 org.apache.rocketmq.store.ha.HAService 来进行commitLog文件的主从同步。
+
+![image-20230309175132326](images/image-20230309175132326.png)
+
+
+
+![image-20230309175231630](images/image-20230309175231630.png)
+
+
+
+### server端：
+
+当broker真正`start` 时，会使用nio监听此端口号：（无论是主从，都会监听此端口号，作为网络I/O中的server端。）
+
+![image-20230309175309359](images/image-20230309175309359.png)
+
+
+
+### client端：
+
+org.apache.rocketmq.store.ha.HAService.HAClient#HAClient
+
+这个client是各线程。
+
+从run方法中，client会先去连接master，如果连接成功master，则会：
+
+- 给master上报offset
+- 从master读取commitLog数据，如果读取成功，则slave使用store模块，把commitlog数据保存到磁盘中 。
+- 判断是否超时。
+
+> 画外音：
+>
+> 这个master的地址是从哪来的？
+
+```java
+@Override
+public void run() {
+    while (!this.isStopped()) {
+        try {
+            // 1、slave先连接master.如果连接master成功,则继续.
+            if (this.connectMaster()) {
+                // 2、当前时间是否应该给master上报offset
+                if (this.isTimeToReportOffset()) {
+                    // 2.1、给master上报最大偏移量
+                    boolean result = this.reportSlaveMaxOffset(this.currentReportedOffset);
+                    if (!result) {
+                        // 上报offset不成功,就关闭master之间的socketChannel网络连接
+                        this.closeMaster();
+                    }
+                }
+                // 3、等待 OP_READ 事件  (也就是:等待master给slave发送信息.在slave端收到信息,就是信息'可读'事件)
+                //     master给slave发送的消息是:
+                this.selector.select(1000);
+                // 4、处理读事件 —— 处理从master读到的数据.
+                boolean ok = this.processReadEvent();
+                if (!ok) {
+                    this.closeMaster();
+                }
+                // 5、如果commitLog偏移量有新增(也就是slave收到新的commitLog数据时),才上报最新的偏移量.
+                if (!reportSlaveMaxOffsetPlus()) {
+                    continue;
+                }
+                // 6、判断是否超时.如果超时则断开master的连接.
+                long interval = HAService.this.getDefaultMessageStore().getSystemClock().now() - this.lastWriteTimestamp;
+                if (interval > HAService.this.getDefaultMessageStore().getMessageStoreConfig().getHaHousekeepingInterval()) {
+                    this.closeMaster();
+                }
+            } else {
+                // 这里,slave没有成功连接master,则让此线程等5秒.
+                this.waitForRunning(1000 * 5);
+            }
+        } catch (Exception e) {
+            this.waitForRunning(1000 * 5);
+        }
+    }
+}
+```
+
+
+
+### HAClient中master地址：
+
+org.apache.rocketmq.store.ha.HAService.HAClient#masterAddress
+
+```java
+class HAClient extends ServiceThread {
+    private final AtomicReference<String> masterAddress = new AtomicReference<>();
+```
+
+这个HAMaster地址,只有slave broker才会有（才能获取到）,
+如果broker是master角色,则获取为空.
+因为:broker向NameServer注册时:NameServer会做如下处理:
+
+org.apache.rocketmq.namesrv.routeinfo.RouteInfoManager#registerBroker
+
+![image-20230309180342423](images/image-20230309180342423.png)
+
+
+
+### Ha模式，如何确定broker是master还是slave
+
+是开发者在配置文件中配置的。
+
+RocketMQ主从同步一个重要的特征：主从同步不具备主从切换功能，即当master节点宕机后，slave不会接管消息发送，但可以提供消息读取。
+
+https://www.jianshu.com/p/60e1639161f5
+
+
+
+如果需要使用主从自主切换，需要启用RocketMQ的DLedger模式：
+   https://zhuanlan.zhihu.com/p/77166786
+   https://blog.csdn.net/nihui123/article/details/127107500
+
 
 
