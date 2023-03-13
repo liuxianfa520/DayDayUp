@@ -62,5 +62,6 @@ https://www.runoob.com/linux/linux-comm-netstat.html
 
 ![image-20230313163529685](images/image-20230313163529685.png)
 
+疑问：我本地使用http，访问这台服务器的接口，为啥没有跟我本地的ip，创建TCP连接呢？是有转发吗？
 
 
